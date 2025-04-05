@@ -1,4 +1,5 @@
 using System;
+using Assets.Scripts.Player.Controller;
 using UnityEngine;
 
 namespace Project.Scripts.Generation
@@ -9,9 +10,9 @@ namespace Project.Scripts.Generation
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.CompareTag("Player"))
+
+            if (other.TryGetComponent<PlayerController>(out var playerController))
             {
-                // Trigger the event when the player enters the location
                 LocationEntered?.Invoke();
             }
         }

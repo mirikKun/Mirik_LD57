@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 722de8d46ccf4e949e66c06d680154f4, type: 3}
+  m_Name: SwingingHookStateConfig
+  m_EditorClassIdentifier: 
+  <SwingingSpeed>k__BackingField: 120
+  <GrapplingSpeed>k__BackingField: 45
+  <PreparingDuration>k__BackingField: 0.33
+  <SwingingDuration>k__BackingField: 5
+  <SwingingMaxDistance>k__BackingField: 50
+  <SwingingMinDistance>k__BackingField: 3
+  <MaxSwingingSpeed>k__BackingField: 25
+  <SwingingExitSpeedMultiplier>k__BackingField: 1
+  <StartSwingMomentum>k__BackingField: 0.1
+  <SwingingDirectionLerpCurve>k__BackingField:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: -7.367846
+      outSlope: -7.367846
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.024000496
+      value: 0.82316804
+      inSlope: -4.701973
+      outSlope: -4.701973
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.3766841
+      value: 0.10506912
+      inSlope: -0.4681595
+      outSlope: -0.4681595
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.076563865
+    - serializedVersion: 3
+      time: 1
+      value: -0.0024986267
+      inSlope: 0.033597976
+      outSlope: 0.033597976
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.068770975
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
