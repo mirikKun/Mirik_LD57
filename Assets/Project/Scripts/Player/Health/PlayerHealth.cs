@@ -10,12 +10,12 @@ namespace Scripts.Player.Health
     {
 
         [SerializeField]
-        private float _health;
+        private int _health=100;
 
         [SerializeField]private PlayerController _playerController;
         public event Action<float> HealthChanged;
-        public float Current { get; set; }
-        public float Max { get; set; }
+        public int Current { get; set; }
+        public int Max { get; set; }
 
         public void Setup(PlayerController playerController)
         {
@@ -27,7 +27,7 @@ namespace Scripts.Player.Health
             Max = _health;
         }
 
-        public void TakeDamage(float damage,bool respawn =true)
+        public void TakeDamage(int damage,bool respawn =true)
         {
             Current -= damage;
             HealthChanged?.Invoke(Current/Max);
@@ -35,6 +35,14 @@ namespace Scripts.Player.Health
             if(respawn)
                 _playerController.PlayerRespawner.Respawn();
             Debug.Log("Damage taken");
+        }
+
+        public void AddHealth(int healAmount)
+        {
+            healAmount = Mathf.Clamp(healAmount, 1, Max);
+            Current += healAmount;
+
+            Current = Mathf.Clamp(Current, Current, Max);
         }
     }
 }

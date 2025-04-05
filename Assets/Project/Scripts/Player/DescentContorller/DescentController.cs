@@ -13,7 +13,7 @@ namespace Scripts.Player.DescentContorller
         [SerializeField] private float _depthStaminaOnGroundRegenSpeed = 10;
         [Space]
         [SerializeField] private PlayerHealth _playerHealth;
-        [SerializeField] private float _staminaEmptyDamage = 10;
+        [SerializeField] private int _staminaEmptyDamage = 10;
 
 
         private float _currentDepthStamina;
