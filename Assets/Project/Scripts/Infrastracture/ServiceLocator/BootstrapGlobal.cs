@@ -7,22 +7,15 @@ namespace Project.Scripts.Infrastracture.ServiceLocator {
         [SerializeField] private bool _dontDestroyOnLoad = true;
         [SerializeField] private List<BootstrapServiceInstaller> _serviceInstallers;
         
-        private const string MenuSceneName = "MainMenuScene";
+        private const string MenuSceneName = "MainScene";
         protected override void Bootstrap() {
             Container.ConfigureAsGlobal(_dontDestroyOnLoad);
             foreach (var installer in _serviceInstallers)
             {
                 installer.Install();
             }
-            
-            if(Container.TryGet( out ISceneLoaderService sceneLoaderService))
-            {
-                sceneLoaderService.LoadScene(MenuSceneName);
-            }
-            else
-            {
-                Debug.LogError("SceneLoaderService not found");
-            }
+            SceneLoaderService.InstantLoad(MenuSceneName);
+       
         }
     }
 }

@@ -4,9 +4,9 @@ namespace Assets.Scripts.General.Health
 {
     public interface IHealth
     {
-        event Action HealthChanged;
+        event Action<float> HealthChanged;
         float Current { get; set; }
         float Max { get; set; }
-        void TakeDamage(float damage);
+        void TakeDamage(float damage,bool respawn =true);
     }
 }

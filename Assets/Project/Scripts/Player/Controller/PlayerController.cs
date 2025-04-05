@@ -4,6 +4,7 @@ using Assets.Scripts.General.StateMachine;
 using Assets.Scripts.Player.PlayerStateMachine;
 using Assets.Scripts.Player.PlayerStateMachine.States;
 using Scripts;
+using Scripts.Player.DescentContorller;
 using Scripts.Utils;
 using UnityEngine;
 
@@ -18,18 +19,24 @@ namespace Assets.Scripts.Player.Controller
         [SerializeField] private PlayerStatesHolder _playerStatesHolder;
         [SerializeField] private PlayerEffects.PlayerEffects _playerEffects;
         [SerializeField] private CameraController _cameraController;
+        [SerializeField] private PlayerRespawner _playerRespawner;
+[SerializeField] private DescentController _descentController;
+        
         [SerializeField] private Transform _cameraViewTransform;
         [SerializeField] private Transform _targetTransform;
         [SerializeField] private float _movementSpeed = 7f;
         [SerializeField] private float _airControlRate = 2f;
-    
+
         [SerializeField] private float _airFriction = 0.5f;
         [SerializeField] private float _groundFriction = 100f;
         [SerializeField] private float _gravity = 30f;
+
         [SerializeField] private float _slideGravity = 5f;
+
         /////
         [SerializeField] private float _slopeLimit = 30f;
         [SerializeField] private bool _useLocalMomentum;
+
 
         private Transform _transform;
         private PlayerMover _mover;
@@ -49,13 +56,14 @@ namespace Assets.Scripts.Player.Controller
         #endregion
 
         public Transform Tr => _transform;
-        public Transform CameraTrX=> _cameraController.CameraTrX;
-        public Transform CameraTrY=> _cameraController.CameraTrY;
-        public Transform TargetTr=> _targetTransform;
-        public Transform CameraViewTr=>_cameraViewTransform;
+        public Transform CameraTrX => _cameraController.CameraTrX;
+        public Transform CameraTrY => _cameraController.CameraTrY;
+
         public InputReader Input => _input;
         public PlayerEffects.PlayerEffects PlayerEffects => _playerEffects;
         public CameraController CameraController => _cameraController;
+        public PlayerRespawner PlayerRespawner => _playerRespawner;
+        public DescentController DescentController => _descentController;
         public WallDetector WallDetector => _wallDetector;
         public float Gravity => _gravity;
         public Vector3 GetGroundNormal() => _mover.GetGroundNormal();
@@ -80,11 +88,14 @@ namespace Assets.Scripts.Player.Controller
             _wallDetector = GetComponent<WallDetector>();
             SetupStateMachine();
             _playerStatesHolder.OnStateConfigsChanged += SetupStateMachine;
+            _input.EnablePlayerActions();
+
         }
 
-        private void Start()
+        private void OnDestroy()
         {
-            _input.EnablePlayerActions();
+            _stateMachine?.Dispose();
+
         }
 
 
@@ -92,10 +103,11 @@ namespace Assets.Scripts.Player.Controller
         {
             _stateMachine?.Dispose();
             _stateMachine = new StateMachine();
-            List<StateConfiguration> configurations= _playerStatesHolder.GetStateConfigurations(this);
+            List<StateConfiguration> configurations = _playerStatesHolder.GetStateConfigurations(this);
             StateMachineFactory factory = new StateMachineFactory(_stateMachine);
-            factory.SetupStateMachine(configurations,typeof(GroundedState));
+            factory.SetupStateMachine(configurations, typeof(GroundedState));
         }
+
 
         private void At(IState from, IState to, Func<bool> condition) =>
             _stateMachine.AddTransition(from, to, condition);
@@ -107,6 +119,12 @@ namespace Assets.Scripts.Player.Controller
 
         public bool IsGroundTooSteep() =>
             !_mover.IsGrounded() || Vector3.Angle(_mover.GetGroundNormal(), _transform.up) > _slopeLimit;
+
+        public void SetState<T>() where T : IState
+        {
+            if (_stateMachine.CurrentState is T) return;
+            _stateMachine.SetState<T>();
+        }
 
         private void Update() => _stateMachine.Update();
 
@@ -123,7 +141,7 @@ namespace Assets.Scripts.Player.Controller
 
 
             if (_ceilingDetector != null) _ceilingDetector.Reset();
-            if(_wallDetector!=null) _wallDetector.Reset();
+            if (_wallDetector != null) _wallDetector.Reset();
         }
 
         public void SetVelocity(Vector3 velocity)
@@ -143,9 +161,9 @@ namespace Assets.Scripts.Player.Controller
         public bool IsGrounded() => _mover.IsGrounded();
         public Vector3 GetVelocity() => _savedVelocity;
         public Vector3 GetMomentum() => _useLocalMomentum ? _transform.localToWorldMatrix * _momentum : _momentum;
-        public Vector3 GetHorizontalMomentum() =>GetMomentum() - GetVerticalMomentum();
+        public Vector3 GetHorizontalMomentum() => GetMomentum() - GetVerticalMomentum();
 
-        public Vector3 GetVerticalMomentum() =>VectorMath.ExtractDotVector( GetMomentum(), Tr.up); 
+        public Vector3 GetVerticalMomentum() => VectorMath.ExtractDotVector(GetMomentum(), Tr.up);
         public Vector3 GetMovementVelocity() => _savedMovementVelocity;
         public Vector3 CalculateMovementVelocity() => CalculateMovementDirection() * _movementSpeed;
 
@@ -155,22 +173,25 @@ namespace Assets.Scripts.Player.Controller
             for (int i = 0; i < statesBack; i++)
             {
                 if (statesCount - 1 - i < 0) return false;
-                
-                if(_stateMachine.PreviousStates[statesCount - 1 - i] is T) return true;
+
+                if (_stateMachine.PreviousStates[statesCount - 1 - i] is T) return true;
             }
+
             return false;
         }
-        public bool HaveStateBeforeStateInHistory<T,TBefore>(int statesBack = 10)
+
+        public bool HaveStateBeforeStateInHistory<T, TBefore>(int statesBack = 10)
         {
             int statesCount = _stateMachine.PreviousStates.Count;
-            
+
             for (int i = 0; i < statesBack; i++)
             {
                 if (statesCount - 1 - i < 0) return false;
-                
-                if(_stateMachine.PreviousStates[statesCount - 1 - i] is T) return true;
-                if(_stateMachine.PreviousStates[statesCount - 1 - i] is TBefore) return false;
+
+                if (_stateMachine.PreviousStates[statesCount - 1 - i] is T) return true;
+                if (_stateMachine.PreviousStates[statesCount - 1 - i] is TBefore) return false;
             }
+
             return false;
         }
 
@@ -184,9 +205,6 @@ namespace Assets.Scripts.Player.Controller
 
             return direction.magnitude > 1f ? direction.normalized : direction;
         }
-
-    
-  
 
 
         public void OnGroundContactLost()
@@ -225,7 +243,7 @@ namespace Assets.Scripts.Player.Controller
         {
             _mover.SetColliderHeight(height);
         }
-     
+
 
         public void StopCrouching()
         {

@@ -69,6 +69,18 @@ namespace Assets.Scripts.General.StateMachine
             _currentNode.State?.OnEnter();
             PreviousStates.Add(state);
         }
+        public void  SetState<T>() where T : IState
+        {
+            if (_nodes.TryGetValue(typeof(T), out var node))
+            {
+                _currentNode = node;
+                _currentNode.State?.OnEnter();
+            }
+            else
+            {
+                Debug.LogError($"State of type {typeof(T)} not found in state machine.");
+            }
+        }
 
         void ChangeState(IState state)
         {

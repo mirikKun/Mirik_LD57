@@ -25,14 +25,33 @@ namespace Scripts
         public event UnityAction<bool> Attack = delegate { };
         public event UnityAction<bool>AttackAlt = delegate { };
         public event UnityAction<RaycastHit> Click = delegate { };
+        public event UnityAction Esc = delegate { };
 
         public PlayerInputActions inputActions;
 
         public bool IsJumpKeyPressed() => inputActions.Player.Jump.IsPressed();
-    
-        public Vector2 Direction => inputActions.Player.Move.ReadValue<Vector2>();
-        public Vector2 LookDirection => inputActions.Player.Look.ReadValue<Vector2>();
+
+
+        
+        public Vector2 Direction
+        {
+            get
+            {if(_actionsDisabled) return Vector2.zero;
+                return inputActions.Player.Move.ReadValue<Vector2>();
+            }
+        }
+
+        public Vector2 LookDirection
+        {
+            get
+            {
+                if(_actionsDisabled) return Vector2.zero;
+                return inputActions.Player.Look.ReadValue<Vector2>();
+            }
+        }
+
         public const float HoldDuration = 0.2f;
+        private bool _actionsDisabled = false;
 
         public void EnablePlayerActions() {
             if (inputActions == null) {
@@ -40,22 +59,32 @@ namespace Scripts
                 inputActions.Player.SetCallbacks(this);
             }
             inputActions.Enable();
+            _actionsDisabled = false;
+        }
+        public void DisablePlayerActions() {
+            _actionsDisabled = true;
         }
 
         public void OnMove(InputAction.CallbackContext context) {
+            if (_actionsDisabled) return;
             Move.Invoke(context.ReadValue<Vector2>());
         }
 
         public void OnLook(InputAction.CallbackContext context) {
+            if (_actionsDisabled) return;
+
             Look.Invoke(context.ReadValue<Vector2>(), IsDeviceMouse(context));
         }
 
         bool IsDeviceMouse(InputAction.CallbackContext context) {
+            
             // Debug.Log($"Device name: {context.control.device.name}");
             return context.control.device.name == "Mouse";
         }
 
         public void OnFire(InputAction.CallbackContext context) {
+            if (_actionsDisabled) return;
+
                 switch (context.phase) {
                     case InputActionPhase.Started:
                         Attack.Invoke(true);
@@ -68,7 +97,8 @@ namespace Scripts
         }
 
         public void OnAltFire(InputAction.CallbackContext context)
-        {
+        {            if (_actionsDisabled) return;
+
             switch (context.phase) {
                 case InputActionPhase.Started:
                     AttackAlt.Invoke(true);
@@ -91,6 +121,8 @@ namespace Scripts
         }
 
         public void OnMouseControlCamera(InputAction.CallbackContext context) {
+            if (_actionsDisabled) return;
+
             switch (context.phase) {
                 case InputActionPhase.Started:
                     EnableMouseControlCamera.Invoke();
@@ -102,6 +134,8 @@ namespace Scripts
         }
 
         public void OnRun(InputAction.CallbackContext context) {
+            if (_actionsDisabled) return;
+
             switch (context.phase) {
                 case InputActionPhase.Started:
                     Dash.Invoke(true);
@@ -113,6 +147,8 @@ namespace Scripts
         }
 
         public void OnJump(InputAction.CallbackContext context) {
+            if (_actionsDisabled) return;
+
             switch (context.phase) {
                 case InputActionPhase.Started:
                     Jump.Invoke(true);
@@ -125,6 +161,8 @@ namespace Scripts
 
         public void OnCrouch(InputAction.CallbackContext context)
         {
+            if (_actionsDisabled) return;
+
             switch (context.phase) {
                 case InputActionPhase.Started:
                     Crouch.Invoke(true);
@@ -137,6 +175,8 @@ namespace Scripts
 
         public void OnAction1(InputAction.CallbackContext context)
         {
+            if (_actionsDisabled) return;
+
             switch (context.phase) {
                 case InputActionPhase.Started:
                     Action1.Invoke(true);
@@ -149,6 +189,8 @@ namespace Scripts
 
         public void OnAction2(InputAction.CallbackContext context)
         {
+            if (_actionsDisabled) return;
+
             switch (context.phase) {
                 case InputActionPhase.Started:
                     Action2.Invoke(true);
@@ -160,6 +202,8 @@ namespace Scripts
 
         public void OnAction3(InputAction.CallbackContext context)
         {
+            if (_actionsDisabled) return;
+
             switch (context.phase) {
                 case InputActionPhase.Started:
                     Action3.Invoke(true);
@@ -171,6 +215,8 @@ namespace Scripts
 
         public void OnAction4(InputAction.CallbackContext context)
         {
+            if (_actionsDisabled) return;
+
             switch (context.phase) {
                 case InputActionPhase.Started:
                     Action4.Invoke(true);
@@ -179,5 +225,10 @@ namespace Scripts
                     Action4.Invoke(false);
                     break;
             }     }
+
+        public void OnEsc(InputAction.CallbackContext context)
+        {
+           Esc?.Invoke();
+        }
     }
 }

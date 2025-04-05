@@ -9,9 +9,10 @@ EditorBuildSettings:
     path: Assets/Scenes/BootstrapScene.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   - enabled: 1
-    path: Assets/Scenes/MainMenuScene.unity
+    path: Assets/Scenes/MainScene.unity
     guid: 1d5d024ce22a87f4a952f34f154cfe47
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Tutorial.unity
     guid: 73197f2a0fdf2b6418232f42fed7507d
   m_configObjects: {}
+  m_UseUCBPForAssetBundles: 0

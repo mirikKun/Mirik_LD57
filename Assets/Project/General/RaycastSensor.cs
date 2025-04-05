@@ -17,6 +17,8 @@ namespace Assets.Scripts.General {
             tr = playerTransform;
         }
 
+        public bool HaveNull=>tr==null;
+
         public void Cast() {
             Vector3 worldOrigin = tr.TransformPoint(origin);
             Vector3 worldDirection = GetCastDirection();

@@ -22,7 +22,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
         private float _startSwingMomentum=4;
 
 
-        private readonly PlayerController _controller;
+        private  PlayerController _controller;
         private RaycastSensor _raycastSensor;
         private CountdownTimer _hookTimer;
         private CountdownTimer _preparingTimer;
@@ -33,6 +33,21 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
         private bool _preparingStarted;
         private bool _preparingFinished;
         private readonly AnimationCurve _swingingDirectionLerpCurve;
+
+        private RaycastSensor RaycastSensor
+        {
+            get
+            {
+                if (_raycastSensor == null||_raycastSensor.HaveNull)
+                {
+                    _raycastSensor = new RaycastSensor(_controller.CameraTrY);
+                    _raycastSensor.castLength = (_swingingMaxDistance);
+                    _raycastSensor.SetCastDirection(RaycastSensor.CastDirection.Forward);
+                }
+
+                return _raycastSensor;
+            }
+        }
 
 
         public SwingingHookState(PlayerController controller, float swingingSpeed, float grapplingSpeed,
@@ -58,10 +73,10 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
 
             _controller.Input.Action3 += HandleActionInput;
 
-
             _raycastSensor = new RaycastSensor(_controller.CameraTrY);
             _raycastSensor.castLength = (_swingingMaxDistance);
             _raycastSensor.SetCastDirection(RaycastSensor.CastDirection.Forward);
+         
 
             _hookTimer = new CountdownTimer(_swingingDuration);
             _preparingTimer = new CountdownTimer(_preparingDuration);
@@ -77,7 +92,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
             _actionKeyIsPressed = isButtonPressed;
             if(!_preparingStarted&&_actionKeyIsPressed&& (CanGrapple))
             {
-                _swingingPoint = _raycastSensor.GetPosition();
+                _swingingPoint = RaycastSensor.GetPosition();
 
                 _preparingTimer.Start();
                 _controller.PlayerEffects.HookEffects.StartLineDrawing(_swingingPoint,_preparingTimer);
@@ -179,8 +194,8 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
         }
 
         private bool CanGrapple =>
-            _raycastSensor.CastAndCheck(_controller.CameraTrY.position) &&
-            _raycastSensor.GetDistance() > _swingingMinDistance;
+            RaycastSensor.CastAndCheck(_controller.CameraTrY.position) &&
+            RaycastSensor.GetDistance() > _swingingMinDistance;
 
 
         public bool GroundedToSwingingHook() => _preparingTimer.IsFinished&&_preparingStarted&&_actionKeyIsPressed;

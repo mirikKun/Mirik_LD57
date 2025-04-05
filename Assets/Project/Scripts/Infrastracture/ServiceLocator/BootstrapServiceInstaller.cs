@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Project.Scripts.Infrastracture.ServiceLocator
 {
-    public class BootstrapServiceInstaller: MonoBehaviour,IServiceInstaller,ICoroutineRunner
+    public class BootstrapServiceInstaller: MonoBehaviour,IServiceInstaller
     {
 
         [SerializeField] private SoundSystemAsset _globalSoundSystemAsset;
@@ -14,7 +14,6 @@ namespace Project.Scripts.Infrastracture.ServiceLocator
             ServiceLocator.Global.Register<ISoundSystem>(soundSystem);
             ServiceLocator.Global.Register<ISoundSettingsService>(new SoundSettingsService(soundSystem));
 
-            ServiceLocator.Global.Register<ISceneLoaderService>(new SceneLoaderService(this));
             
             soundSystem.LoadSoundAsset(_globalSoundSystemAsset);
         }
