@@ -6,7 +6,8 @@ namespace Project.Scripts.Generation
     public class LocationsGenerator:MonoBehaviour
     {
         [SerializeField] private Location _startLocation;
-        [SerializeField] private List<Location> _locationPrefabs;
+        [SerializeField] private List<Location> _bigLocationPrefabs;
+        [SerializeField] private List<Location> _smallLocationPrefabs;
         private List<Location> _currentLocations = new List<Location>();
         
         private void Start()
@@ -19,14 +20,27 @@ namespace Project.Scripts.Generation
         {
             foreach (var root in fromLocation.LocationEndPoints)
             {
-                int randomIndex = Random.Range(0, _locationPrefabs.Count);
-                Location chosenLocation = _locationPrefabs[randomIndex];
+                Location chosenLocation;
+                if (fromLocation.IsBigLocation)
+                {
+                    int randomIndex = Random.Range(0, _smallLocationPrefabs.Count);
+                    chosenLocation = _smallLocationPrefabs[randomIndex];
+                }else
+                {
+                    int randomIndex = Random.Range(0, _bigLocationPrefabs.Count);
+                    chosenLocation = _bigLocationPrefabs[randomIndex];
+                }
                 Location newLocation = Instantiate(chosenLocation,
-                    GetNextLocationPosition(root.position, chosenLocation), Quaternion.identity);
+                    GetNextLocationPosition(root.position, chosenLocation), Quaternion.Euler(0,Random.Range(0,360),0));
                 _currentLocations.Add(newLocation);
                 newLocation.LocationEntered+=OnLocationEntered;
             }
           
+        }
+
+        public void GenerateNextLocation()
+        {
+            OnLocationEntered(_currentLocations[^1]);
         }
 
         private void OnLocationEntered(Location enteredLocation)
