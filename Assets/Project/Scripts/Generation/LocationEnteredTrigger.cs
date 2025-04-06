@@ -23,6 +23,7 @@ namespace Project.Scripts.Generation
             {
                 playerController.PlayerRespawner.SetRespawnPosition(transform.position + Vector3.up * _respawnOffset);
                 playerController.DescentController.ReplenishFullStamina();
+                playerController.PlayerInventory.ApplyTempSpentAbilities();
 
                 LocationEntered?.Invoke();
                 foreach (var obj in _objectsToAppear)

@@ -21,7 +21,7 @@ namespace Assets.Scripts.Player.Controller
         [SerializeField] private CameraController _cameraController;
         [SerializeField] private PlayerRespawner _playerRespawner;
 [SerializeField] private DescentController _descentController;
-        
+[SerializeField] private PlayerInventory _playerInventory;
         [SerializeField] private Transform _cameraViewTransform;
         [SerializeField] private Transform _targetTransform;
         [SerializeField] private float _movementSpeed = 7f;
@@ -64,6 +64,8 @@ namespace Assets.Scripts.Player.Controller
         public CameraController CameraController => _cameraController;
         public PlayerRespawner PlayerRespawner => _playerRespawner;
         public DescentController DescentController => _descentController;
+        public PlayerInventory PlayerInventory => _playerInventory;
+        public PlayerMover Mover => _mover;
         public WallDetector WallDetector => _wallDetector;
         public float Gravity => _gravity;
         public Vector3 GetGroundNormal() => _mover.GetGroundNormal();
@@ -124,6 +126,11 @@ namespace Assets.Scripts.Player.Controller
         {
             if (_stateMachine.CurrentState is T) return;
             _stateMachine.SetState<T>();
+        }
+
+        public Type GetStateType()
+        {
+            return _stateMachine.CurrentState.GetType();
         }
 
         private void Update() => _stateMachine.Update();

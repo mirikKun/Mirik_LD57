@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.Player.PlayerStateMachine.States
 {
-    public class GrapplingHookState:IState
+    public class GrapplingHookState:ISpendableState
     {
         
         private float _grappleSpeed = 10f;
@@ -63,7 +63,10 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
             _actionKeyIsPressed = isButtonPressed;
         }
 
-        public  void OnEnter() {
+        public  void OnEnter()
+        {
+
+            _controller.PlayerInventory.TempSpendAbility(this.GetType());
             _controller.OnGroundContactLost();
             OnGrapplingHookStart();
         }
@@ -88,10 +91,11 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
         }
 
         private bool CanGrapple => _raycastSensor.CastAndCheck(_controller.CameraTrY.position) && _raycastSensor.GetDistance() > _grappleMinDistance;
+        private bool HaveAbility => _controller.PlayerInventory.HaveAbility(this.GetType());
 
 
-        public bool GroundedToGrappleHook()=>_actionKeyIsPressed&&CanGrapple;
-        public bool AirToGrappleHook()=>_actionKeyIsPressed&&CanGrapple&&!_controller.HaveStateBeforeStateInHistory<GrapplingHookState,IGroundState>();
+        public bool GroundedToGrappleHook()=>_actionKeyIsPressed&&CanGrapple&&HaveAbility;
+        public bool AirToGrappleHook()=>_actionKeyIsPressed&&CanGrapple&&!_controller.HaveStateBeforeStateInHistory<GrapplingHookState,IGroundState>()&&HaveAbility;
         public bool GrappleHookToRising() => _grapplingTimer.IsFinished&&_controller.IsRising();
         public bool GrappleHookToFalling() => _grapplingTimer.IsFinished&&_controller.IsFalling();
     }

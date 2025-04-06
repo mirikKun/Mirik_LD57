@@ -30,11 +30,11 @@ namespace Scripts.Player.Health
         public void TakeDamage(int damage,bool respawn =true)
         {
             Current -= damage;
-            HealthChanged?.Invoke(Current/Max);
+            HealthChanged?.Invoke((float)Current/Max);
             
             if(respawn)
                 _playerController.PlayerRespawner.Respawn();
-            Debug.Log("Damage taken");
+            Debug.Log("Damage taken" + damage);
         }
 
         public void AddHealth(int healAmount)
@@ -43,6 +43,8 @@ namespace Scripts.Player.Health
             Current += healAmount;
 
             Current = Mathf.Clamp(Current, Current, Max);
+            HealthChanged?.Invoke((float)Current/Max);
+
         }
     }
 }

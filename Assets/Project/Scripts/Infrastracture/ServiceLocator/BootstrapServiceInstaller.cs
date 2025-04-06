@@ -12,10 +12,8 @@ namespace Project.Scripts.Infrastracture.ServiceLocator
         {
             SoundSystem soundSystem = new SoundSystem();
             ServiceLocator.Global.Register<ISoundSystem>(soundSystem);
-            ServiceLocator.Global.Register<ISoundSettingsService>(new SoundSettingsService(soundSystem));
-
-            
             soundSystem.LoadSoundAsset(_globalSoundSystemAsset);
+            ServiceLocator.Global.Register<ISoundSettingsService>(new SoundSettingsService(soundSystem));
         }
     }
 }

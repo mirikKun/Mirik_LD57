@@ -13,6 +13,8 @@ namespace Scripts.Player.DescentContorller
 
         [SerializeField] private Image _depthStaminaBar;
 
+        [SerializeField] private float _falseStaminaOffset = 0.12f;
+
         private void Start()
         {
             _descentController.DepthStaminaChanged += UpdateDepthStaminaBar;
@@ -28,7 +30,11 @@ namespace Scripts.Player.DescentContorller
 
         private void UpdateDepthStaminaBar(float stamina)
         {
-            _depthStaminaBar.fillAmount = stamina;
+            float fakeStamina = stamina - (1 - stamina) * _falseStaminaOffset;
+            _depthStaminaBar.fillAmount = fakeStamina;
+            Debug.Log("_______");
+            Debug.Log(stamina);
+            Debug.Log(fakeStamina);
         }
        
     }

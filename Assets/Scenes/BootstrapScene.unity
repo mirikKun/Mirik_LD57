@@ -594,7 +594,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 823bc1518a164fb3898457bb22e2f0b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _globalSoundSystemAsset: {fileID: 11400000, guid: db6c53aa94da17e419bf859c41acb8b3, type: 2}
+  _globalSoundSystemAsset: {fileID: 11400000, guid: 71bdab2153fc5ce4d9982857a6a84698, type: 2}
 --- !u!114 &1977846425
 MonoBehaviour:
   m_ObjectHideFlags: 0

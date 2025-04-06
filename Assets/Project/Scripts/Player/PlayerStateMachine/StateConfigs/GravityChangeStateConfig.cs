@@ -12,6 +12,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.StateConfigs
     {
         [field: SerializeField] public float RaycastDistance { get; private set; } = 4.5f;
         [field: SerializeField] public float ChangingDuration { get; private set; } = 0.5f;
+        [field: SerializeField] public float GravityChangeFullDuration { get; private set; } = 5.5f;
 
         public override List<StateConfiguration> GetStateConfiguration(PlayerController playerController)
         {
@@ -24,13 +25,19 @@ namespace Assets.Scripts.Player.PlayerStateMachine.StateConfigs
 
         private StateConfiguration GetPounceConfiguration(PlayerController playerController)
         {
-            var gravityChange = new GravityChangeState(playerController, RaycastDistance, ChangingDuration);
+            var gravityChange = new GravityChangeState(playerController, RaycastDistance, ChangingDuration,GravityChangeFullDuration);
             StateConfiguration configuration = new StateConfiguration
             {
                 State = gravityChange,
                 Transitions = new List<TransitionConfiguration>()
                 {
                     TransitionConfiguration.GetConfiguration<GroundedState, GravityChangeState>(gravityChange.GroundedToGravityChange),
+                    
+                    TransitionConfiguration.GetConfiguration<GroundedState, GravityChangeState>(gravityChange.GravityChangeDurationEnded),
+                    TransitionConfiguration.GetConfiguration<RisingState, GravityChangeState>(gravityChange.GravityChangeDurationEnded),
+                    TransitionConfiguration.GetConfiguration<FallingState, GravityChangeState>(gravityChange.GravityChangeDurationEnded),
+                    TransitionConfiguration.GetConfiguration<SlopeSlidingState, GravityChangeState>(gravityChange.GravityChangeDurationEnded),
+                    
                     TransitionConfiguration.GetConfiguration<GravityChangeState, GroundedState>(gravityChange.GravityChangeToGrounded),
                     TransitionConfiguration.GetConfiguration<GravityChangeState, FallingState>(gravityChange.GravityChangeToFalling)
                 }

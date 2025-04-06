@@ -20,7 +20,9 @@ namespace Scripts.Player.DescentContorller
 
         private float _currentDepth;
         private float _maxDepth;
+        private float _maxGroundDepth;
         private Vector3 _startPosition;
+        private bool _inStaminaReplenishZone;
 
         private Vector3 _lastPosition;
         public event Action<float, float> DepthChanged;
@@ -47,9 +49,13 @@ namespace Scripts.Player.DescentContorller
             DepthStaminaChanged?.Invoke(_currentDepthStamina/_maxDepthStamina);
         }
 
+        public void SetInStaminaReplenishZone(bool inside)
+        {
+            _inStaminaReplenishZone = inside;
+        }
         private void CheckOneTimeDepth()
         {
-            if(_playerMover.IsGrounded())
+            if(_playerMover.IsGrounded()||_inStaminaReplenishZone)
             {
                 if (_currentDepthStamina < _maxDepthStamina)
                 {
@@ -57,17 +63,25 @@ namespace Scripts.Player.DescentContorller
                     _currentDepthStamina = Mathf.Clamp(_currentDepthStamina, 0, _maxDepthStamina);
                     DepthStaminaChanged?.Invoke(_currentDepthStamina/_maxDepthStamina);
                 }
+                if (_maxGroundDepth < _startPosition.y - transform.position.y)
+                {
+                    _maxGroundDepth = _startPosition.y - transform.position.y;
+                }
             }
             else
             {
                 if (_currentDepthStamina > 0)
                 {
-                 
-                    float depthDiff = _startPosition.y - transform.position.y - _currentDepth;
+                    float depthDiff = _startPosition.y - transform.position.y-_currentDepth;
+                    // if (_currentDepth < _maxGroundDepth)
+                    // {
+                    //     depthDiff = 0;
+                    // }
+                    
                     float staminaChange = _depthStaminaDecreaseRate * depthDiff;
                     _currentDepthStamina -= staminaChange;
+                    _currentDepthStamina = Mathf.Clamp(_currentDepthStamina, 0, _maxDepthStamina);
                     DepthStaminaChanged?.Invoke(_currentDepthStamina/_maxDepthStamina);
-
                 }
                 else
                 {

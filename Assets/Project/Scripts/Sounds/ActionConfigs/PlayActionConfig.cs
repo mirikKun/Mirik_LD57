@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Project.Scripts.Sounds.Attributes;
 using Project.Scripts.Sounds.AudioConfigsBase;
 using Project.Scripts.Sounds.Utils;
 using UnityEngine;
 using UnityEngine.Audio;
 using Object = UnityEngine.Object;
+using Random = UnityEngine.Random;
 
 namespace Project.Scripts.Sounds.ActionConfigs
 {
@@ -26,6 +28,11 @@ namespace Project.Scripts.Sounds.ActionConfigs
 
         [SerializeField]
         private SoundSystemActionWaitType _waitType;
+
+        [Space] [SerializeField] private bool _randomPitch;
+        [SerializeField]
+        [Range(0f, 2f)] private float _pitchFrom = 1f;    [SerializeField]
+        [Range(0f, 2f)] private float _pitchTo = 1f;
 
         public SoundSystemActionWaitType WaitType => _waitType;
 
@@ -55,13 +62,17 @@ namespace Project.Scripts.Sounds.ActionConfigs
             source.loop = _loop;
             source.volume = _volume;
             source.clip = sourceClip;
+            if (_randomPitch)
+            {
+                source.pitch = Random.Range(_pitchFrom, _pitchTo);
+            }
 
             source.Play();
 
             if (_loop)
                 return;
 
-            //await Awaiters.Seconds(sourceClip.length);
+            await UniTask.WaitForSeconds(sourceClip.length);
             IsCompleted = true;
 
             if (soundGameObject == null)

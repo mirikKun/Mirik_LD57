@@ -14,6 +14,8 @@ namespace Scripts.LevelObjects
             if (other.TryGetComponent<IHealth>(out var health))
             {
                 health.AddHealth(_healAmount);
+                Destroy(gameObject);
+
             }
         }
     }

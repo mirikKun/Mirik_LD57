@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &2520212180251078549
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 572852994551491188, guid: 73efd926c036bab4c967c9c8160d8039, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 358d8a23b3759964c93a74f207e1a0ab, type: 3}
+    - target: {fileID: 1687026789839206264, guid: 73efd926c036bab4c967c9c8160d8039, type: 3}
+      propertyPath: m_Name
+      value: 'AbilityPickUp[GravityChange]'
+      objectReference: {fileID: 0}
+    - target: {fileID: 2555028758841603586, guid: 73efd926c036bab4c967c9c8160d8039, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.1559355
+      objectReference: {fileID: 0}
+    - target: {fileID: 2555028758841603586, guid: 73efd926c036bab4c967c9c8160d8039, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.07
+      objectReference: {fileID: 0}
+    - target: {fileID: 2555028758841603586, guid: 73efd926c036bab4c967c9c8160d8039, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 3.1434135
+      objectReference: {fileID: 0}
+    - target: {fileID: 2555028758841603586, guid: 73efd926c036bab4c967c9c8160d8039, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2555028758841603586, guid: 73efd926c036bab4c967c9c8160d8039, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2555028758841603586, guid: 73efd926c036bab4c967c9c8160d8039, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2555028758841603586, guid: 73efd926c036bab4c967c9c8160d8039, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2555028758841603586, guid: 73efd926c036bab4c967c9c8160d8039, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2555028758841603586, guid: 73efd926c036bab4c967c9c8160d8039, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2555028758841603586, guid: 73efd926c036bab4c967c9c8160d8039, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4139200324338278043, guid: 73efd926c036bab4c967c9c8160d8039, type: 3}
+      propertyPath: _ability._assemblyQualifiedName
+      value: Assets.Scripts.Player.PlayerStateMachine.States.GravityChangeState,
+        Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      objectReference: {fileID: 0}
+    - target: {fileID: 5923399100445553227, guid: 73efd926c036bab4c967c9c8160d8039, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 358d8a23b3759964c93a74f207e1a0ab, type: 3}
+    - target: {fileID: 6547812832403374224, guid: 73efd926c036bab4c967c9c8160d8039, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 358d8a23b3759964c93a74f207e1a0ab, type: 3}
+    - target: {fileID: 7001600194606272869, guid: 73efd926c036bab4c967c9c8160d8039, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 358d8a23b3759964c93a74f207e1a0ab, type: 3}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 73efd926c036bab4c967c9c8160d8039, type: 3}

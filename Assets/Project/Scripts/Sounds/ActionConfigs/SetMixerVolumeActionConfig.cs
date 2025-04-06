@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using DG.Tweening;
 using Project.Scripts.Sounds.AudioConfigsBase;
 using UnityEngine;
 
@@ -38,10 +39,10 @@ namespace Project.Scripts.Sounds.ActionConfigs
                     string paramName = $"{_mixerName}Volume";
                     clipGroup.Group.audioMixer.GetFloat(paramName, out float currentVolume);
 
-                    // DOTween.To(() => currentVolume, volume => clipGroup.Group.audioMixer.SetFloat(paramName, volume), _volumeDB,
-                    //         _transitionTime)
-                    //     .SetTarget(clipGroup)
-                    //     .OnComplete(() => IsCompleted = true);
+                    DOTween.To(() => currentVolume, volume => clipGroup.Group.audioMixer.SetFloat(paramName, volume), _volumeDB,
+                            _transitionTime)
+                        .SetTarget(clipGroup)
+                        .OnComplete(() => IsCompleted = true);
                     clipGroup.Group.audioMixer.SetFloat(paramName, _volumeDB);
                     IsCompleted = true;
                 }

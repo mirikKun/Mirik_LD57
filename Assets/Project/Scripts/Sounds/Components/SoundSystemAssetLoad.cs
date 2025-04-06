@@ -25,6 +25,8 @@ namespace Project.Scripts.Sounds.Components
 
         private void Awake()
         {
+            if(ServiceLocator.Global==null)
+                return;
             _soundSystem = ServiceLocator.Global.Get<ISoundSystem>();
             
             if (_loadOnAwake)
@@ -33,7 +35,7 @@ namespace Project.Scripts.Sounds.Components
 
         private void OnDestroy()
         {
-            if (_unloadOnDestroy)
+            if (_soundSystem!=null&&_unloadOnDestroy)
                 UnloadSoundAsset();
         }
         
