@@ -71,7 +71,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
 
             _swingingDirectionLerpCurve = swingingDirectionLerpCurve;
 
-            _controller.Input.Action3 += HandleActionInput;
+            _controller.Input.Action1 += HandleActionInput;
 
             _raycastSensor = new RaycastSensor(_controller.CameraTrY);
             _raycastSensor.castLength = (_swingingMaxDistance);
@@ -84,7 +84,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
 
         public void Dispose()
         {
-            _controller.Input.Action3 -= HandleActionInput;
+            _controller.Input.Action1 -= HandleActionInput;
         }
 
         private void HandleActionInput(bool isButtonPressed)

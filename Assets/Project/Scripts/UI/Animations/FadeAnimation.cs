@@ -9,9 +9,16 @@ namespace Scripts.UI.Animations
         [SerializeField] private AnimationCurve _fadeCurve;
         [SerializeField] private CanvasGroup _canvasGroup;
         [SerializeField] private float _fadeDuration = 1f;
-        
-        
 
+        [SerializeField] private bool _fadeOutOnStart;
+
+        private void OnEnable()
+        {
+            if (_fadeOutOnStart)
+            {
+                FadeOut();
+            }
+        }
 
         public void FadeIn()
         {

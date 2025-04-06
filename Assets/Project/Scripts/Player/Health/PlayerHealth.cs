@@ -3,6 +3,7 @@ using Assets.Scripts.General.ColliderLogic;
 using Assets.Scripts.General.Health;
 using Assets.Scripts.Player.Controller;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Scripts.Player.Health
 {
@@ -31,7 +32,11 @@ namespace Scripts.Player.Health
         {
             Current -= damage;
             HealthChanged?.Invoke((float)Current/Max);
-            
+
+            if (Current <= 0)
+            {
+                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            }
             if(respawn)
                 _playerController.PlayerRespawner.Respawn();
             Debug.Log("Damage taken" + damage);

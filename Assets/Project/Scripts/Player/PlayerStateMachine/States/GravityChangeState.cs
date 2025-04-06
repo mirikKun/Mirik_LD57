@@ -37,7 +37,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
             _gravityChangeFullDuration = gravityChangeFullDuration;
             _gravityChangingTimer = new CountdownTimer(_changingDuration);
             _gravityFullChangeTimer = new CountdownTimer(_gravityChangeFullDuration);
-            _controller.Input.Action1 += HandleActionInput;
+            _controller.Input.Action3 += HandleActionInput;
 
             _raycastSensor = new RaycastSensor(_controller.CameraTrY);
             _raycastSensor.castLength=(_raycastDistance);
@@ -45,7 +45,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
         }
         public void Dispose()
         {
-            _controller.Input.Action1 -= HandleActionInput;
+            _controller.Input.Action3 -= HandleActionInput;
         }
 
         private void HandleActionInput(bool isButtonPressed)

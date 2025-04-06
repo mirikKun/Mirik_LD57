@@ -22,6 +22,7 @@ namespace Assets.Scripts.Player.Controller
         [SerializeField] private PlayerRespawner _playerRespawner;
 [SerializeField] private DescentController _descentController;
 [SerializeField] private PlayerInventory _playerInventory;
+[SerializeField] private PlayerSoundsManager _playerSoundsManager;
         [SerializeField] private Transform _cameraViewTransform;
         [SerializeField] private Transform _targetTransform;
         [SerializeField] private float _movementSpeed = 7f;
@@ -65,6 +66,7 @@ namespace Assets.Scripts.Player.Controller
         public PlayerRespawner PlayerRespawner => _playerRespawner;
         public DescentController DescentController => _descentController;
         public PlayerInventory PlayerInventory => _playerInventory;
+        public PlayerSoundsManager PlayerSoundsManager=>_playerSoundsManager;
         public PlayerMover Mover => _mover;
         public WallDetector WallDetector => _wallDetector;
         public float Gravity => _gravity;

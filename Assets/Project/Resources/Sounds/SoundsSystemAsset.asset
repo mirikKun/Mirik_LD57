@@ -77,10 +77,10 @@ MonoBehaviour:
     - rid: 8473138015717031940
       type: {class: PlayActionConfig, ns: Project.Scripts.Sounds.ActionConfigs, asm: Assembly-CSharp}
       data:
-        _clipName: Step3
+        _clipName: Steps3
         _loop: 0
-        _volume: 0.226
+        _volume: 0.65
         _waitType: 0
         _randomPitch: 1
-        _pitchFrom: 0.67
-        _pitchTo: 0.78
+        _pitchFrom: 0.66
+        _pitchTo: 0.89
