@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using Project.Scripts.Extensions;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Project.Scripts.Generation
 {
@@ -14,14 +16,14 @@ namespace Project.Scripts.Generation
         [SerializeField] private List<Location> _smallLocationPrefabs;
         private List<Location> _currentLocations = new List<Location>();
         private int _currentLocationIndex;
-     
+        public event Action<Vector3,Vector3> LocationEntered; 
         
         private void Start()
         {
             _currentLocations.Add(_startLocation);
-            GenerateLocations(_startLocation);
             _easyLcationsPrefabs=_easyLcationsPrefabs.Shuffle();
             _hardLocationsPrefabs = _hardLocationsPrefabs.Shuffle();
+            GenerateLocations(_startLocation);
         }
 
         private void GenerateLocations(Location fromLocation)
@@ -80,6 +82,9 @@ namespace Project.Scripts.Generation
             _currentLocations.Clear();
             _currentLocations.Add(enteredLocation);
             GenerateLocations(enteredLocation);
+            enteredLocation. CalculateBounds();
+            enteredLocation.GetLocationSize(out Vector3 center, out Vector3 size);
+            LocationEntered?.Invoke(center-size/2,size);
         }
 
 

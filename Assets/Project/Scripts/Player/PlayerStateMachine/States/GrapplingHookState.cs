@@ -74,6 +74,8 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
         public void OnExit()
         {
             _controller.SetMomentum(_controller.GetMomentum()*_grapplingExitSpeedMultiplier);
+            _controller.PlayerEffects.HookEffects.ClearGrappleLine();
+
         }
 
         private void OnGrapplingHookStart()
@@ -88,6 +90,11 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
 
             Vector3 momentum=_grappleDirection*_grappleSpeed;
             _controller.SetMomentum(momentum);
+        }
+        
+        public void Update()
+        {
+            _controller.PlayerEffects.HookEffects.DrawGrappleLine(_raycastSensor.GetPosition(), 1);
         }
 
         private bool CanGrapple => _raycastSensor.CastAndCheck(_controller.CameraTrY.position) && _raycastSensor.GetDistance() > _grappleMinDistance;

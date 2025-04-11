@@ -3145,6 +3145,10 @@ MonoBehaviour:
   _bigLocation: 0
   _locationEndPoints:
   - {fileID: 5753410789538074149}
+  _size: {x: 37.9, y: 37.9, z: 37.9}
+  _center: {x: 10.550001, y: 5.964999, z: 4.9000006}
+  _visualizeBounds: 1
+  _boundsColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!1001 &485610566996193221
 PrefabInstance:
   m_ObjectHideFlags: 0

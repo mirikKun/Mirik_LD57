@@ -43,6 +43,9 @@ namespace Assets.Scripts.Player.Controller {
             _horizontalPivot.localRotation = Quaternion.Euler(0, _currentYAngle, 0);
             _angleYToRotate -= deltaAngle;
         }
+        public void SetCameraSpeed(float speed) {
+            _cameraSpeed = speed;
+        }
 
         public void RotateCamera(float horizontalInput, float verticalInput) {
             if (_smoothCameraRotation) {

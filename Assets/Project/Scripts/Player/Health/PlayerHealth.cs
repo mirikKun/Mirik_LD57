@@ -30,12 +30,12 @@ namespace Scripts.Player.Health
 
         public void TakeDamage(int damage,bool respawn =true)
         {
-            Current -= damage;
+            //Current -= damage;
             HealthChanged?.Invoke((float)Current/Max);
 
             if (Current <= 0)
             {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                //SceneManager.LoadScene(SceneManager.GetActiveScene().name);
             }
             if(respawn)
                 _playerController.PlayerRespawner.Respawn();

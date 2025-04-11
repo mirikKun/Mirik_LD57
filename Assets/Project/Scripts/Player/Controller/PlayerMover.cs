@@ -104,7 +104,11 @@ namespace Assets.Scripts.Player.Controller
             // Debug.Break();
         }
 
-        public bool IsGrounded() => _isGrounded;
+        public bool IsGrounded()
+        {
+            return _isGrounded;
+        }
+
         public Vector3 GetGroundNormal() => _sensor.GetNormal();
 
         // NOTE: Older versions of Unity use rb.velocity instead

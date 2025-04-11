@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52d8786fd92e45779cc235fa47445252, type: 3}
   m_Name: GrapplingHookStateConfig
   m_EditorClassIdentifier: 
-  <GrappleSpeed>k__BackingField: 35
+  <GrappleSpeed>k__BackingField: 30
   <GrappleMaxDistance>k__BackingField: 100
   <GrappleMaxApproachableDistance>k__BackingField: 30
   <GrappleMinDistance>k__BackingField: 5

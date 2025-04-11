@@ -18,6 +18,7 @@ MonoBehaviour:
   _maxVerticalSpeedToStartWallRun: 14
   _wallGravity: 5
   _cameraAngle: 7
+  _wallAngleMultiplier: 1.6
   _jumpForwardPower: 12
   _jumpUpPower: 12
   _jumpFromWallPower: 8

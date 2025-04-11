@@ -100,8 +100,8 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
                                                     _controller.Tr.up);
             Vector3 wallRunDirection = Vector3.ProjectOnPlane(horizontalCameraDirection, _controller.GetWallNormal())
                 .normalized;
-            Vector3 inputDirection = _controller.CalculateMovementDirection();
-            return Vector3.Dot(wallRunDirection, inputDirection) > 0f;
+            Vector3 inputDirection = (_controller.CalculateMovementDirection() - _controller.GetWallNormal()).normalized;
+            return Vector3.Dot(wallRunDirection, inputDirection) > 0.6f;
         }
         
         

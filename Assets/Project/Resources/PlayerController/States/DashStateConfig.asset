@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0c4985911f046538c6d064d3d6a1e03, type: 3}
   m_Name: DashStateConfig
   m_EditorClassIdentifier: 
-  <DashSpeed>k__BackingField: 50
-  <DashExitSpeed>k__BackingField: 15
-  <DashDuration>k__BackingField: 0.24
+  <DashSpeed>k__BackingField: 35
+  <DashExitSpeed>k__BackingField: 2
+  <DashDuration>k__BackingField: 0.32
+  <UpdatedFov>k__BackingField: 70

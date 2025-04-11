@@ -14,6 +14,7 @@ namespace Scripts.Player.DescentContorller
         [Space]
         [SerializeField] private PlayerHealth _playerHealth;
         [SerializeField] private int _staminaEmptyDamage = 10;
+        [SerializeField] private float _minGroundedChange = 0.5f;
 
 
         private float _currentDepthStamina;
@@ -23,10 +24,14 @@ namespace Scripts.Player.DescentContorller
         private float _maxGroundDepth;
         private Vector3 _startPosition;
         private bool _inStaminaReplenishZone;
+        private Vector3 _lastGroundPosition;
+        private bool _grounded;
 
         private Vector3 _lastPosition;
         public event Action<float, float> DepthChanged;
         public event Action<float> DepthStaminaChanged;
+        public event Action Grounded; 
+        public float GetDistance => _maxDepthStamina / _depthStaminaDecreaseRate;
 
 
         private void Start()
@@ -40,8 +45,28 @@ namespace Scripts.Player.DescentContorller
 
         private void Update()
         {
+            CheckGrounded();
             CheckOneTimeDepth();
             CheckCurrentDepth();
+        }
+
+        private void CheckGrounded()
+        {
+            if(!_grounded && _playerMover.IsGrounded()&&
+               Mathf.Abs(_lastGroundPosition.y - transform.position.y) > _minGroundedChange)
+            {
+                Grounded?.Invoke();
+            }
+            if(_grounded||_inStaminaReplenishZone)
+            {
+                _lastGroundPosition = transform.position;
+            }
+            _grounded = _playerMover.IsGrounded();
+        }
+
+        public  float GetCurrenMaxDepth()
+        {
+            return _lastGroundPosition.y-_maxDepthStamina/_depthStaminaDecreaseRate;
         }
         public void ReplenishFullStamina()
         {
@@ -55,7 +80,8 @@ namespace Scripts.Player.DescentContorller
         }
         private void CheckOneTimeDepth()
         {
-            if(_playerMover.IsGrounded()||_inStaminaReplenishZone)
+            
+            if(_grounded||_inStaminaReplenishZone||transform.position.y > _lastGroundPosition.y)
             {
                 if (_currentDepthStamina < _maxDepthStamina)
                 {
@@ -67,6 +93,7 @@ namespace Scripts.Player.DescentContorller
                 {
                     _maxGroundDepth = _startPosition.y - transform.position.y;
                 }
+             
             }
             else
             {
@@ -81,6 +108,7 @@ namespace Scripts.Player.DescentContorller
                     float staminaChange = _depthStaminaDecreaseRate * depthDiff;
                     _currentDepthStamina -= staminaChange;
                     _currentDepthStamina = Mathf.Clamp(_currentDepthStamina, 0, _maxDepthStamina);
+                 
                     DepthStaminaChanged?.Invoke(_currentDepthStamina/_maxDepthStamina);
                 }
                 else

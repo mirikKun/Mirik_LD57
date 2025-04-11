@@ -32,9 +32,7 @@ namespace Scripts.Player.DescentContorller
         {
             float fakeStamina = stamina - (1 - stamina) * _falseStaminaOffset;
             _depthStaminaBar.fillAmount = fakeStamina;
-            Debug.Log("_______");
-            Debug.Log(stamina);
-            Debug.Log(fakeStamina);
+     
         }
        
     }

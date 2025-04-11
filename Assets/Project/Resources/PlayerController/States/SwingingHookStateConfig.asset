@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 722de8d46ccf4e949e66c06d680154f4, type: 3}
   m_Name: SwingingHookStateConfig
   m_EditorClassIdentifier: 
-  <SwingingSpeed>k__BackingField: 120
-  <GrapplingSpeed>k__BackingField: 45
+  <SwingingSpeed>k__BackingField: 35
+  <GrapplingSpeed>k__BackingField: 10
   <PreparingDuration>k__BackingField: 0.33
   <SwingingDuration>k__BackingField: 5
   <SwingingMaxDistance>k__BackingField: 50
-  <SwingingMinDistance>k__BackingField: 3
+  <SwingingMinDistance>k__BackingField: 2
   <MaxSwingingSpeed>k__BackingField: 25
   <SwingingExitSpeedMultiplier>k__BackingField: 1
   <StartSwingMomentum>k__BackingField: 0.1
