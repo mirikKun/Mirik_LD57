@@ -1,4 +1,5 @@
 using Assets.Scripts.Player.Controller;
+using Assets.Scripts.Player.PlayerStateMachine.StateConfigs;
 using Assets.Scripts.Player.PlayerStateMachine.States.AbstractStates;
 using Scripts.Utils;
 using UnityEngine;
@@ -8,18 +9,15 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
     public class CrouchSlidingJumpState: IJumpState
     {
         private readonly PlayerController _controller;
+        private readonly CrouchSlidingStateConfig _crouchSlidingStateConfig;
 
-        private readonly float _jumpPower;
-        private readonly float _minJumpAngle;
         private bool _jumpKeyIsPressed;
 
 
-
-        public CrouchSlidingJumpState(PlayerController controller, float jumpPower, float minJumpAngle)
+        public CrouchSlidingJumpState(PlayerController controller, CrouchSlidingStateConfig crouchSlidingStateConfig)
         {
             _controller = controller;
-            _jumpPower = jumpPower;
-            _minJumpAngle = minJumpAngle;
+            _crouchSlidingStateConfig = crouchSlidingStateConfig;
             _controller.Input.Jump += HandleJumpKeyInput;
         }
         public void Dispose()
@@ -47,10 +45,10 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
 
 
             Vector3 axis = Vector3.Cross(_controller.Tr.up, horizontalDirection);
-            Quaternion jumpRotation = Quaternion.AngleAxis(-_minJumpAngle, axis);
+            Quaternion jumpRotation = Quaternion.AngleAxis(-_crouchSlidingStateConfig.PounceMinAngle, axis);
 
             Vector3 jumpDirection = jumpRotation * horizontalDirection;
-            Vector3 newMomentum = jumpDirection * _jumpPower;
+            Vector3 newMomentum = jumpDirection * _crouchSlidingStateConfig.PouncePower;
 
             _controller.SetMomentum(newMomentum);
             _jumpKeyIsPressed= false;

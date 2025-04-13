@@ -1,5 +1,6 @@
 using Assets.Scripts.General.StateMachine;
 using Assets.Scripts.Player.Controller;
+using Assets.Scripts.Player.PlayerStateMachine.StateConfigs;
 using Assets.Scripts.Player.PlayerStateMachine.States.AbstractStates;
 using ImprovedTimers;
 using UnityEngine;
@@ -9,27 +10,21 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
     public class DashState:IState
     {
         private readonly PlayerController _controller;
-        private float _dashSpeed;
-        private float _dashDuration;
-        private float _dashExitSpeed;
+        private readonly DashStateConfig _dashStateConfig;
+ 
 
-        private float _updatedFov=70;
-        
-        
+
         private Vector3 _dashDirection;
         private readonly CountdownTimer _dashTimer;
         private bool _jumpKeyIsPressed;
 
 
-        public DashState(PlayerController controller, float dashSpeed, float dashDuration, float dashExitSpeed, float updatedFov)
+        public DashState(PlayerController controller, DashStateConfig dashStateConfig)
         {
             _controller = controller;
-            _dashSpeed = dashSpeed;
-            _dashDuration = dashDuration;
-            _dashExitSpeed = dashExitSpeed;
-            
-            _updatedFov = updatedFov;
-            _dashTimer = new CountdownTimer(_dashDuration);
+            _dashStateConfig = dashStateConfig;
+     
+            _dashTimer = new CountdownTimer(dashStateConfig.DashDuration);
             _controller.Input.Dash += HandleKeyInput;
 
 
@@ -56,18 +51,18 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
             _dashTimer.Start();
             _jumpKeyIsPressed = false;
             
-            _controller.PlayerEffects.CameraMovingEffects.SetFOV(_updatedFov);
+            _controller.PlayerEffects.CameraMovingEffects.SetFOV(_dashStateConfig.UpdatedFov);
         }
 
         public void OnExit()
         {
-            _controller.SetMomentum(_dashDirection * _dashExitSpeed);
+            _controller.SetMomentum(_dashDirection * _dashStateConfig.DashExitSpeed);
             _controller.PlayerEffects.CameraMovingEffects.ResetFOV();
         }
 
         public void FixedUpdate()
         {
-            _controller.SetMomentum(_dashDirection * _dashSpeed);
+            _controller.SetMomentum(_dashDirection * _dashStateConfig.DashSpeed);
             
             
         }

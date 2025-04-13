@@ -1,4 +1,5 @@
 using Assets.Scripts.Player.Controller;
+using Assets.Scripts.Player.PlayerStateMachine.StateConfigs;
 using Assets.Scripts.Player.PlayerStateMachine.States.AbstractStates;
 using UnityEngine;
 
@@ -8,18 +9,15 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
     {
         
         protected readonly PlayerController _controller;
-
-        private readonly float _jumpForwardForwardPower;
-        private readonly float _jumpUpPower;
-        private readonly float _jumpFromFromWallPower;
-        private bool _jumpKeyIsPressed;
+        private readonly WallRunStateConfig _wallRunStateConfig;
         
-        public WallRunJumpState(PlayerController controller, float jumpForwardPower, float jumpUpPower, float jumpFromWallPower)
+        private bool _jumpKeyIsPressed;
+
+        public WallRunJumpState(PlayerController controller, WallRunStateConfig wallRunStateConfig)
         {
             _controller = controller;
-            _jumpForwardForwardPower = jumpForwardPower;
-            _jumpUpPower = jumpUpPower;
-            _jumpFromFromWallPower = jumpFromWallPower;
+            _wallRunStateConfig = wallRunStateConfig;
+       
             _controller.Input.Jump += HandleJumpKeyInput;
         }
         public void Dispose()
@@ -43,7 +41,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
             Vector3 movingDirection = _controller.GetMomentum().normalized;
             Vector3 upDirection = _controller.Tr.up;
             
-            Vector3 momentum = wallNormal * _jumpFromFromWallPower + movingDirection * _jumpForwardForwardPower + upDirection * _jumpUpPower;
+            Vector3 momentum = wallNormal * _wallRunStateConfig.JumpFromWallPower + movingDirection * _wallRunStateConfig.JumpForwardPower + upDirection * _wallRunStateConfig.JumpUpPower;
 
             _controller.SetMomentum(momentum);
             _jumpKeyIsPressed= false;        

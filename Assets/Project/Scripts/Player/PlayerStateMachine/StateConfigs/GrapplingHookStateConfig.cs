@@ -31,7 +31,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.StateConfigs
 
         private StateConfiguration GetGrapplingHookConfiguration(Player.Controller.PlayerController playerController)
         {
-            var grapplingHook = new GrapplingHookState(playerController, GrappleSpeed, GrappleMaxDistance,GrappleMaxApproachableDistance, GrappleMinDistance, GrapplingExitSpeedMultiplier,AdaptiveGrapple, AdaptiveGrappleOffset, AdaptiveGrappleLetGoDistance);
+            var grapplingHook = new GrapplingHookState(playerController, this);
             StateConfiguration configuration = new StateConfiguration
             {
                 State = grapplingHook,

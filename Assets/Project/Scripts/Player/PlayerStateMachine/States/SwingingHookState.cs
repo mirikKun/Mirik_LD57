@@ -1,6 +1,7 @@
 using Assets.Scripts.General;
 using Assets.Scripts.General.StateMachine;
 using Assets.Scripts.Player.Controller;
+using Assets.Scripts.Player.PlayerStateMachine.StateConfigs;
 using Assets.Scripts.Player.PlayerStateMachine.States.AbstractStates;
 using ImprovedTimers;
 using Scripts.Utils;
@@ -10,18 +11,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
 {
     public class SwingingHookState : ISpendableState
     {
-        private float _swingingSpeed = 10f;
-        private float _grapplingSpeed = 10f;
-
-        private float _preparingDuration = 0.25f;
-        private float _swingingDuration = 5;
-        private float _swingingMaxDistance = 50f;
-        private float _swingingMinDistance = 5f;
-        private float _maxSwingingSpeed = 20f;
-        private float _swingingExitSpeedMultiplier = 1f;
-        private float _startSwingMomentum = 4;
-
-
+        private readonly SwingingHookStateConfig _swingingHookStateConfig;
         private PlayerController _controller;
         private RaycastSensor _raycastSensor;
         private CountdownTimer _hookTimer;
@@ -32,7 +22,6 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
         private bool _actionKeyIsPressed;
         private bool _preparingStarted;
         private bool _preparingFinished;
-        private readonly AnimationCurve _swingingDirectionLerpCurve;
 
         private RaycastSensor RaycastSensor
         {
@@ -41,7 +30,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
                 if (_raycastSensor == null || _raycastSensor.HaveNull)
                 {
                     _raycastSensor = new RaycastSensor(_controller.CameraTrY);
-                    _raycastSensor.castLength = (_swingingMaxDistance);
+                    _raycastSensor.castLength = (_swingingHookStateConfig.SwingingMaxDistance);
                     _raycastSensor.SetCastDirection(RaycastSensor.CastDirection.Forward);
                 }
 
@@ -50,36 +39,21 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
         }
 
 
-        public SwingingHookState(PlayerController controller, float swingingSpeed, float grapplingSpeed,
-            float preparingDuration,
-            float swingingDuration,
-            float swingingMaxDistance, float maxSwingingSpeed,
-            float swingingMinDistance, float swingingExitSpeedMultiplier, float startSwingMomentum,
-            AnimationCurve swingingDirectionLerpCurve)
+        public SwingingHookState(PlayerController controller, SwingingHookStateConfig swingingHookStateConfig)
         {
             _controller = controller;
-            _swingingSpeed = swingingSpeed;
-            _grapplingSpeed = grapplingSpeed;
-            _preparingDuration = preparingDuration;
-            _swingingDuration = swingingDuration;
-            _swingingMaxDistance = swingingMaxDistance;
-
-            _maxSwingingSpeed = maxSwingingSpeed;
-            _swingingMinDistance = swingingMinDistance;
-            _swingingExitSpeedMultiplier = swingingExitSpeedMultiplier;
-            _startSwingMomentum = startSwingMomentum;
-
-            _swingingDirectionLerpCurve = swingingDirectionLerpCurve;
+            _swingingHookStateConfig = swingingHookStateConfig;
+       
 
             _controller.Input.Action1 += HandleActionInput;
 
             _raycastSensor = new RaycastSensor(_controller.CameraTrY);
-            _raycastSensor.castLength = (_swingingMaxDistance);
+            _raycastSensor.castLength = (_swingingHookStateConfig.SwingingMaxDistance);
             _raycastSensor.SetCastDirection(RaycastSensor.CastDirection.Forward);
 
 
-            _hookTimer = new CountdownTimer(_swingingDuration);
-            _preparingTimer = new CountdownTimer(_preparingDuration);
+            _hookTimer = new CountdownTimer(_swingingHookStateConfig.SwingingDuration);
+            _preparingTimer = new CountdownTimer(_swingingHookStateConfig.PreparingDuration);
         }
 
         public void Dispose()
@@ -125,7 +99,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
             _actionKeyIsPressed = false;
             float momentumMagnitude = _controller.GetMomentum().magnitude;
 
-            _controller.SetMomentum(_controller.GetMomentum() * _swingingExitSpeedMultiplier);
+            _controller.SetMomentum(_controller.GetMomentum() * _swingingHookStateConfig.SwingingExitSpeedMultiplier);
             _preparingTimer.Stop();
             _controller.PlayerEffects.HookEffects.ClearGrappleLine();
         }
@@ -139,8 +113,8 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
             Vector3 hookDirection = _swingingPoint - _controller.Tr.position;
             momentum = VectorMath.RemoveDotVector(momentum, -hookDirection);
             //momentum=Vector3.zero;
-            momentum += hookDirection.normalized * _startSwingMomentum;
-            momentum = Vector3.ClampMagnitude(momentum, _maxSwingingSpeed);
+            momentum += hookDirection.normalized * _swingingHookStateConfig.StartSwingMomentum;
+            momentum = Vector3.ClampMagnitude(momentum, _swingingHookStateConfig.MaxSwingingSpeed);
             _controller.SetMomentum(momentum);
         }
 
@@ -162,11 +136,11 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
             Vector3 swingingDirectionFroward =
                 VectorMath.RemoveDotVector(_controller.CameraTrY.forward, -hookDirection.normalized);
             float aligning =
-                _swingingDirectionLerpCurve.Evaluate(VectorMath.GetDotProduct(_controller.CameraTrY.forward,
+                _swingingHookStateConfig.SwingingDirectionLerpCurve.Evaluate(VectorMath.GetDotProduct(_controller.CameraTrY.forward,
                     hookDirection));
 
             Vector3 swingingDirection = Vector3.Lerp(swingingDirectionFroward, swingingDirectionOrbital, aligning);
-            float additionalSpeed = Mathf.Lerp(_grapplingSpeed, _swingingSpeed, aligning);
+            float additionalSpeed = Mathf.Lerp(_swingingHookStateConfig.GrapplingSpeed, _swingingHookStateConfig.SwingingSpeed, aligning);
             momentum = AdjustMaxMomentum(momentum, swingingDirection.normalized, additionalSpeed);
             momentum = VectorMath.RemoveDotVector(momentum, -hookDirection.normalized);
             _controller.SetMomentum(momentum);
@@ -187,7 +161,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
 
         private Vector3 AdjustMaxMomentum(Vector3 momentum, Vector3 addingMomentum, float speed)
         {
-            if (momentum.magnitude > _maxSwingingSpeed)
+            if (momentum.magnitude > _swingingHookStateConfig.MaxSwingingSpeed)
             {
                 if (VectorMath.GetDotProduct(addingMomentum, momentum.normalized) > 0f)
                 {
@@ -201,14 +175,14 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
                 momentum += speed * (Time.fixedDeltaTime) * addingMomentum;
             }
 
-            momentum = Vector3.ClampMagnitude(momentum, _maxSwingingSpeed);
+            momentum = Vector3.ClampMagnitude(momentum, _swingingHookStateConfig.MaxSwingingSpeed);
 
             return momentum;
         }
 
         private bool CanGrapple =>
             RaycastSensor.CastAndCheck(_controller.CameraTrY.position) &&
-            RaycastSensor.GetDistance() > _swingingMinDistance;
+            RaycastSensor.GetDistance() > _swingingHookStateConfig.SwingingMinDistance;
 
         private bool HaveAbility => _controller.PlayerInventory.HaveAbility(this.GetType());
 
@@ -221,11 +195,11 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
                                            HaveAbility;
 
         public bool SwingingHookToRising() =>
-            (!_actionKeyIsPressed || _hookTimer.IsFinished || _distance <= _swingingMinDistance) &&
+            (!_actionKeyIsPressed || _hookTimer.IsFinished || _distance <= _swingingHookStateConfig.SwingingMinDistance) &&
             _controller.IsRising();
 
         public bool SwingingHookToFalling() =>
-            (!_actionKeyIsPressed || _hookTimer.IsFinished || _distance <= _swingingMinDistance) &&
+            (!_actionKeyIsPressed || _hookTimer.IsFinished || _distance <= _swingingHookStateConfig.SwingingMinDistance) &&
             _controller.IsFalling();
     }
 }

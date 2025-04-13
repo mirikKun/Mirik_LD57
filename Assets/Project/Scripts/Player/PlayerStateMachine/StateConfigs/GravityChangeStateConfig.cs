@@ -25,7 +25,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.StateConfigs
 
         private StateConfiguration GetPounceConfiguration(PlayerController playerController)
         {
-            var gravityChange = new GravityChangeState(playerController, RaycastDistance, ChangingDuration,GravityChangeFullDuration);
+            var gravityChange = new GravityChangeState(playerController, this);
             StateConfiguration configuration = new StateConfiguration
             {
                 State = gravityChange,

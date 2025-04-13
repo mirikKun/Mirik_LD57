@@ -1,5 +1,6 @@
 using Assets.Scripts.General.StateMachine;
 using Assets.Scripts.Player.Controller;
+using Assets.Scripts.Player.PlayerStateMachine.StateConfigs;
 using ImprovedTimers;
 using Scripts.Utils;
 using UnityEngine;
@@ -8,14 +9,10 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
 {
     public class CrouchSlidingState : IState
     {
-        private float _slideSpeed;
-        private float _slideMaxSpeedDuration;
-        private float _minSlideSpeed;
-        private float _minSlideAngle;
-        private float _colliderHeight;
-        private float _slidingFriction;
+
 
         private readonly PlayerController _controller;
+        private readonly CrouchSlidingStateConfig _crouchSlidingStateConfig;
         private bool _crouchKeyIsPressed;
         private readonly CountdownTimer _slideMaxSpeedTimer;
 
@@ -23,18 +20,13 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
         private Vector3 _slideDirection;
         private bool _firstTimerFinished;
 
-        public CrouchSlidingState(PlayerController controller,  float slideSpeed,float slideMaxSpeedDuration,
-            float minSlideSpeed, float minSlideAngle, float colliderHeight, float slidingFriction)
+        public CrouchSlidingState(PlayerController controller,  CrouchSlidingStateConfig crouchSlidingStateConfig)
         {
             _controller = controller;
-            _slideSpeed = slideSpeed;
-            _slideMaxSpeedDuration = slideMaxSpeedDuration;
-            _minSlideSpeed = minSlideSpeed;
-            _minSlideAngle = minSlideAngle;
-            _colliderHeight = colliderHeight;
-            _slidingFriction = slidingFriction;
+            _crouchSlidingStateConfig = crouchSlidingStateConfig;
+         
             _controller.Input.Crouch += HandleCrouchKeyInput;
-            _slideMaxSpeedTimer = new CountdownTimer(slideMaxSpeedDuration);
+            _slideMaxSpeedTimer = new CountdownTimer(crouchSlidingStateConfig.SlideMaxSpeedDuration);
         }
         public void Dispose()
         {
@@ -49,10 +41,10 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
         public void OnEnter()
         {
             _slideMaxSpeedTimer.Start();
-            _controller.StartCrouching(_colliderHeight);
+            _controller.StartCrouching(_crouchSlidingStateConfig.ColliderHeight);
             Vector3 momentum = _controller.GetMomentum();
             _slideDirection = Vector3.ProjectOnPlane(momentum, _controller.GetGroundNormal()).normalized;
-            _controller.SetMomentum(_slideDirection * _slideSpeed);
+            _controller.SetMomentum(_slideDirection * _crouchSlidingStateConfig.SlideSpeed);
             _firstTimerFinished = false;
         }
 
@@ -81,14 +73,14 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
                 .normalized;
             float slideOppositeAngle = Vector3.Angle(slopeDirection, momentum.normalized);
             bool onSlope = Vector3.Angle(_controller.Tr.up, _controller.GetGroundNormal()) > 0.1f;
-            if (onSlope && slideOppositeAngle < _minSlideAngle)
+            if (onSlope && slideOppositeAngle < _crouchSlidingStateConfig.MinSlideAngle)
             {
                 if(_firstTimerFinished||_slideMaxSpeedTimer.IsFinished)
                 {
                     _firstTimerFinished = true;
                     _slideMaxSpeedTimer.Start();
-                    momentum = Vector3.MoveTowards(momentum, slopeDirection * _slideSpeed,
-                        _slidingFriction * Time.fixedDeltaTime);
+                    momentum = Vector3.MoveTowards(momentum, slopeDirection * _crouchSlidingStateConfig.SlideSpeed,
+                        _crouchSlidingStateConfig.SlidingFriction * Time.fixedDeltaTime);
                 }
             }
             else
@@ -96,13 +88,13 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
              {
                  _firstTimerFinished = true;
 
-                momentum = Vector3.MoveTowards(momentum, Vector3.zero, _slidingFriction * Time.fixedDeltaTime);
+                momentum = Vector3.MoveTowards(momentum, Vector3.zero, _crouchSlidingStateConfig.SlidingFriction * Time.fixedDeltaTime);
             }
             
             _controller.SetMomentum(momentum);
         }
 
-        public bool CrouchSlidingToGround() => (!_crouchKeyIsPressed&&_firstTimerFinished)|| (_controller.GetMomentum().magnitude < _minSlideSpeed && !_crouchKeyIsPressed) ;
+        public bool CrouchSlidingToGround() => (!_crouchKeyIsPressed&&_firstTimerFinished)|| (_controller.GetMomentum().magnitude < _crouchSlidingStateConfig.MinSlideSpeed && !_crouchKeyIsPressed) ;
 
         public bool CrouchSlidingToFalling() => !_controller.IsGrounded()&&_controller.IsFalling();
         public bool GroundedToCrouchSliding() => _crouchKeyIsPressed;

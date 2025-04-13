@@ -1,4 +1,5 @@
 using Assets.Scripts.Player.Controller;
+using Assets.Scripts.Player.PlayerStateMachine.StateConfigs;
 using Assets.Scripts.Player.PlayerStateMachine.States.AbstractStates;
 using Scripts.Utils;
 using UnityEngine;
@@ -9,17 +10,15 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
     {
         protected readonly PlayerController _controller;
 
-        private readonly float _jumpPower;
-        private readonly float _minJumpAngle;
+        private readonly PounceStateConfig _pounceStateConfig;
+   
         private bool _jumpKeyIsPressed;
 
 
-
-        public PounceState(PlayerController controller, float jumpPower, float minJumpAngle)
+        public PounceState(PlayerController controller, PounceStateConfig pounceStateConfig)
         {
             _controller = controller;
-            _jumpPower = jumpPower;
-            _minJumpAngle = minJumpAngle;
+            _pounceStateConfig = pounceStateConfig;
             _controller.Input.Jump += HandleJumpKeyInput;
         }
         public void Dispose()
@@ -43,13 +42,13 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
             Vector3 horizontalDirection = (cameraForward - VectorMath.ExtractDotVector(cameraForward, _controller.Tr.up)).normalized;
 
             float cameraAngle = Vector3.Angle(_controller.Tr.up, cameraForward);
-            float clampedAngle = Mathf.Max(90f - cameraAngle, _minJumpAngle); // Минимум 30 градусов вверх
+            float clampedAngle = Mathf.Max(90f - cameraAngle, _pounceStateConfig.PounceMinAngle); // Минимум 30 градусов вверх
 
             Vector3 axis = Vector3.Cross(_controller.Tr.up, horizontalDirection);
             Quaternion jumpRotation = Quaternion.AngleAxis(-clampedAngle, axis);
 
             Vector3 jumpDirection = jumpRotation * horizontalDirection;
-            Vector3 momentum = jumpDirection * _jumpPower;
+            Vector3 momentum = jumpDirection * _pounceStateConfig.PouncePower;
 
             _controller.SetMomentum(momentum);
             _jumpKeyIsPressed= false;

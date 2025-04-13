@@ -16475,11 +16475,11 @@ MonoBehaviour:
   _playerSoundsManager: {fileID: 774458098}
   _cameraViewTransform: {fileID: 5870397798399800564}
   _targetTransform: {fileID: 6765490104537284111}
-  _movementSpeed: 8
-  _airControlRate: 8
-  _airFriction: 0.7
-  _groundFriction: 80
-  _gravity: 30
+  _movementSpeed: 7
+  _airControlRate: 6
+  _airFriction: 0.85
+  _groundFriction: 110
+  _gravity: 25
   _slideGravity: 5
   _slopeLimit: 46
   _useLocalMomentum: 0

@@ -24,7 +24,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.StateConfigs
         
         private StateConfiguration GetClimbingOverConfiguration(PlayerController playerController)
         {
-            var climbingOver = new ClimbingOverState(playerController,ClimbingOverSpeed,HorizontalSpeedReduction);
+            var climbingOver = new ClimbingOverState(playerController,this);
             StateConfiguration configuration = new StateConfiguration
             {
                 State = climbingOver,

@@ -28,7 +28,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.StateConfigs
         }
         private StateConfiguration GetDashConfiguration(PlayerController playerController)
         {
-            var dash = new DashState(playerController,DashSpeed,DashDuration,DashExitSpeed,UpdatedFov);
+            var dash = new DashState(playerController,this);
             StateConfiguration configuration = new StateConfiguration
             {
                 State = dash,

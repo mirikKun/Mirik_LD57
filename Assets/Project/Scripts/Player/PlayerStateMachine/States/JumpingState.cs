@@ -1,4 +1,5 @@
 using Assets.Scripts.Player.Controller;
+using Assets.Scripts.Player.PlayerStateMachine.StateConfigs;
 using Assets.Scripts.Player.PlayerStateMachine.States.AbstractStates;
 using ImprovedTimers;
 using Scripts.Utils;
@@ -6,23 +7,21 @@ using UnityEngine;
 
 namespace Assets.Scripts.Player.PlayerStateMachine.States {
     public class JumpingState : BaseAirState {
-        private readonly float _jumpDuration;
-        private readonly float _jumpSpeed;
+ 
         private readonly CountdownTimer _jumpTimer;
+        private readonly JumpStateConfig _jumpStateConfig;
 
 
         private bool _jumpKeyIsPressed; // Tracks whether the jump key is currently being held down by the player
         private bool _jumpKeyWasPressed; // Indicates if the jump key was pressed since the last reset, used to detect jump initiation
         private bool _jumpKeyWasLetGo; // Indicates if the jump key was released since it was last pressed, used to detect when to stop jumping
         private bool _jumpInputIsLocked; // Prevents jump initiation when true, used to ensure only one jump action per press
-        
-        public JumpingState(PlayerController controller, float jumpDuration, float jumpSpeed) : base(controller)
-        {
-            _jumpDuration = jumpDuration;
-            _jumpSpeed = jumpSpeed;
-            _jumpTimer = new CountdownTimer(jumpDuration);
-            _controller.Input.Jump += HandleJumpKeyInput;
 
+        public JumpingState(PlayerController controller, JumpStateConfig jumpStateConfig) : base(controller)
+        {
+            _jumpStateConfig = jumpStateConfig;
+            _jumpTimer = new CountdownTimer(jumpStateConfig.JumpDuration);
+            _controller.Input.Jump += HandleJumpKeyInput;
         }
         public void Dispose()
         {
@@ -52,7 +51,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States {
             momentum = horizontalMomentum;
             
             momentum = VectorMath.RemoveDotVector(momentum, _controller.Tr.up);
-            momentum += _controller.Tr.up * _jumpSpeed;
+            momentum += _controller.Tr.up * _jumpStateConfig.JumpSpeed;
             
             _controller.SetMomentum(momentum);
 
@@ -84,7 +83,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States {
             Vector3 momentum = _controller.GetMomentum();
 
 
-            momentum += _controller.Tr.up * _jumpSpeed;
+            momentum += _controller.Tr.up * _jumpStateConfig.JumpSpeed;
             _jumpTimer.Start();
             _jumpInputIsLocked = true;
 

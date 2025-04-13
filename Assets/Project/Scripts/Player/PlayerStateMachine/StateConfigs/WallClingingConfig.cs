@@ -21,7 +21,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.StateConfigs
         }
         private StateConfiguration GetClingingConfiguration(PlayerController playerController)
         {
-            var clinging = new WallClingingState(playerController);
+            var clinging = new WallClingingState(playerController,this);
             StateConfiguration configuration = new StateConfiguration
             {
                 State = clinging,

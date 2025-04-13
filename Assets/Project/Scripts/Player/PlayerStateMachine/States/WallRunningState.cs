@@ -1,5 +1,6 @@
 using Assets.Scripts.General.StateMachine;
 using Assets.Scripts.Player.Controller;
+using Assets.Scripts.Player.PlayerStateMachine.StateConfigs;
 using ImprovedTimers;
 using Scripts.Utils;
 using UnityEngine;
@@ -9,36 +10,25 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
     public class WallRunningState : IState
     {
         private readonly PlayerController _controller;
+        private readonly WallRunStateConfig _wallRunStateConfig;
 
-        private readonly float _wallRunDuration;
-        private readonly float _wallRunSpeed;
-        private readonly float _minSpeedToStartWallRun;
-        private readonly float _wallGravity;
-        private readonly float _cameraAngle;
+
         private readonly CountdownTimer _wallRunTimer;
-        private readonly float _maxVerticalSpeedToStartWallRun;
-        private float _wallAngleMultiplier=3;
 
         private Vector3 _wallNormal;
 
-        public WallRunningState(PlayerController controller, float wallRunDuration, float wallRunSpeed,
-            float minSpeedToStartWallRun,float maxVerticalSpeedToStartWallRun, float wallGravity, float cameraAngle, float wallAngleMultiplier)
+        public WallRunningState(PlayerController controller, WallRunStateConfig wallRunStateConfig)
         {
             _controller = controller;
-            _wallRunDuration = wallRunDuration;
-            _wallRunSpeed = wallRunSpeed;
-            _minSpeedToStartWallRun = minSpeedToStartWallRun;
-            _maxVerticalSpeedToStartWallRun = maxVerticalSpeedToStartWallRun;
-            _wallGravity = wallGravity;
-            _cameraAngle = cameraAngle;
-            _wallAngleMultiplier = wallAngleMultiplier;
-            _wallRunTimer = new CountdownTimer(_wallRunDuration);
+            _wallRunStateConfig = wallRunStateConfig;
+         
+            _wallRunTimer = new CountdownTimer(_wallRunStateConfig.WallRunDuration);
         }
 
         public void OnEnter()
         {
             _controller.OnGroundContactLost();
-            _controller.WallDetector.SetWallAngleWithMultiplier(_wallAngleMultiplier);
+            _controller.WallDetector.SetWallAngleWithMultiplier(_wallRunStateConfig.WallAngleMultiplier);
             _wallRunTimer.Start();
             RotateCamera();
             _wallNormal = _controller.GetWallNormal();
@@ -52,7 +42,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
                                                     _controller.Tr.up);
             Vector3 wallRunDirection = Vector3.ProjectOnPlane(horizontalCameraDirection, _controller.GetWallNormal())
                 .normalized;
-            Vector3 velocity = wallRunDirection * _wallRunSpeed - _controller.GetWallNormal() * _wallGravity;
+            Vector3 velocity = wallRunDirection * _wallRunStateConfig.WallRunSpeed - _controller.GetWallNormal() * _wallRunStateConfig.WallGravity;
             
             _controller.CameraController.RotateCameraHorizontal(wallRotation);
             _wallNormal = _controller.GetWallNormal();
@@ -110,13 +100,13 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
 
         public bool FallingToWallRunning() =>
             !_controller.IsGrounded() &&
-            _controller.GetHorizontalMomentum().magnitude > _minSpeedToStartWallRun &&
+            _controller.GetHorizontalMomentum().magnitude > _wallRunStateConfig.MinSpeedToStartWallRun &&
             _controller.HitSidewaysWall() &&
-            _controller.GetVerticalMomentum().magnitude < _maxVerticalSpeedToStartWallRun
+            _controller.GetVerticalMomentum().magnitude < _wallRunStateConfig.MaxVerticalSpeedToStartWallRun
             && !_controller.HaveStateInHistory<WallRunningState>(2) && AlignWithInput();
 
         public bool RisingToWallRunning() => (_controller.IsFalling() || _controller.HitCeiling()) &&
-                                             _controller.GetHorizontalMomentum().magnitude > _minSpeedToStartWallRun &&
+                                             _controller.GetHorizontalMomentum().magnitude > _wallRunStateConfig.MinSpeedToStartWallRun &&
                                              _controller.HitSidewaysWall()&&AlignWithInput();
     }
 }

@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edebc714d52f463e9c816d169e9dfc48, type: 3}
   m_Name: JumpStateConfig
   m_EditorClassIdentifier: 
+  <JumpSpeed>k__BackingField: 8.5
   <JumpDuration>k__BackingField: 0.2
-  <JumpSpeed>k__BackingField: 10

@@ -10,18 +10,18 @@ namespace Assets.Scripts.Player.PlayerStateMachine.StateConfigs
 
     public class WallRunStateConfig:BaseStateConfig
     {
-        [SerializeField]private  float _wallRunDuration=3;
-        [SerializeField]private  float _wallRunSpeed=6;
-        [SerializeField]private  float _minSpeedToStartWallRun=4;
-        [SerializeField] private float _maxVerticalSpeedToStartWallRun=14;
-        [SerializeField]private  float _wallGravity=5;
-        [SerializeField]private float _cameraAngle=7;
-        [SerializeField]private float _wallAngleMultiplier=3;
+        [field:SerializeField] public float WallRunDuration { get; private set; }=3;
+        [field:SerializeField]public  float WallRunSpeed{ get; private set; }=6;
+        [field:SerializeField]public  float MinSpeedToStartWallRun{ get; private set; }=4;
+        [field:SerializeField] public float MaxVerticalSpeedToStartWallRun{ get; private set; }=14;
+        [field:SerializeField]public  float WallGravity{ get; private set; }=5;
+        [field:SerializeField]public float CameraAngle{ get; private set; }=7;
+        [field:SerializeField]public float WallAngleMultiplier{ get; private set; }=1.6f;
 
-        [Space]
-        [SerializeField]private  float _jumpForwardPower=12;
-        [SerializeField]private  float _jumpUpPower=12;
-        [SerializeField]private  float _jumpFromWallPower=8;
+        [field:Space]
+        [field:SerializeField]public  float JumpForwardPower{ get; private set; }=12;
+        [field:SerializeField]public  float JumpUpPower{ get; private set; }=12;
+        [field:SerializeField]public  float JumpFromWallPower{ get; private set; }=8;
         public override List<StateConfiguration> GetStateConfiguration(PlayerController playerController)
         {
             List<StateConfiguration> jumpStateConfigurations = new List<StateConfiguration>()
@@ -36,7 +36,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.StateConfigs
         
         private StateConfiguration GetWallRunningConfiguration(PlayerController playerController)
         {
-            var wallRunning = new WallRunningState(playerController,_wallRunDuration,_wallRunSpeed,_minSpeedToStartWallRun,_maxVerticalSpeedToStartWallRun,_wallGravity,_cameraAngle,_wallAngleMultiplier);
+            var wallRunning = new WallRunningState(playerController,this);
             StateConfiguration configuration = new StateConfiguration
             {
                 State = wallRunning,
@@ -53,7 +53,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.StateConfigs
         
         private StateConfiguration GetWallRunJumpConfiguration(PlayerController playerController)
         {
-            var wallJumping = new WallRunJumpState(playerController,_jumpForwardPower,_jumpUpPower,_jumpFromWallPower);
+            var wallJumping = new WallRunJumpState(playerController,this);
             StateConfiguration configuration = new StateConfiguration
             {
                 State = wallJumping,

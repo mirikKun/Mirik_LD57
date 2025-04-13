@@ -1,6 +1,7 @@
 using Assets.Scripts.General;
 using Assets.Scripts.General.StateMachine;
 using Assets.Scripts.Player.Controller;
+using Assets.Scripts.Player.PlayerStateMachine.StateConfigs;
 using Assets.Scripts.Player.PlayerStateMachine.States.AbstractStates;
 using ImprovedTimers;
 using UnityEngine;
@@ -10,16 +11,14 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
     public class GravityChangeState:ISpendableState
     {
         private readonly PlayerController _controller;
-        private float _raycastDistance = 4.5f;
-        private float _changingDuration = 0.5f;
-        private float _gravityChangeFullDuration = 5f;
-        
-        
+        private readonly GravityChangeStateConfig _gravityChangeStateConfig;
+
+
         private Vector3 _gravityDirection;
         private Vector3 _lastGravityDirection;
         private Quaternion _startRotation;
         private Quaternion _changeRotation;
-        
+
         private RaycastSensor _raycastSensor;
         private  CountdownTimer _gravityChangingTimer;
         private  CountdownTimer _gravityFullChangeTimer;
@@ -28,19 +27,17 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
         private bool _wrongGravity;
 
 
-        public GravityChangeState(PlayerController controller,float raycastDistance,float changingDuration,float gravityChangeFullDuration)
+        public GravityChangeState(PlayerController controller,GravityChangeStateConfig gravityChangeStateConfig)
         {
             _controller = controller;
-            _raycastDistance = raycastDistance;
-            _changingDuration = changingDuration;
-
-            _gravityChangeFullDuration = gravityChangeFullDuration;
-            _gravityChangingTimer = new CountdownTimer(_changingDuration);
-            _gravityFullChangeTimer = new CountdownTimer(_gravityChangeFullDuration);
+            _gravityChangeStateConfig = gravityChangeStateConfig;
+       
+            _gravityChangingTimer = new CountdownTimer(_gravityChangeStateConfig.ChangingDuration);
+            _gravityFullChangeTimer = new CountdownTimer(_gravityChangeStateConfig.GravityChangeFullDuration);
             _controller.Input.Action3 += HandleActionInput;
 
             _raycastSensor = new RaycastSensor(_controller.CameraTrY);
-            _raycastSensor.castLength=(_raycastDistance);
+            _raycastSensor.castLength=(gravityChangeStateConfig.RaycastDistance);
             _raycastSensor.SetCastDirection(RaycastSensor.CastDirection.Forward);
         }
         public void Dispose()

@@ -34,7 +34,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.StateConfigs
         
         private StateConfiguration GetGrapplingHookConfiguration(Player.Controller.PlayerController playerController)
         {
-            var swingingHook = new SwingingHookState(playerController,SwingingSpeed,GrapplingSpeed,PreparingDuration,SwingingDuration,SwingingMaxDistance,MaxSwingingSpeed,SwingingMinDistance,SwingingExitSpeedMultiplier,StartSwingMomentum,SwingingDirectionLerpCurve);
+            var swingingHook = new SwingingHookState(playerController,this);
             StateConfiguration configuration = new StateConfiguration
             {
                 State = swingingHook,

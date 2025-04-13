@@ -24,7 +24,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.StateConfigs
         }
         private StateConfiguration GetPounceConfiguration(PlayerController playerController)
         {
-            var pounce = new PounceState(playerController,PouncePower,PounceMinAngle);
+            var pounce = new PounceState(playerController,this);
             StateConfiguration configuration = new StateConfiguration
             {
                 State = pounce,

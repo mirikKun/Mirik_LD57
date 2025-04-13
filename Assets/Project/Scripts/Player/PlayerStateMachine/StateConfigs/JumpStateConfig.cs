@@ -24,7 +24,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.StateConfigs
         
         private StateConfiguration GetJumpingConfiguration(PlayerController playerController)
         {
-            var jumping = new JumpingState(playerController,JumpDuration,JumpSpeed);
+            var jumping = new JumpingState(playerController,this);
             StateConfiguration configuration = new StateConfiguration
             {
                 State = jumping,

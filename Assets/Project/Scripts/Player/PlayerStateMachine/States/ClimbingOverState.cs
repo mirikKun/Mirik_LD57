@@ -1,5 +1,6 @@
 using Assets.Scripts.General.StateMachine;
 using Assets.Scripts.Player.Controller;
+using Assets.Scripts.Player.PlayerStateMachine.StateConfigs;
 using Scripts.Utils;
 using UnityEngine;
 
@@ -8,13 +9,13 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
     public class ClimbingOverState:IState
     {
         private readonly PlayerController _controller;
-        private readonly float _climbingSpeed =7f;
-        private readonly float _horizontalSpeedReduction =0.3f;
+  
+        private readonly ClimbingOverStateConfig _climbingOverStateConfig;
 
-        public ClimbingOverState(PlayerController controller,float climbingSpeed,float horizontalSpeedReduction) {
+        public ClimbingOverState(PlayerController controller,ClimbingOverStateConfig climbingOverStateConfig) {
             this._controller = controller;
-            _climbingSpeed = climbingSpeed;
-            _horizontalSpeedReduction = horizontalSpeedReduction;
+            _climbingOverStateConfig = climbingOverStateConfig;
+      
         }
 
         public  void OnEnter()
@@ -24,10 +25,10 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
         }
         public  void FixedUpdate()
         {
-            Vector3 velocity = _controller.CalculateMovementVelocity()*_horizontalSpeedReduction;
+            Vector3 velocity = _controller.CalculateMovementVelocity()*_climbingOverStateConfig.HorizontalSpeedReduction;
             Vector3 verticalVelocity = VectorMath.ExtractDotVector(velocity, _controller.Tr.up);
             Vector3 horizontalMomentum = velocity - verticalVelocity;
-            verticalVelocity += _controller.Tr.up * _climbingSpeed;
+            verticalVelocity += _controller.Tr.up * _climbingOverStateConfig.ClimbingOverSpeed;
 
             velocity = horizontalMomentum + verticalVelocity;
             _controller.SetVelocity(velocity);

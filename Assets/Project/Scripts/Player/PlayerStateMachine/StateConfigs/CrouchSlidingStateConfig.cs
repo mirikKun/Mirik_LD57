@@ -32,7 +32,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.StateConfigs
         }
         private StateConfiguration GetSlideConfiguration(PlayerController playerController)
         {
-            var sliding = new CrouchSlidingState(playerController,SlideSpeed,SlideMaxSpeedDuration,MinSlideSpeed,MinSlideAngle,ColliderHeight,SlidingFriction);
+            var sliding = new CrouchSlidingState(playerController,this);
             StateConfiguration configuration = new StateConfiguration
             {
                 State = sliding,
@@ -49,7 +49,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.StateConfigs
         }
         private StateConfiguration GetSlideJumpConfiguration(PlayerController playerController)
         {
-            var slidingJump = new CrouchSlidingJumpState(playerController,PouncePower,PounceMinAngle);
+            var slidingJump = new CrouchSlidingJumpState(playerController,this);
             StateConfiguration configuration = new StateConfiguration
             {
                 State = slidingJump,

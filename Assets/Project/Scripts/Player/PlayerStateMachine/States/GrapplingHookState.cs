@@ -1,58 +1,38 @@
 using Assets.Scripts.General;
-using Assets.Scripts.General.StateMachine;
 using Assets.Scripts.Player.Controller;
+using Assets.Scripts.Player.PlayerStateMachine.StateConfigs;
 using Assets.Scripts.Player.PlayerStateMachine.States.AbstractStates;
 using ImprovedTimers;
 using UnityEngine;
 
 namespace Assets.Scripts.Player.PlayerStateMachine.States
 {
-    public class GrapplingHookState:ISpendableState
+    public class GrapplingHookState : ISpendableState
     {
-        
-        private float _grappleSpeed = 10f;
-        private float _grappleMaxDistance = 100f;
-        private float _grappleMaxApproachableDistance = 50f;
-        private float _grappleMinDistance = 5f;
-        private float _grapplingExitSpeedMultiplier= 0.5f;
-        
-        private bool _adaptiveGrapple = true;
-        private float _adaptiveGrappleOffset = 0.5f;
-        private float _adaptiveGrappleLetGoDistance = 3f;
-        
+        private readonly GrapplingHookStateConfig _grapplingHookStateConfig;
         private readonly PlayerController _controller;
         private RaycastSensor _raycastSensor;
-        private  CountdownTimer _grapplingTimer;
+        private CountdownTimer _grapplingTimer;
 
-        
-        
+
         private Vector3 _grapplePoint;
         private Vector3 _grappleDirection;
         private bool _actionKeyIsPressed;
 
 
-        public GrapplingHookState(PlayerController controller, float grappleSpeed, float grappleMaxDistance,float grappleMaxApproachableDistance, float grappleMinDistance,float grapplingExitSpeedMultiplier, bool adaptiveGrapple, float adaptiveGrappleOffset,float adaptiveGrappleLetGoDistance)
+        public GrapplingHookState(PlayerController controller, GrapplingHookStateConfig grapplingHookStateConfig)
         {
             _controller = controller;
-            _grappleSpeed = grappleSpeed;
-            _grappleMaxDistance = grappleMaxDistance;
-    
-            _grappleMaxApproachableDistance = grappleMaxApproachableDistance;
-            _grappleMinDistance = grappleMinDistance;
-            _grapplingExitSpeedMultiplier = grapplingExitSpeedMultiplier;
-            
-            
-            _adaptiveGrapple = adaptiveGrapple;
-            _adaptiveGrappleOffset = adaptiveGrappleOffset;
-            _adaptiveGrappleLetGoDistance = adaptiveGrappleLetGoDistance;
+            _grapplingHookStateConfig = grapplingHookStateConfig;
 
             _controller.Input.Action2 += HandleActionInput;
 
-            
+
             _raycastSensor = new RaycastSensor(_controller.CameraTrY);
-            _raycastSensor.castLength=(_grappleMaxDistance);
+            _raycastSensor.castLength = (_grapplingHookStateConfig.GrappleMaxDistance);
             _raycastSensor.SetCastDirection(RaycastSensor.CastDirection.Forward);
         }
+
         public void Dispose()
         {
             _controller.Input.Action2 -= HandleActionInput;
@@ -63,9 +43,8 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
             _actionKeyIsPressed = isButtonPressed;
         }
 
-        public  void OnEnter()
+        public void OnEnter()
         {
-
             _controller.PlayerInventory.TempSpendAbility(this.GetType());
             _controller.OnGroundContactLost();
             OnGrapplingHookStart();
@@ -73,9 +52,8 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
 
         public void OnExit()
         {
-            _controller.SetMomentum(_controller.GetMomentum()*_grapplingExitSpeedMultiplier);
+            _controller.SetMomentum(_controller.GetMomentum() * _grapplingHookStateConfig.GrapplingExitSpeedMultiplier);
             _controller.PlayerEffects.HookEffects.ClearGrappleLine();
-
         }
 
         private void OnGrapplingHookStart()
@@ -84,26 +62,33 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
             _grapplePoint = _raycastSensor.GetPosition();
             float distance = Vector3.Distance(_controller.Tr.position, _grapplePoint);
 
-            float grappleDuration = (Mathf.Clamp(distance,_grappleMinDistance, _grappleMaxApproachableDistance )-_adaptiveGrappleLetGoDistance) / _grappleSpeed;
+            float grappleDuration =
+                (Mathf.Clamp(distance, _grapplingHookStateConfig.GrappleMinDistance, _grapplingHookStateConfig.GrappleMaxApproachableDistance) -
+                 _grapplingHookStateConfig.AdaptiveGrappleLetGoDistance) / _grapplingHookStateConfig.GrappleSpeed;
             _grapplingTimer = new CountdownTimer(grappleDuration);
             _grapplingTimer.Start();
 
-            Vector3 momentum=_grappleDirection*_grappleSpeed;
+            Vector3 momentum = _grappleDirection * _grapplingHookStateConfig.GrappleSpeed;
             _controller.SetMomentum(momentum);
         }
-        
+
         public void Update()
         {
             _controller.PlayerEffects.HookEffects.DrawGrappleLine(_raycastSensor.GetPosition(), 1);
         }
 
-        private bool CanGrapple => _raycastSensor.CastAndCheck(_controller.CameraTrY.position) && _raycastSensor.GetDistance() > _grappleMinDistance;
+        private bool CanGrapple => _raycastSensor.CastAndCheck(_controller.CameraTrY.position) &&
+                                   _raycastSensor.GetDistance() > _grapplingHookStateConfig.GrappleMinDistance;
+
         private bool HaveAbility => _controller.PlayerInventory.HaveAbility(this.GetType());
 
 
-        public bool GroundedToGrappleHook()=>_actionKeyIsPressed&&CanGrapple&&HaveAbility;
-        public bool AirToGrappleHook()=>_actionKeyIsPressed&&CanGrapple&&!_controller.HaveStateBeforeStateInHistory<GrapplingHookState,IGroundState>()&&HaveAbility;
-        public bool GrappleHookToRising() => _grapplingTimer.IsFinished&&_controller.IsRising();
-        public bool GrappleHookToFalling() => _grapplingTimer.IsFinished&&_controller.IsFalling();
+        public bool GroundedToGrappleHook() => _actionKeyIsPressed && CanGrapple && HaveAbility;
+
+        public bool AirToGrappleHook() => _actionKeyIsPressed && CanGrapple && !_controller
+                                              .HaveStateBeforeStateInHistory<GrapplingHookState, IGroundState>() && HaveAbility;
+
+        public bool GrappleHookToRising() => _grapplingTimer.IsFinished && _controller.IsRising();
+        public bool GrappleHookToFalling() => _grapplingTimer.IsFinished && _controller.IsFalling();
     }
 }

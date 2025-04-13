@@ -1,17 +1,21 @@
 using Assets.Scripts.General.StateMachine;
 using Assets.Scripts.Player.Controller;
+using Assets.Scripts.Player.PlayerStateMachine.StateConfigs;
 using UnityEngine;
 
 namespace Assets.Scripts.Player.PlayerStateMachine.States
 {
     public class WallClingingState:IState
     {
+        private readonly WallClingingConfig _wallClingingConfig;
         private readonly PlayerController _controller;
         private bool _jumpKeyIsPressed;
 
-        public WallClingingState(PlayerController controller)
+        public WallClingingState(PlayerController controller,WallClingingConfig wallClingingConfig)
         {
+            
             _controller = controller;
+            _wallClingingConfig = wallClingingConfig;
         
             _controller.Input.Jump += HandleJumpKeyInput;
         }
