@@ -22,7 +22,6 @@ namespace Project.Scripts.Generation
             if (other.TryGetComponent<PlayerController>(out var playerController))
             {
                 playerController.PlayerRespawner.SetRespawnPosition(transform.position + Vector3.up * _respawnOffset);
-                playerController.DescentController.ReplenishFullStamina();
                 playerController.PlayerInventory.ApplyTempSpentAbilities();
 
                 LocationEntered?.Invoke();

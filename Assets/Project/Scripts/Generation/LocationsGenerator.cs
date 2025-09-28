@@ -69,8 +69,32 @@ namespace Project.Scripts.Generation
             OnLocationEntered(_currentLocations[^1]);
         }
 
-        
-  
+        public bool  TryGetNearestLocationEnterPoint(Vector3 position,float maxDistance ,out Vector3 enterPoint)
+        {
+            enterPoint = default;
+
+            float minDistance = maxDistance;
+            foreach (Location location in _currentLocations)
+            {
+                foreach (Transform point in location.LocationEndPoints)
+                {
+                    if (point.position.y > position.y)
+                    {
+                        continue;
+                    }
+                    float distance = Vector3.Distance(position, point.position);
+                    if (distance < minDistance)
+                    {
+                        minDistance = distance;
+                        enterPoint = point.position;
+                    }
+                }
+            }
+
+            return enterPoint!=default;
+        }
+
+
         private void OnLocationEntered(Location enteredLocation)
         {
             foreach (var location in _currentLocations)

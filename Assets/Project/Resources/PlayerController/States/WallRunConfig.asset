@@ -12,13 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da58a5b510494b2bb73a0d67500674b1, type: 3}
   m_Name: WallRunConfig
   m_EditorClassIdentifier: 
-  _wallRunDuration: 3
-  _wallRunSpeed: 6
-  _minSpeedToStartWallRun: 4
-  _maxVerticalSpeedToStartWallRun: 14
-  _wallGravity: 5
-  _cameraAngle: 7
-  _wallAngleMultiplier: 1.6
-  _jumpForwardPower: 12
-  _jumpUpPower: 12
-  _jumpFromWallPower: 8
+  <WallRunDuration>k__BackingField: 3
+  <WallRunSpeed>k__BackingField: 6
+  <MinSpeedToStartWallRun>k__BackingField: 4
+  <MaxVerticalSpeedToStartWallRun>k__BackingField: 16
+  <WallGravity>k__BackingField: 5
+  <WallAngleMultiplier>k__BackingField: 1.8
+  <JumpForwardPower>k__BackingField: 12
+  <JumpUpPower>k__BackingField: 12
+  <JumpFromWallPower>k__BackingField: 8

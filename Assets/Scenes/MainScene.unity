@@ -1798,7 +1798,8 @@ MonoBehaviour:
   _acceleration: 2
   _deceleration: 1.3
   _impulseSpeedChange: -15
-  _offset: {x: 0, y: 0, z: 0}
+  _offset: {x: 0, y: -15, z: 0}
+  _newLocationOffset: {x: 0, y: -35, z: 0}
   _descentController: {fileID: 1117198931}
   _locationsGenerator: {fileID: 1116786453}
   _speedCurve:
@@ -6838,11 +6839,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerMover: {fileID: 1548558053676932065}
-  _maxDepthStamina: 30
-  _depthStaminaDecreaseRate: 2.1
-  _depthStaminaOnGroundRegenSpeed: 30
   _playerHealth: {fileID: 9042120081693549020}
-  _staminaEmptyDamage: 10
   _minGroundedChange: 0.5
 --- !u!1001 &1119217608
 PrefabInstance:

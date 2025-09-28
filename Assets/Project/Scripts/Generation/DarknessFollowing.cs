@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using DG.Tweening;
 using Scripts.Player.DescentContorller;
 using UnityEngine;
 
@@ -13,6 +11,7 @@ namespace Project.Scripts.Generation
         [SerializeField] private float _deceleration= 1.3f;
         [SerializeField] private float _impulseSpeedChange=-20;
         [SerializeField] private Vector3 _offset;
+        [SerializeField] private Vector3 _newLocationOffset;
         [Space] 
         [SerializeField] private DescentController _descentController;
 
@@ -69,7 +68,7 @@ namespace Project.Scripts.Generation
 
         public void Update()
         {
-            Vector3 targetPosition = new Vector3(0,_descentController.GetCurrenMaxDepth(),0) + _offset;
+            Vector3 targetPosition = GetTargetPosition();
             
             int accelerationSign= (int)Mathf.Sign(targetPosition.y - transform.position.y);
             int speedSign= (int)Mathf.Sign(_currentSpeed);
@@ -85,12 +84,19 @@ namespace Project.Scripts.Generation
 
         private void OnCharacterGrounded()
         {
-            Vector3 targetPosition = new Vector3(0,_descentController.GetCurrenMaxDepth(),0) + _offset;
-
-            float speedOffset= _impulseSpeedChange*_speedCurve.Evaluate(Mathf.Abs(targetPosition.y - transform.position.y)/_descentController.GetDistance);
+            var targetPosition = GetTargetPosition();
+            float speedOffset= _impulseSpeedChange*_speedCurve.Evaluate(Mathf.Abs(targetPosition.y - transform.position.y)/_offset.magnitude);
       
             _currentSpeed+= speedOffset;
         }
-        
+
+        private Vector3 GetTargetPosition()
+        {
+            if (_locationsGenerator.TryGetNearestLocationEnterPoint(_descentController.LastGroundPosition, _offset.magnitude, out Vector3 locationEnter))
+                return locationEnter+_newLocationOffset;
+            
+            Vector3 targetPosition = new Vector3(0,_descentController.LastGroundPosition.y,0) + _offset;
+            return targetPosition;
+        }
     }
 }
