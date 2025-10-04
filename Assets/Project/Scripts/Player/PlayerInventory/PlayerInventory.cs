@@ -64,15 +64,15 @@ namespace Assets.Scripts.Player.Controller
         {
             if (_abilityStacks.TryGetValue(abilityType, out var value) && value > 0)
             {
-                if (_tempSpentAbilityStacks.TryGetValue(abilityType, out var tempValue) &&
-                    _abilityStacks[abilityType] > tempValue)
-                {
-                    _tempSpentAbilityStacks[abilityType]+= 1;
-                }
-                else
-                {
-                    _tempSpentAbilityStacks.Add(abilityType, 1);
-                }
+                // if (_tempSpentAbilityStacks.TryGetValue(abilityType, out var tempValue) &&
+                //     _abilityStacks[abilityType] > tempValue)
+                // {
+                //     _tempSpentAbilityStacks[abilityType]+= 1;
+                // }
+                // else
+                // {
+                //     _tempSpentAbilityStacks.Add(abilityType, 1);
+                // }
 
                 AbilitySpent?.Invoke(abilityType);
             }

@@ -21,7 +21,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
         {
             _controller = controller;
             _wallRunStateConfig = wallRunStateConfig;
-         
+
             _wallRunTimer = new CountdownTimer(_wallRunStateConfig.WallRunDuration);
         }
 
@@ -36,27 +36,29 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
 
         public void FixedUpdate()
         {
-            float wallRotation=SignedAngle(_wallNormal,_controller.GetWallNormal(),_controller.Tr.up);
+            float wallRotation = SignedAngle(_wallNormal, _controller.GetWallNormal(), _controller.Tr.up);
             Vector3 horizontalCameraDirection = _controller.CameraTrX.forward -
                                                 VectorMath.ExtractDotVector(_controller.CameraTrX.forward,
                                                     _controller.Tr.up);
             Vector3 wallRunDirection = Vector3.ProjectOnPlane(horizontalCameraDirection, _controller.GetWallNormal())
                 .normalized;
-            Vector3 velocity = wallRunDirection * _wallRunStateConfig.WallRunSpeed - _controller.GetWallNormal() * _wallRunStateConfig.WallGravity;
-            
+            Vector3 velocity = wallRunDirection * _wallRunStateConfig.WallRunSpeed -
+                               _controller.GetWallNormal() * _wallRunStateConfig.WallGravity;
+
             _controller.CameraController.RotateCameraHorizontal(wallRotation);
             _wallNormal = _controller.GetWallNormal();
 
             _controller.SetVelocity(velocity);
             _controller.SetMomentum(velocity);
         }
+
         float SignedAngle(Vector3 from, Vector3 to, Vector3 axis)
         {
             float angle = Vector3.Angle(from, to);
-    
+
             Vector3 cross = Vector3.Cross(from, to);
             float sign = Mathf.Sign(Vector3.Dot(axis, cross));
-    
+
             return angle * sign;
         }
 
@@ -68,11 +70,11 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
 
         private void RotateCamera()
         {
-            float sign = Mathf.Sign( Vector3.Dot(_controller.GetWallNormal(), _controller.CameraTrX.right));
+            float sign = Mathf.Sign(Vector3.Dot(_controller.GetWallNormal(), _controller.CameraTrX.right));
             //
             // float targetAngle = sign * _cameraAngle;
             // _controller.CameraViewTr.rotation = Quaternion.AngleAxis(-targetAngle, _controller.CameraTrX.forward)*_controller.CameraViewTr.rotation;
-            
+
             _controller.PlayerEffects.CameraMovingEffects.SetWallRunTilt(-sign);
         }
 
@@ -80,22 +82,18 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
         {
             //_controller.CameraViewTr.localRotation = Quaternion.identity;
             _controller.PlayerEffects.CameraMovingEffects.SetWallRunTilt(0);
-
         }
 
         private bool AlignWithInput()
         {
-            Vector3 horizontalCameraDirection = _controller.CameraTrX.forward -
-                                                VectorMath.ExtractDotVector(_controller.CameraTrX.forward,
-                                                    _controller.Tr.up);
-            Vector3 wallRunDirection = Vector3.ProjectOnPlane(horizontalCameraDirection, _controller.GetWallNormal())
-                .normalized;
-            Vector3 neededDirection = (-_controller.GetWallNormal() + wallRunDirection)/2;
+            Vector3 horizontalCameraDirection = _controller.CameraTrX.forward - VectorMath.ExtractDotVector(_controller.CameraTrX.forward, _controller.Tr.up);
+            Vector3 wallRunDirection = Vector3.ProjectOnPlane(horizontalCameraDirection, _controller.GetWallNormal()).normalized;
+            Vector3 neededDirection = (-_controller.GetWallNormal() + wallRunDirection) / 2;
             Vector3 inputDirection = (_controller.CalculateMovementDirection() - _controller.GetWallNormal()).normalized;
-            return _controller.Input.Direction.x!=0&& Vector3.Dot(neededDirection, inputDirection) > 0.6f;
+            return _controller.Input.Direction.x != 0 && Vector3.Dot(neededDirection, inputDirection) > 0.6f;
         }
-        
-        
+
+
         public bool WallRunningToGround() => _controller.IsGrounded();
         public bool WallRunningToFalling() => _wallRunTimer.IsFinished || !_controller.HitSidewaysWall();
 
@@ -107,7 +105,8 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
             && !_controller.HaveStateInHistory<WallRunningState>(2) && AlignWithInput();
 
         public bool RisingToWallRunning() => (_controller.IsFalling() || _controller.HitCeiling()) &&
-                                             _controller.GetHorizontalMomentum().magnitude > _wallRunStateConfig.MinSpeedToStartWallRun &&
-                                             _controller.HitSidewaysWall()&&AlignWithInput();
+                                             _controller.GetHorizontalMomentum().magnitude >
+                                             _wallRunStateConfig.MinSpeedToStartWallRun &&
+                                             _controller.HitSidewaysWall() && AlignWithInput();
     }
 }

@@ -6,23 +6,34 @@ using Random = UnityEngine.Random;
 
 namespace Project.Scripts.Generation
 {
-    public class LocationsGenerator:MonoBehaviour
+    public class LocationsGenerator : MonoBehaviour
     {
         [SerializeField] private Location _startLocation;
+        [SerializeField] private List<Location> _basicTutorialLocations;
         [SerializeField] private List<Location> _easyLcationsPrefabs;
+        [SerializeField] private List<Location> _advancedTutorialLocations;
+
         [SerializeField] private List<Location> _hardLocationsPrefabs;
 
         [SerializeField] private Location _lastLocation;
         [SerializeField] private List<Location> _smallLocationPrefabs;
         private List<Location> _currentLocations = new List<Location>();
+        private List<Location> _allLocations = new List<Location>();
         private int _currentLocationIndex;
-        public event Action<Vector3,Vector3> LocationEntered; 
-        
+        public event Action<Vector3, Vector3> LocationEntered;
+
         private void Start()
         {
             _currentLocations.Add(_startLocation);
-            _easyLcationsPrefabs=_easyLcationsPrefabs.Shuffle();
+            _easyLcationsPrefabs = _easyLcationsPrefabs.Shuffle();
             _hardLocationsPrefabs = _hardLocationsPrefabs.Shuffle();
+
+
+            _allLocations.AddRange(_basicTutorialLocations);
+            _allLocations.AddRange(_easyLcationsPrefabs);
+            _allLocations.AddRange(_advancedTutorialLocations);
+            _allLocations.AddRange(_hardLocationsPrefabs);
+            _allLocations.Add(_lastLocation);
             GenerateLocations(_startLocation);
         }
 
@@ -31,21 +42,21 @@ namespace Project.Scripts.Generation
             foreach (var root in fromLocation.LocationEndPoints)
             {
                 Location chosenLocation;
-                if (fromLocation.IsBigLocation)
-                {
-                    int randomIndex = Random.Range(0, _smallLocationPrefabs.Count);
-                    chosenLocation = _smallLocationPrefabs[randomIndex];
-                }else
-                {
-                    chosenLocation = GetNextBigLocation();
-                    _currentLocationIndex++;
-                }
-                Location newLocation = Instantiate(chosenLocation,
-                    GetNextLocationPosition(root.position, chosenLocation), Quaternion.Euler(0,Random.Range(0,360),0));
+                // if (fromLocation.IsBigLocation)
+                // {
+                // int randomIndex = Random.Range(0, _smallLocationPrefabs.Count);
+                // chosenLocation = _smallLocationPrefabs[randomIndex];
+                // }
+                // else
+                // {
+                chosenLocation = _allLocations[_currentLocationIndex];
+                _currentLocationIndex++;
+                // }
+
+                Location newLocation = Instantiate(chosenLocation, GetNextLocationPosition(root.position, chosenLocation), Quaternion.Euler(0, Random.Range(0, 360), 0));
                 _currentLocations.Add(newLocation);
-                newLocation.LocationEntered+=OnLocationEntered;
+                newLocation.LocationEntered += OnLocationEntered;
             }
-          
         }
 
         private Location GetNextBigLocation()
@@ -56,20 +67,20 @@ namespace Project.Scripts.Generation
             }
             else if (_currentLocationIndex < _easyLcationsPrefabs.Count + _hardLocationsPrefabs.Count)
             {
-                return _hardLocationsPrefabs[_currentLocationIndex-_easyLcationsPrefabs.Count];
+                return _hardLocationsPrefabs[_currentLocationIndex - _easyLcationsPrefabs.Count];
             }
             else
             {
                 return _lastLocation;
             }
         }
-   
+
         public void GenerateNextLocation()
         {
             OnLocationEntered(_currentLocations[^1]);
         }
 
-        public bool  TryGetNearestLocationEnterPoint(Vector3 position,float maxDistance ,out Vector3 enterPoint)
+        public bool TryGetNearestLocationEnterPoint(Vector3 position, float maxDistance, out Vector3 enterPoint)
         {
             enterPoint = default;
 
@@ -82,6 +93,7 @@ namespace Project.Scripts.Generation
                     {
                         continue;
                     }
+
                     float distance = Vector3.Distance(position, point.position);
                     if (distance < minDistance)
                     {
@@ -91,7 +103,7 @@ namespace Project.Scripts.Generation
                 }
             }
 
-            return enterPoint!=default;
+            return enterPoint != default;
         }
 
 
@@ -99,24 +111,24 @@ namespace Project.Scripts.Generation
         {
             foreach (var location in _currentLocations)
             {
-                if(location == enteredLocation)
+                if (location == enteredLocation)
                     continue;
                 Destroy(location.gameObject);
             }
+
             _currentLocations.Clear();
             _currentLocations.Add(enteredLocation);
             GenerateLocations(enteredLocation);
-            enteredLocation. CalculateBounds();
+            enteredLocation.CalculateBounds();
             enteredLocation.GetLocationSize(out Vector3 center, out Vector3 size);
-            LocationEntered?.Invoke(center-size/2,size);
+            LocationEntered?.Invoke(center - size / 2, size);
         }
 
 
         private Vector3 GetNextLocationPosition(Vector3 fromPosition, Location toLocation)
         {
-            Vector3 toOffset = toLocation.LocationStartPoint.localPosition ;
-            return fromPosition-toOffset;
+            Vector3 toOffset = toLocation.LocationStartPoint.localPosition;
+            return fromPosition - toOffset;
         }
-    
     }
 }
