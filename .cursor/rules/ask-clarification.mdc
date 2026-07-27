@@ -1,0 +1,8 @@
+---
+description: Ask the user for clarification when something is unclear
+alwaysApply: true
+---
+
+# Ask for Clarification
+
+If anything in the user's request is unclear, ambiguous, or requires a decision that only the user can make, do not guess — ask the user a clarifying question first (use the AskQuestion tool when available). Proceed only after the ambiguity is resolved.

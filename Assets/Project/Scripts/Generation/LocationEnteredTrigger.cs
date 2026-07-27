@@ -14,6 +14,16 @@ namespace Project.Scripts.Generation
         private bool _triggered;
         public event Action LocationEntered;
 
+        /// <summary>
+        /// Wires a runtime-constructed trigger (used by the procedural level builder).
+        /// </summary>
+        public void InitializeRuntime(GameObject[] objectsToAppear, LightFader[] lightsToFade, float respawnOffset)
+        {
+            _objectsToAppear = objectsToAppear;
+            _lightsToFade = lightsToFade;
+            _respawnOffset = respawnOffset;
+        }
+
         private void OnTriggerEnter(Collider other)
         {
             if(_triggered)

@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0de5eed000baaaa8888bbbbcccc000b, type: 3}
+  m_Name: Columns_PillarField
+  m_EditorClassIdentifier: 
+  LengthRange: {x: 60, y: 100}
+  StepDistanceRange: {x: 4.5, y: 6}
+  StepDownRange: {x: 1.5, y: 3}
+  PlateauChance: 0.2
+  MeanderAngleRange: {x: 15, y: 35}
+  CurvatureBiasRange: {x: 0, y: 0}
+  PlatformSizeRange: {x: 3, y: 5}
+  DifficultyGapBonus: 1.2
+  DifficultyPlatformShrink: 1.2
+  SceneryScale: 1
+  SceneryDensity: 1
+  LightEveryNthPlatform: 4
+  Palette: {fileID: 11400000, guid: c0de5eed1001aaaa8888bbbbcccc1001, type: 2}
+  LootChancePerLevel: 0.55
+  HealChancePerLevel: 0.3
+  HangingChance: 0.15
+  ColumnDiameterRange: {x: 3, y: 6}
+  ColumnDepthRange: {x: 45, y: 80}
+  MonolithWidthRange: {x: 3, y: 6}
+  MonolithHeightRange: {x: 35, y: 55}
+  SceneryPerStep: 1.5
+  SceneryDistanceRange: {x: 14, y: 40}
+  SceneryWidthRange: {x: 4, y: 12}

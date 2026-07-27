@@ -39,6 +39,21 @@ namespace Project.Scripts.Editor
                 }
             }
 
+            GUI.enabled = Application.isPlaying;
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("Regenerate Last (Same Seed)", GUILayout.Height(24)))
+            {
+                _locationsGenerator.RegenerateLastLocation(newSeed: false);
+                SceneView.RepaintAll();
+            }
+            if (GUILayout.Button("Regenerate Last (New Seed)", GUILayout.Height(24)))
+            {
+                _locationsGenerator.RegenerateLastLocation(newSeed: true);
+                SceneView.RepaintAll();
+            }
+            EditorGUILayout.EndHorizontal();
+            GUI.enabled = true;
+
             if (EditorGUI.EndChangeCheck())
             {
                 serializedObject.ApplyModifiedProperties();

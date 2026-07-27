@@ -16,12 +16,37 @@ namespace Project.Scripts.Generation
         [Space] [SerializeField] private bool _visualizeBounds = true;
         [SerializeField] private Color _boundsColor = Color.green;
 
+        private bool _skipBoundsRecalculation;
+
         public event Action<Location> LocationEntered;
 
         public Transform LocationStartPoint => _locationStartPoint;
         public List<Transform> LocationEndPoints => _locationEndPoints;
 
         public bool IsBigLocation => _bigLocation;
+
+        /// <summary>
+        /// Used by the procedural level builder to wire a runtime-constructed location.
+        /// Must be called right after AddComponent, before Start runs.
+        /// </summary>
+        public void InitializeRuntime(Transform startPoint, List<Transform> endPoints, LocationEnteredTrigger enterTrigger)
+        {
+            _locationStartPoint = startPoint;
+            _locationEndPoints = new List<Transform>(endPoints);
+            _locationEnterTrigger = enterTrigger;
+        }
+
+        /// <summary>
+        /// Sets precomputed world-space bounds and prevents CalculateBounds from
+        /// overwriting them (the transform-based recalculation cubes the size,
+        /// which is far too large for long procedural levels).
+        /// </summary>
+        public void SetBounds(Vector3 center, Vector3 size)
+        {
+            _center = center;
+            _size = size;
+            _skipBoundsRecalculation = true;
+        }
 
         private void Start()
         {
@@ -53,6 +78,9 @@ namespace Project.Scripts.Generation
         [ContextMenu("CalculateBounds")]
         public void CalculateBounds()
         {
+            if (_skipBoundsRecalculation)
+                return;
+
             Transform[] allChildren = GetComponentsInChildren<Transform>();
 
             if (allChildren.Length <= 1)

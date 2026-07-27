@@ -8,6 +8,12 @@ namespace Scripts.LevelObjects
         [SerializeField] private float _fadeDuration = 1f;
         [SerializeField] private Light _light;
         private float _startIntensity;
+
+        public void InitializeRuntime(Light light, float fadeDuration)
+        {
+            _light = light;
+            _fadeDuration = fadeDuration;
+        }
         public void FadeIn()
         {
             _startIntensity = _light.intensity;

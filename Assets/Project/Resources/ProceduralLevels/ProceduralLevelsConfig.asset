@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0de5eed0006aaaa8888bbbbcccc0006, type: 3}
+  m_Name: ProceduralLevelsConfig
+  m_EditorClassIdentifier: 
+  Archetypes:
+  - Archetype: {fileID: 11400000, guid: c0de5eed1004aaaa8888bbbbcccc1004, type: 2}
+    Weight: 1
+  - Archetype: {fileID: 11400000, guid: c0de5eed1005aaaa8888bbbbcccc1005, type: 2}
+    Weight: 1
+  - Archetype: {fileID: 11400000, guid: c0de5eed1006aaaa8888bbbbcccc1006, type: 2}
+    Weight: 1
+  - Archetype: {fileID: 11400000, guid: c0de5eed1007aaaa8888bbbbcccc1007, type: 2}
+    Weight: 1
+  - Archetype: {fileID: 11400000, guid: c0de5eed1008aaaa8888bbbbcccc1008, type: 2}
+    Weight: 1
+  - Archetype: {fileID: 11400000, guid: c0de5eed1009aaaa8888bbbbcccc1009, type: 2}
+    Weight: 1
+  - Archetype: {fileID: 11400000, guid: c0de5eed100aaaaa8888bbbbcccc100a, type: 2}
+    Weight: 1
+  - Archetype: {fileID: 11400000, guid: c0de5eed100baaaa8888bbbbcccc100b, type: 2}
+    Weight: 1
+  LevelsBeforeAdvancedTutorials: 3
+  LevelsToMaxDifficulty: 12
+  Seed: 0
+  TunnelLength: 14
+  TunnelExitDropHeight: 5
+  EntryPlatformSize: {x: 10, y: 10}
+  BarrierHeight: 8
+  DarknessPlanePrefab: {fileID: 4435916920760830742, guid: b14babc51426bf04f8f23ac41c8f5415, type: 3}
+  DeathZoneDarknessPlanePrefab: {fileID: 4435916920760830742, guid: 736b15288adae994e8965547ee34b5d1, type: 3}
+  LootRandomizerPrefab: {fileID: 2310189391056254033, guid: 7fcc02f56ec51ba4ca87555fdba6268a, type: 3}
+  HealPrefab: {fileID: 5228506880158682456, guid: fdf89d0005a62764c971a231b57659a0, type: 3}

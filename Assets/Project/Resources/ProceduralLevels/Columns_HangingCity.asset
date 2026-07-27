@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0de5eed000baaaa8888bbbbcccc000b, type: 3}
+  m_Name: Columns_HangingCity
+  m_EditorClassIdentifier: 
+  LengthRange: {x: 80, y: 120}
+  StepDistanceRange: {x: 5, y: 6.5}
+  StepDownRange: {x: 2, y: 4}
+  PlateauChance: 0.12
+  MeanderAngleRange: {x: 10, y: 25}
+  CurvatureBiasRange: {x: 0, y: 3}
+  PlatformSizeRange: {x: 2.5, y: 4}
+  DifficultyGapBonus: 1.2
+  DifficultyPlatformShrink: 1
+  SceneryScale: 1.5
+  SceneryDensity: 1.4
+  LightEveryNthPlatform: 4
+  Palette: {fileID: 11400000, guid: c0de5eed1003aaaa8888bbbbcccc1003, type: 2}
+  LootChancePerLevel: 0.65
+  HealChancePerLevel: 0.4
+  HangingChance: 0.6
+  ColumnDiameterRange: {x: 2.5, y: 5}
+  ColumnDepthRange: {x: 40, y: 70}
+  MonolithWidthRange: {x: 4, y: 8}
+  MonolithHeightRange: {x: 40, y: 70}
+  SceneryPerStep: 2
+  SceneryDistanceRange: {x: 16, y: 50}
+  SceneryWidthRange: {x: 5, y: 16}

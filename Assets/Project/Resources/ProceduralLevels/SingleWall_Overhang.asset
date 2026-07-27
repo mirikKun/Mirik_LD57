@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0de5eed0009aaaa8888bbbbcccc0009, type: 3}
+  m_Name: SingleWall_Overhang
+  m_EditorClassIdentifier: 
+  LengthRange: {x: 60, y: 100}
+  StepDistanceRange: {x: 5, y: 6.5}
+  StepDownRange: {x: 2.5, y: 4.5}
+  PlateauChance: 0.1
+  MeanderAngleRange: {x: 6, y: 16}
+  CurvatureBiasRange: {x: 2, y: 5}
+  PlatformSizeRange: {x: 2, y: 3.5}
+  DifficultyGapBonus: 1.2
+  DifficultyPlatformShrink: 0.8
+  SceneryScale: 1.4
+  SceneryDensity: 1.5
+  LightEveryNthPlatform: 3
+  Palette: {fileID: 11400000, guid: c0de5eed1002aaaa8888bbbbcccc1002, type: 2}
+  LootChancePerLevel: 0.6
+  HealChancePerLevel: 0.4
+  WallHeightAboveRange: {x: 45, y: 70}
+  WallDepthBelowRange: {x: 35, y: 55}
+  WallThicknessRange: {x: 4, y: 7}
+  WallTiltRange: {x: 5, y: 10}
+  WallRoughness: 1.6
+  RockChance: 0.25
+  ProtrusionLengthRange: {x: 3, y: 5}
+  DecorPerStep: 3
