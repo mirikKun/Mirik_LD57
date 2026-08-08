@@ -121,7 +121,7 @@ namespace Project.Scripts.Generation.Procedural
                 float lateralSign = ctx.Chance(0.5f) ? -1f : 1f;
                 float lateral = ctx.Range(BranchLateralOffsetRange) * lateralSign;
                 float distanceMul = ctx.Range(BranchDistanceMultiplierRange);
-                float cappedDistance = Mathf.Min(baseDistance * distanceMul, DescentPathGenerator.MaxStepDistance * 1.3f);
+                float cappedDistance = baseDistance * distanceMul;
 
                 Vector3 flatPos = flatPrev + dir * cappedDistance + lateralAxis * lateral;
                 Vector3 pos = new Vector3(flatPos.x, primary.Position.y, flatPos.z);
@@ -138,7 +138,7 @@ namespace Project.Scripts.Generation.Procedural
         protected Transform PlacePlatform(LevelBuildContext ctx, Vector3 topLocalPosition, float width, float depth, float thickness, Quaternion rotation, int pathIndex, bool isPrimary = true)
         {
             Transform platform = LevelGeometry.CreateBox(
-                ctx.Root, $"Platform_{pathIndex}",
+                ctx.LevelElements, $"Platform_{pathIndex}",
                 topLocalPosition + Vector3.down * (thickness * 0.5f),
                 rotation,
                 new Vector3(width, thickness, depth),
@@ -163,7 +163,7 @@ namespace Project.Scripts.Generation.Procedural
             // Small emissive marker so the route reads in the dark.
             Vector3 markerOffset = new Vector3(ctx.Range(-0.6f, 0.6f), 0.06f, ctx.Range(-0.6f, 0.6f));
             LevelGeometry.CreateBox(
-                ctx.Root, "GuideMarker",
+                ctx.LevelElements, "GuideMarker",
                 topLocalPosition + markerOffset,
                 Quaternion.Euler(0f, ctx.Range(0f, 90f), 0f),
                 new Vector3(0.5f, 0.12f, 0.5f),
@@ -173,7 +173,7 @@ namespace Project.Scripts.Generation.Procedural
             if (LightEveryNthPlatform > 0 && pathIndex % LightEveryNthPlatform == 0 && pathIndex > 0)
             {
                 LevelGeometry.CreatePointLight(
-                    ctx.Root, "GuideLight",
+                    ctx.LevelElements, "GuideLight",
                     topLocalPosition + Vector3.up * 2f,
                     ctx.Palette.GuideLightColor, 2.5f, 10f);
             }

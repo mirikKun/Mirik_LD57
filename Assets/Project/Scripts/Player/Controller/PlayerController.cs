@@ -20,9 +20,9 @@ namespace Assets.Scripts.Player.Controller
         [SerializeField] private PlayerEffects.PlayerEffects _playerEffects;
         [SerializeField] private CameraController _cameraController;
         [SerializeField] private PlayerRespawner _playerRespawner;
-[SerializeField] private DescentController _descentController;
-[SerializeField] private PlayerInventory _playerInventory;
-[SerializeField] private PlayerSoundsManager _playerSoundsManager;
+        [SerializeField] private DescentController _descentController;
+        [SerializeField] private PlayerInventory _playerInventory;
+        [SerializeField] private PlayerSoundsManager _playerSoundsManager;
         [SerializeField] private Transform _cameraViewTransform;
         [SerializeField] private Transform _targetTransform;
         [SerializeField] private float _movementSpeed = 7f;
@@ -86,22 +86,36 @@ namespace Assets.Scripts.Player.Controller
 
         private void Awake()
         {
-            _transform = transform;
-            _mover = GetComponent<PlayerMover>();
-            _ceilingDetector = GetComponent<CeilingDetector>();
-            _wallDetector = GetComponent<WallDetector>();
+            CacheComponents();
             SetupStateMachine();
             _playerStatesHolder.OnStateConfigsChanged += SetupStateMachine;
             _input.EnablePlayerActions();
+        }
 
+        private void OnEnable()
+        {
+            CacheComponents();
+            if (_stateMachine == null)
+            {
+                SetupStateMachine();
+                _playerStatesHolder.OnStateConfigsChanged -= SetupStateMachine;
+                _playerStatesHolder.OnStateConfigsChanged += SetupStateMachine;
+            }
         }
 
         private void OnDestroy()
         {
-            _stateMachine?.Dispose();
-
+            _playerStatesHolder.OnStateConfigsChanged -= SetupStateMachine;
+            _stateMachine.Dispose();
         }
 
+        private void CacheComponents()
+        {
+            _transform = transform;
+            _mover = GetComponent<PlayerMover>();
+            _ceilingDetector = GetComponent<CeilingDetector>();
+            _wallDetector = GetComponent<WallDetector>();
+        }
 
         private void SetupStateMachine()
         {
@@ -147,7 +161,6 @@ namespace Assets.Scripts.Player.Controller
             _mover.SetExtendSensorRange(IsGroundedState());
             _mover.SetVelocity(_savedVelocity);
             _savedMovementVelocity = CalculateMovementVelocity();
-
 
             if (_ceilingDetector != null) _ceilingDetector.Reset();
             if (_wallDetector != null) _wallDetector.Reset();

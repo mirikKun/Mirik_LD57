@@ -11,57 +11,62 @@ namespace Project.Scripts.Generation
         [SerializeField] private bool _bigLocation;
         [Space] [SerializeField] private List<Transform> _locationEndPoints;
 
-        [SerializeField] private Vector3 _size;
-        [SerializeField] private Vector3 _center;
+        [SerializeField] private Transform _levelElements;
+        [SerializeField] private Transform _locationEntrance;
+        [SerializeField] private Transform _locationExit;
+        [SerializeField] private Transform _decorations;
+
+        [SerializeField] private Bounds _worldBounds;
         [Space] [SerializeField] private bool _visualizeBounds = true;
         [SerializeField] private Color _boundsColor = Color.green;
 
-        private bool _skipBoundsRecalculation;
+        private bool _boundsLocked;
 
         public event Action<Location> LocationEntered;
 
         public Transform LocationStartPoint => _locationStartPoint;
         public List<Transform> LocationEndPoints => _locationEndPoints;
-
         public bool IsBigLocation => _bigLocation;
+        public Bounds WorldBounds => _worldBounds;
+        public Transform LevelElements => _levelElements;
+        public Transform LocationEntrance => _locationEntrance;
+        public Transform LocationExit => _locationExit;
+        public Transform Decorations => _decorations;
 
-        /// <summary>
-        /// Used by the procedural level builder to wire a runtime-constructed location.
-        /// Must be called right after AddComponent, before Start runs.
-        /// </summary>
-        public void InitializeRuntime(Transform startPoint, List<Transform> endPoints, LocationEnteredTrigger enterTrigger)
+        public void InitializeRuntime(
+            Transform startPoint,
+            List<Transform> endPoints,
+            LocationEnteredTrigger enterTrigger,
+            Transform levelElements,
+            Transform locationEntrance,
+            Transform locationExit,
+            Transform decorations)
         {
             _locationStartPoint = startPoint;
             _locationEndPoints = new List<Transform>(endPoints);
             _locationEnterTrigger = enterTrigger;
+            _levelElements = levelElements;
+            _locationEntrance = locationEntrance;
+            _locationExit = locationExit;
+            _decorations = decorations;
         }
 
-        /// <summary>
-        /// Sets precomputed world-space bounds and prevents CalculateBounds from
-        /// overwriting them (the transform-based recalculation cubes the size,
-        /// which is far too large for long procedural levels).
-        /// </summary>
-        public void SetBounds(Vector3 center, Vector3 size)
+        public void SetWorldBounds(Bounds worldBounds)
         {
-            _center = center;
-            _size = size;
-            _skipBoundsRecalculation = true;
+            _worldBounds = worldBounds;
+            _boundsLocked = true;
         }
 
         private void Start()
         {
             if (_locationEnterTrigger != null)
-            {
                 _locationEnterTrigger.LocationEntered += HandleLocationEntered;
-            }
         }
 
         private void OnDestroy()
         {
             if (_locationEnterTrigger != null)
-            {
                 _locationEnterTrigger.LocationEntered -= HandleLocationEntered;
-            }
         }
 
         private void HandleLocationEntered()
@@ -69,89 +74,69 @@ namespace Project.Scripts.Generation
             LocationEntered?.Invoke(this);
         }
 
-        public void GetLocationSize(out Vector3 center, out Vector3 size)
-        {
-            center = _center;
-            size = _size;
-        }
-
         [ContextMenu("CalculateBounds")]
         public void CalculateBounds()
         {
-            if (_skipBoundsRecalculation)
+            if (_boundsLocked)
                 return;
 
-            Transform[] allChildren = GetComponentsInChildren<Transform>();
-
-            if (allChildren.Length <= 1)
-            {
-                Debug.LogWarning("no childs");
-                _size = Vector3.zero;
-                _center = Vector3.zero;
-                return;
-            }
-
-            Vector3 min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
-            Vector3 max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
-
-
-            foreach (Transform child in allChildren)
-            {
-                if (child == transform)
-                    continue;
-
-                Vector3 pos = child.position;
-
-                min.x = Mathf.Min(min.x, pos.x);
-                min.y = Mathf.Min(min.y, pos.y);
-                min.z = Mathf.Min(min.z, pos.z);
-
-                max.x = Mathf.Max(max.x, pos.x);
-                max.y = Mathf.Max(max.y, pos.y);
-                max.z = Mathf.Max(max.z, pos.z);
-            }
-
-            _size = max - min;
-
-            float maxSize = Mathf.Max(_size.x, _size.y, _size.z);
-            _size = new Vector3(maxSize, maxSize, maxSize);
-
-            _center = min + _size / 2f;
+            _worldBounds = ComputeWorldBoundsFromGeometry();
         }
 
-        private Vector3 GetAvgPoint()
+        private Bounds ComputeWorldBoundsFromGeometry()
         {
-            List<Vector3> points = new List<Vector3>();
-            foreach (var point in _locationEndPoints)
+            Transform searchRoot = _levelElements != null ? _levelElements : transform;
+            return ComputeBoundsUnder(searchRoot);
+        }
+
+        public static Bounds ComputeBoundsUnder(Transform root)
+        {
+            bool hasBounds = false;
+            Bounds bounds = default;
+
+            foreach (Collider collider in root.GetComponentsInChildren<Collider>())
             {
-                points.Add(point.position);
+                if (!hasBounds)
+                {
+                    bounds = collider.bounds;
+                    hasBounds = true;
+                }
+                else
+                {
+                    bounds.Encapsulate(collider.bounds);
+                }
             }
 
-            points.Add(_locationStartPoint.position);
-
-            Vector3 avg = Vector3.zero;
-            foreach (var point in points)
+            foreach (Renderer renderer in root.GetComponentsInChildren<Renderer>())
             {
-                avg += point;
+                if (renderer is ParticleSystemRenderer)
+                    continue;
+
+                if (!hasBounds)
+                {
+                    bounds = renderer.bounds;
+                    hasBounds = true;
+                }
+                else
+                {
+                    bounds.Encapsulate(renderer.bounds);
+                }
             }
 
-            avg /= points.Count;
-            return avg;
+            if (!hasBounds)
+                return new Bounds(root.position, Vector3.zero);
+
+            return bounds;
         }
 
         private void OnDrawGizmos()
         {
-            if (!_visualizeBounds)
+            if (!_visualizeBounds || _worldBounds.size == Vector3.zero)
                 return;
 
             Gizmos.color = _boundsColor;
-
-            Matrix4x4 originalMatrix = Gizmos.matrix;
-            Gizmos.matrix = transform.localToWorldMatrix;
-            Gizmos.DrawWireCube(_center, _size);
-            Gizmos.matrix = originalMatrix;
-
-            Gizmos.DrawSphere(transform.TransformPoint(_center), 0.05f);
+            Gizmos.DrawWireCube(_worldBounds.center, _worldBounds.size);
+            Gizmos.DrawSphere(_worldBounds.center, 0.05f);
         }
     }
 }

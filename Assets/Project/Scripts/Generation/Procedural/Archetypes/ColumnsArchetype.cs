@@ -62,14 +62,14 @@ namespace Project.Scripts.Generation.Procedural
             float depth = ctx.Range(ColumnDepthRange) * SceneryScale;
 
             LevelGeometry.CreateCylinder(
-                ctx.Root, $"Column_{index}_{candidateIndex}",
+                ctx.LevelElements, $"Column_{index}_{candidateIndex}",
                 point.Position + Vector3.down * (depth * 0.5f),
                 Quaternion.identity,
                 diameter, depth, ctx.Palette.StructureMaterial);
 
             // Slightly wider capital so the landing surface is generous.
             LevelGeometry.CreateCylinder(
-                ctx.Root, $"ColumnCap_{index}_{candidateIndex}",
+                ctx.LevelElements, $"ColumnCap_{index}_{candidateIndex}",
                 point.Position + Vector3.down * 0.4f,
                 Quaternion.identity,
                 diameter * 1.25f, 0.8f, ctx.Palette.PlatformMaterial);
@@ -91,7 +91,7 @@ namespace Project.Scripts.Generation.Procedural
                                  + Vector3.up * (height * 0.5f - 2f);
 
             LevelGeometry.CreateBox(
-                ctx.Root, $"Monolith_{index}_{candidateIndex}",
+                ctx.LevelElements, $"Monolith_{index}_{candidateIndex}",
                 bodyCenter,
                 Quaternion.LookRotation(point.Forward) * Quaternion.Euler(0f, ctx.Range(-8f, 8f), 0f),
                 new Vector3(width, height, width * ctx.Range(0.9f, 1.6f)),
@@ -99,7 +99,7 @@ namespace Project.Scripts.Generation.Procedural
 
             // Side ledge at path height.
             LevelGeometry.CreateBox(
-                ctx.Root, $"MonolithLedge_{index}_{candidateIndex}",
+                ctx.LevelElements, $"MonolithLedge_{index}_{candidateIndex}",
                 point.Position + Vector3.down * 0.35f,
                 Quaternion.LookRotation(point.Forward),
                 new Vector3(ledgeSize * 1.4f, 0.7f, ledgeSize),
@@ -128,7 +128,7 @@ namespace Project.Scripts.Generation.Procedural
                     : ctx.Range(-20f, 5f) - height * 0.5f;
 
                 LevelGeometry.CreateBox(
-                    ctx.Root, hanging ? "SceneryMonolith" : "SceneryColumn",
+                    ctx.LevelElements, hanging ? "SceneryMonolith" : "SceneryColumn",
                     anchor + Vector3.up * yCenter,
                     Quaternion.Euler(0f, ctx.Range(0f, 360f), 0f),
                     new Vector3(width, height, width * ctx.Range(0.8f, 1.4f)),

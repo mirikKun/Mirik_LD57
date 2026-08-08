@@ -45,14 +45,13 @@ namespace Project.Scripts.Generation.Procedural
     {
         // Derived from player tuning: MovementSpeed 7, JumpSpeed 8.5 held 0.2s, gravity 30.
         // A flat jump covers ~6.5m; leave margin for platform edges.
-        public const float MaxStepDistance = 7.5f;
-        public const float MaxStepDown = 6f;
+ 
 
         public static List<PathPoint> Generate(PathSettings settings, System.Random rng)
         {
             var points = new List<PathPoint>();
 
-            float stepDistance = Mathf.Min(settings.StepDistance, MaxStepDistance);
+            float stepDistance = settings.StepDistance;
             int stepCount = Mathf.Max(3, Mathf.CeilToInt(settings.Length / stepDistance));
 
             Vector3 position = Vector3.zero;
@@ -70,7 +69,6 @@ namespace Project.Scripts.Generation.Procedural
                 Vector3 nextForward = Quaternion.Euler(0f, heading, 0f) * Vector3.forward;
 
                 float drop = settings.StepDown + Mathf.Lerp(-settings.StepDownJitter, settings.StepDownJitter, (float)rng.NextDouble());
-                drop = Mathf.Clamp(drop, 0f, MaxStepDown);
                 if (rng.NextDouble() < settings.PlateauChance)
                     drop = 0f;
 

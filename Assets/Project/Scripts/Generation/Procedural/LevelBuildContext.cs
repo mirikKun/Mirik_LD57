@@ -17,6 +17,10 @@ namespace Project.Scripts.Generation.Procedural
         public float Difficulty;
 
         public Transform Root;
+        public Transform LevelElements;
+        public Transform Entrance;
+        public Transform Exit;
+        public Transform Decorations;
         public ModulePalette Palette;
         public ProceduralLevelsConfig Config;
 

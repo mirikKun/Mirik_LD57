@@ -62,7 +62,7 @@ namespace Project.Scripts.Generation.Procedural
                         float beamWidth = ctx.Range(BeamWidthRange) * (isPrimary ? 1f : 0.8f);
                         float beamThickness = ctx.Range(BeamThicknessRange);
                         LevelGeometry.CreateBox(
-                            ctx.Root, $"Beam_{i}_{c}",
+                            ctx.LevelElements, $"Beam_{i}_{c}",
                             candidates[c].Position + Vector3.down * (beamThickness * 0.5f),
                             Quaternion.LookRotation(candidates[c].Forward),
                             new Vector3(gap + 3f, beamThickness, beamWidth),
@@ -107,7 +107,7 @@ namespace Project.Scripts.Generation.Procedural
                 center.y = centerY;
 
                 LevelGeometry.CreateBox(
-                    ctx.Root, $"Wall_{index}_{(sideSign < 0 ? "L" : "R")}{s}",
+                    ctx.LevelElements, $"Wall_{index}_{(sideSign < 0 ? "L" : "R")}{s}",
                     center,
                     Quaternion.LookRotation(forward),
                     new Vector3(thickness, slabHeight + 0.5f, length),
@@ -134,7 +134,7 @@ namespace Project.Scripts.Generation.Procedural
                 float thickness = ctx.Range(0.5f, 1.3f);
 
                 LevelGeometry.CreateBox(
-                    ctx.Root, "CrissCrossBeam",
+                    ctx.LevelElements, "CrissCrossBeam",
                     (a + b) * 0.5f,
                     Quaternion.FromToRotation(Vector3.right, direction.normalized),
                     new Vector3(direction.magnitude + 2f, thickness, thickness),

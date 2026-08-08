@@ -44,7 +44,7 @@ namespace Project.Scripts.Generation.Procedural
 
                 Vector3 center = mid + right * (sideSign * FarWallDistance);
                 LevelGeometry.CreateBox(
-                    ctx.Root, $"FarWall_{(sideSign < 0f ? "L" : "R")}_{i}",
+                    ctx.Decorations, $"FarWall_{(sideSign < 0f ? "L" : "R")}_{i}",
                     center,
                     Quaternion.LookRotation(forward),
                     new Vector3(SlabThickness, SlabSpan, length),
@@ -67,7 +67,7 @@ namespace Project.Scripts.Generation.Procedural
                     : Quaternion.LookRotation(path[i].Forward);
 
                 LevelGeometry.CreateBox(
-                    ctx.Root, $"FarCeiling_{i}",
+                    ctx.Decorations, $"FarCeiling_{i}",
                     mid,
                     rotation,
                     new Vector3(SlabSpan, SlabThickness, length),
@@ -102,7 +102,7 @@ namespace Project.Scripts.Generation.Procedural
             Vector3 center = new Vector3((min.x + max.x) * 0.5f, min.y - floorMargin, (min.z + max.z) * 0.5f);
 
             var floor = new GameObject("DeathFloor");
-            floor.transform.SetParent(ctx.Root, false);
+            floor.transform.SetParent(ctx.LevelElements, false);
             floor.transform.localPosition = center;
             var collider = floor.AddComponent<BoxCollider>();
             collider.isTrigger = true;

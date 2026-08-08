@@ -47,7 +47,7 @@ namespace Assets.Scripts.General.StateMachine
                 ResetActionPredicateFlags(_anyTransitions);
             }
 
-            _currentNode.State?.Update();
+            _currentNode.State.Update();
         }
 
         private static void ResetActionPredicateFlags(IEnumerable<Transition> transitions)
@@ -60,13 +60,13 @@ namespace Assets.Scripts.General.StateMachine
 
         public void FixedUpdate()
         {
-            _currentNode.State?.FixedUpdate();
+            _currentNode.State.FixedUpdate();
         }
 
         public void SetState(IState state)
         {
-            _currentNode = _nodes[state.GetType()];
-            _currentNode.State?.OnEnter();
+            _currentNode = GetOrAddNode(state);
+            _currentNode.State.OnEnter();
             PreviousStates.Add(state);
         }
         public void  SetState<T>() where T : IState
@@ -74,7 +74,7 @@ namespace Assets.Scripts.General.StateMachine
             if (_nodes.TryGetValue(typeof(T), out var node))
             {
                 _currentNode = node;
-                _currentNode.State?.OnEnter();
+                _currentNode.State.OnEnter();
             }
             else
             {
@@ -88,9 +88,9 @@ namespace Assets.Scripts.General.StateMachine
                 return;
 
             var previousState = _currentNode.State;
-            var nextState = _nodes[state.GetType()].State;
+            var nextState = GetOrAddNode(state).State;
 
-            previousState?.OnExit();
+            previousState.OnExit();
             AddStateToHistory(state);
             nextState.OnEnter();
             _currentNode = _nodes[state.GetType()];

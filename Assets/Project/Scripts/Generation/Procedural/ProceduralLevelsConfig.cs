@@ -32,8 +32,10 @@ namespace Project.Scripts.Generation.Procedural
 
         [Header("Entry & Tunnel")]
         [FormerlySerializedAs("EntryDropHeight")]
-        [Tooltip("Base depth of the entry shaft each level builds below its root. Archetypes with overhead geometry (e.g. a ceiling) extend it so the shaft always exits into open air.")]
-        public float TunnelLength = 14f;
+        [Tooltip("Subtracted from (level top - start platform) when sizing the entry shaft.")]
+        public float TunnelLength = 2f;
+        [Tooltip("Minimum entry shaft depth.")]
+        public float MinEntryTunnelLength = 4f;
         [Tooltip("Open free-fall distance between the shaft exit and the entry platform below it.")]
         public float TunnelExitDropHeight = 5f;
         public Vector2 EntryPlatformSize = new Vector2(10f, 10f);

@@ -24,17 +24,28 @@ namespace Assets.Scripts.Player.Controller
         private RaycastSensor _topSensor;
 
 
+        private void OnEnable()
+        {
+            if (_dawnSensor == null)
+                InitSensors();
+        }
+
         private void Start()
+        {
+            InitSensors();
+        }
+
+        private void InitSensors()
         {
             _capsuleCollider = GetComponent<CapsuleCollider>();
             _currentWallAngleLimit = _wallAngleLimit;
             int layerMask = _layerMask;
             _dawnSensor ??= new RaycastSensor(_cameraTransform);
             _topSensor ??= new RaycastSensor(_cameraTransform);
-            
+
             _dawnSensor.layermask = layerMask;
             _topSensor.layermask = layerMask;
-            
+
             float castLenght=_capsuleCollider.radius+_raycastDistance;
             _dawnSensor.castLength = castLenght;
             _topSensor.castLength = castLenght;
@@ -42,7 +53,6 @@ namespace Assets.Scripts.Player.Controller
             Vector3 offset = new Vector3(0, _capsuleCollider.bounds.size.y/2, 0);
             _dawnSensor.SetCastOrigin(_capsuleCollider.bounds.center-offset);
             _topSensor.SetCastOrigin(_capsuleCollider.bounds.center+offset*2);
-
         }
 
         private void OnCollisionEnter(Collision collision) => CheckForContact(collision);

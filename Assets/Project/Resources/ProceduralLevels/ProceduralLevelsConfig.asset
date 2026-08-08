@@ -32,7 +32,8 @@ MonoBehaviour:
   LevelsBeforeAdvancedTutorials: 3
   LevelsToMaxDifficulty: 12
   Seed: 0
-  TunnelLength: 14
+  TunnelLength: 2
+  MinEntryTunnelLength: 4
   TunnelExitDropHeight: 5
   EntryPlatformSize: {x: 10, y: 10}
   BarrierHeight: 8

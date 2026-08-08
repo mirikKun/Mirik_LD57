@@ -84,12 +84,12 @@ namespace Project.Scripts.Generation.Procedural
                 // Mushroom: thin stem from the ceiling, wide flat cap at the bottom.
                 float capThickness = ctx.Range(MushroomCapThicknessRange);
                 LevelGeometry.CreateCylinder(
-                    ctx.Root, $"MushroomStem_{index}_{candidateIndex}",
+                    ctx.LevelElements, $"MushroomStem_{index}_{candidateIndex}",
                     point.Position + Vector3.up * (hangLength * 0.5f + capThickness),
                     Quaternion.identity,
                     stemDiameter * 0.6f, hangLength, ctx.Palette.StructureMaterial);
                 LevelGeometry.CreateCylinder(
-                    ctx.Root, $"MushroomCap_{index}_{candidateIndex}",
+                    ctx.LevelElements, $"MushroomCap_{index}_{candidateIndex}",
                     point.Position + Vector3.down * (capThickness * 0.5f),
                     Quaternion.identity,
                     platformSize * 1.2f, capThickness, ctx.Palette.AccentMaterial);
@@ -105,7 +105,7 @@ namespace Project.Scripts.Generation.Procedural
                     float diameter = Mathf.Lerp(stemDiameter * 2.2f, stemDiameter, t);
                     float centerY = ceilingPoint.y - sectionHeight * (s + 0.5f);
                     LevelGeometry.CreateBox(
-                        ctx.Root, $"Stalactite_{index}_{candidateIndex}_{s}",
+                        ctx.LevelElements, $"Stalactite_{index}_{candidateIndex}_{s}",
                         new Vector3(point.Position.x, centerY, point.Position.z),
                         Quaternion.Euler(0f, ctx.Range(0f, 90f), 0f),
                         new Vector3(diameter, sectionHeight + 0.3f, diameter),
@@ -113,7 +113,7 @@ namespace Project.Scripts.Generation.Procedural
                 }
 
                 LevelGeometry.CreateBox(
-                    ctx.Root, $"StalactitePlatform_{index}_{candidateIndex}",
+                    ctx.LevelElements, $"StalactitePlatform_{index}_{candidateIndex}",
                     point.Position + Vector3.down * 0.3f,
                     Quaternion.Euler(0f, ctx.Range(0f, 360f), 0f),
                     new Vector3(platformSize, 0.6f, platformSize),
@@ -132,7 +132,7 @@ namespace Project.Scripts.Generation.Procedural
 
             Quaternion rotation = Quaternion.LookRotation(delta.normalized);
             LevelGeometry.CreateBox(
-                ctx.Root, $"Ceiling_{index}",
+                ctx.LevelElements, $"Ceiling_{index}",
                 mid + Vector3.up * (thickness * 0.5f),
                 rotation,
                 new Vector3(halfWidth * 2f, thickness, length),
@@ -154,7 +154,7 @@ namespace Project.Scripts.Generation.Procedural
                 float length = ctx.Range(2f, 14f) * SceneryScale;
                 float diameter = ctx.Range(0.6f, 2.4f);
                 LevelGeometry.CreateBox(
-                    ctx.Root, "DecorStalactite",
+                    ctx.LevelElements, "DecorStalactite",
                     anchor + Vector3.down * (length * 0.5f),
                     Quaternion.Euler(ctx.Range(-4f, 4f), ctx.Range(0f, 360f), ctx.Range(-4f, 4f)),
                     new Vector3(diameter, length, diameter),

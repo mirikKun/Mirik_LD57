@@ -88,7 +88,7 @@ namespace Project.Scripts.Generation.Procedural
                 Vector3 rockSize = new Vector3(size, ctx.Range(1.5f, 3f), size * ctx.Range(0.8f, 1.3f));
                 Quaternion rot = Quaternion.LookRotation(point.Forward) * Quaternion.Euler(ctx.Range(-7f, 7f), ctx.Range(0f, 360f), ctx.Range(-7f, 7f));
                 LevelGeometry.CreateBox(
-                    ctx.Root, $"Rock_{index}_{candidateIndex}",
+                    ctx.LevelElements, $"Rock_{index}_{candidateIndex}",
                     point.Position + Vector3.down * (rockSize.y * 0.45f) + toWall * (length * 0.3f),
                     rot, rockSize, ctx.Palette.StructureMaterial);
             }
@@ -98,7 +98,7 @@ namespace Project.Scripts.Generation.Procedural
                 float thickness = ctx.Range(0.6f, 1.2f);
                 Vector3 beamCenter = point.Position + Vector3.down * (thickness * 0.5f) + toWall * (length * 0.5f - size * 0.25f);
                 LevelGeometry.CreateBox(
-                    ctx.Root, $"CantileverBeam_{index}_{candidateIndex}",
+                    ctx.LevelElements, $"CantileverBeam_{index}_{candidateIndex}",
                     beamCenter,
                     Quaternion.LookRotation(toWall),
                     new Vector3(size * 0.7f, thickness, length + size),
@@ -130,7 +130,7 @@ namespace Project.Scripts.Generation.Procedural
                 center.y = centerY;
 
                 LevelGeometry.CreateBox(
-                    ctx.Root, $"Wall_{index}_{s}",
+                    ctx.LevelElements, $"Wall_{index}_{s}",
                     center, rotation,
                     new Vector3(thickness, slabHeight + 0.6f, length),
                     ctx.Palette.StructureMaterial);
@@ -146,7 +146,7 @@ namespace Project.Scripts.Generation.Procedural
                 Vector3 pos = faceMid + forward * ctx.Range(-length * 0.4f, length * 0.4f) + Vector3.up * y - toWall * ctx.Range(0.5f, 2.5f);
                 Vector3 size = new Vector3(ctx.Range(0.8f, 2.5f), ctx.Range(0.8f, 2.5f), ctx.Range(1.5f, 4f));
                 LevelGeometry.CreateBox(
-                    ctx.Root, "WallDecor",
+                    ctx.LevelElements, "WallDecor",
                     pos,
                     Quaternion.LookRotation(-toWall) * Quaternion.Euler(ctx.Range(-10f, 10f), ctx.Range(-10f, 10f), ctx.Range(0f, 360f)),
                     size, ctx.Palette.SceneryMaterial);

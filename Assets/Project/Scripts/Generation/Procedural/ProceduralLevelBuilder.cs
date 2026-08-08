@@ -115,24 +115,39 @@ namespace Project.Scripts.Generation.Procedural
             var rootGo = new GameObject($"ProceduralLevel_{archetype.name}_{seed}");
             rootGo.transform.SetPositionAndRotation(worldPosition, rotation);
 
+            Transform levelElements = CreateCategoryParent(rootGo.transform, "LevelElements");
+            Transform entrance = CreateCategoryParent(rootGo.transform, "Entrance");
+            Transform exit = CreateCategoryParent(rootGo.transform, "Exit");
+            Transform decorations = CreateCategoryParent(rootGo.transform, "Decorations");
+
             var ctx = new LevelBuildContext
             {
                 Rng = new System.Random(seed),
                 LevelIndex = levelIndex,
                 Difficulty = difficulty,
                 Root = rootGo.transform,
+                LevelElements = levelElements,
+                Entrance = entrance,
+                Exit = exit,
+                Decorations = decorations,
                 Palette = archetype.Palette,
                 Config = config,
             };
 
             List<PathPoint> path = archetype.BuildPath(ctx);
 
-            // The root sits at the previous level's tunnel stub bottom. This level builds
-            // its own entry shaft below it, deep enough to pierce its own overhead
-            // geometry, and the whole path sinks so the player exits the shaft into
-            // TunnelExitDropHeight of open air before landing on the entry platform.
-            float entryShaftDepth = Mathf.Max(4f, config.TunnelLength) + archetype.RollEntryOverheadHeight(ctx);
+            BuildEntryLanding(ctx, path[0]);
+            archetype.BuildGeometry(ctx, path);
+            EnclosingShellBuilder.Build(ctx, path);
+
+            // Shaft depth = how far the start platform sits below the level's top, minus margin.
+            Bounds levelBounds = Location.ComputeBoundsUnder(levelElements);
+            float startPlatformWorldY = rootGo.transform.TransformPoint(path[0].Position).y;
+            float entryShaftDepth = Mathf.Max(
+                config.MinEntryTunnelLength,
+                levelBounds.max.y - startPlatformWorldY - config.TunnelLength);
             float totalSink = entryShaftDepth + config.TunnelExitDropHeight;
+
             for (int i = 0; i < path.Count; i++)
             {
                 var p = path[i];
@@ -140,19 +155,25 @@ namespace Project.Scripts.Generation.Procedural
                 path[i] = p;
             }
 
+            levelElements.localPosition += Vector3.down * totalSink;
+            decorations.localPosition += Vector3.down * totalSink;
+
             BuildEntryShaft(ctx, entryShaftDepth);
-            BuildEntryLanding(ctx, path[0]);
 
-            archetype.BuildGeometry(ctx, path);
-            EnclosingShellBuilder.Build(ctx, path);
-
-            Transform startPoint = CreateAnchor(ctx.Root, "StartPoint", Vector3.zero);
+            Transform startPoint = CreateAnchor(ctx.Entrance, "StartPoint", Vector3.zero);
             Transform endPoint = BuildTunnelExit(ctx, path[path.Count - 1], out LocationEnteredTrigger enterTrigger);
 
             SpawnPickups(ctx, archetype);
 
             Location location = rootGo.AddComponent<Location>();
-            location.InitializeRuntime(startPoint, new List<Transform> { endPoint }, enterTrigger);
+            location.InitializeRuntime(
+                startPoint,
+                new List<Transform> { endPoint },
+                enterTrigger,
+                levelElements,
+                entrance,
+                exit,
+                decorations);
             ApplyBounds(ctx, location);
 
             if (Application.isPlaying)
@@ -161,10 +182,17 @@ namespace Project.Scripts.Generation.Procedural
             return location;
         }
 
-        private static Transform CreateAnchor(Transform root, string name, Vector3 localPosition)
+        private static Transform CreateCategoryParent(Transform root, string name)
         {
             var go = new GameObject(name);
             go.transform.SetParent(root, false);
+            return go.transform;
+        }
+
+        private static Transform CreateAnchor(Transform parent, string name, Vector3 localPosition)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(parent, false);
             go.transform.localPosition = localPosition;
             return go.transform;
         }
@@ -177,11 +205,11 @@ namespace Project.Scripts.Generation.Procedural
         private static void BuildEntryShaft(LevelBuildContext ctx, float depth)
         {
             // Start slightly above the root to overlap the previous level's stub seam.
-            BuildTunnelShaft(ctx, Vector3.up * 0.5f, Vector3.down * depth, TunnelRadius);
+            BuildTunnelShaft(ctx.Entrance, ctx, Vector3.up * 0.5f, Vector3.down * depth, TunnelRadius);
 
             // Faint exit glow so the player sees the opening rush toward them in the dark.
             LevelGeometry.CreatePointLight(
-                ctx.Root, "ShaftExitLight",
+                ctx.Entrance, "ShaftExitLight",
                 Vector3.down * (depth - 1f),
                 ctx.Palette.GuideLightColor, 3f, 10f);
         }
@@ -201,7 +229,7 @@ namespace Project.Scripts.Generation.Procedural
             Quaternion facing = Quaternion.LookRotation(entry.Forward);
 
             LevelGeometry.CreateBox(
-                ctx.Root, "EntryPlatform",
+                ctx.LevelElements, "EntryPlatform",
                 top + Vector3.down * 0.5f, facing,
                 new Vector3(width, 1f, depth),
                 ctx.Palette.PlatformMaterial);
@@ -210,7 +238,7 @@ namespace Project.Scripts.Generation.Procedural
 
             // Safe zone: holds the darkness while the player gets their bearings after the fall.
             var staminaZone = new GameObject("StaminaReplenishZone");
-            staminaZone.transform.SetParent(ctx.Root, false);
+            staminaZone.transform.SetParent(ctx.LevelElements, false);
             staminaZone.transform.localPosition = top;
             var staminaCollider = staminaZone.AddComponent<BoxCollider>();
             staminaCollider.isTrigger = true;
@@ -259,7 +287,7 @@ namespace Project.Scripts.Generation.Procedural
 
             // Glowing ring marks the jump target clearly against the dark.
             LevelGeometry.CreateCylinder(
-                ctx.Root, "TunnelMouthRing",
+                ctx.Exit, "TunnelMouthRing",
                 mouth + Vector3.down * 0.05f,
                 Quaternion.identity,
                 TunnelRadius * 2f + 0.6f, 0.3f,
@@ -267,16 +295,16 @@ namespace Project.Scripts.Generation.Procedural
                 withCollider: false);
 
             LevelGeometry.CreatePointLight(
-                ctx.Root, "TunnelLight",
+                ctx.Exit, "TunnelLight",
                 mouth + Vector3.down * 1.5f,
                 ctx.Palette.GuideLightColor, 4f, 12f);
 
-            BuildTunnelShaft(ctx, mouth, stubBottom, TunnelRadius);
+            BuildTunnelShaft(ctx.Exit, ctx, mouth, stubBottom, TunnelRadius);
 
             // Commit trigger: fires the instant the player's collider enters the pipe mouth,
             // while still falling - this is what tells LocationsGenerator to build the next level.
             var gate = new GameObject("TunnelEnterTrigger");
-            gate.transform.SetParent(ctx.Root, false);
+            gate.transform.SetParent(ctx.Exit, false);
             gate.transform.localPosition = mouth + Vector3.down * 0.6f;
             var gateCollider = gate.AddComponent<BoxCollider>();
             gateCollider.isTrigger = true;
@@ -286,7 +314,7 @@ namespace Project.Scripts.Generation.Procedural
             // Seal barrier: inactive until commit, then closes the shaft above so there is
             // no climbing back up out of the tunnel.
             var barrier = new GameObject("TunnelSealBarrier");
-            barrier.transform.SetParent(ctx.Root, false);
+            barrier.transform.SetParent(ctx.Exit, false);
             barrier.transform.localPosition = mouth + Vector3.up * config.BarrierHeight;
             var barrierCollider = barrier.AddComponent<BoxCollider>();
             barrierCollider.isTrigger = true;
@@ -308,11 +336,11 @@ namespace Project.Scripts.Generation.Procedural
                 trigger.LocationEntered += () => deathFloor.SetActive(false);
 
             enterTrigger = trigger;
-            return CreateAnchor(ctx.Root, "EndPoint", stubBottom);
+            return CreateAnchor(ctx.Exit, "EndPoint", stubBottom);
         }
 
         /// <summary>A ring of vertical slabs forming the walls of the fall-through shaft.</summary>
-        private static void BuildTunnelShaft(LevelBuildContext ctx, Vector3 top, Vector3 bottom, float radius)
+        private static void BuildTunnelShaft(Transform parent, LevelBuildContext ctx, Vector3 top, Vector3 bottom, float radius)
         {
             const int slabCount = 8;
             float height = Vector3.Distance(top, bottom);
@@ -324,7 +352,7 @@ namespace Project.Scripts.Generation.Procedural
                 Quaternion rot = Quaternion.Euler(0f, angle, 0f);
                 Vector3 offset = rot * Vector3.forward * radius;
                 LevelGeometry.CreateBox(
-                    ctx.Root, $"TunnelSlab_{i}",
+                    parent, $"TunnelSlab_{i}",
                     mid + offset,
                     rot,
                     new Vector3(radius * 0.85f, height, 0.4f),
@@ -348,29 +376,19 @@ namespace Project.Scripts.Generation.Procedural
         {
             int index = ctx.RangeInt(1, ctx.PlatformTops.Count - 1);
             Vector3 top = ctx.PlatformTops[index];
-            GameObject instance = UnityEngine.Object.Instantiate(prefab, ctx.Root);
+            GameObject instance = UnityEngine.Object.Instantiate(prefab, ctx.LevelElements);
             instance.transform.localPosition = top + Vector3.up * 1f;
         }
 
         private static void ApplyBounds(LevelBuildContext ctx, Location location)
         {
-            // Bounds cover the playable path (not distant scenery) so the darkness
-            // plane tiling stays proportional to the area the player actually uses.
-            Vector3 min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
-            Vector3 max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
-            foreach (Vector3 localTop in ctx.PlatformTops)
-            {
-                Vector3 world = ctx.Root.TransformPoint(localTop);
-                min = Vector3.Min(min, world);
-                max = Vector3.Max(max, world);
-            }
+            Bounds bounds = Location.ComputeBoundsUnder(ctx.LevelElements);
 
             const float horizontalMargin = 15f;
             const float verticalMargin = 10f;
-            min -= new Vector3(horizontalMargin, verticalMargin, horizontalMargin);
-            max += new Vector3(horizontalMargin, verticalMargin, horizontalMargin);
+            bounds.Expand(new Vector3(horizontalMargin * 2f, verticalMargin * 2f, horizontalMargin * 2f));
 
-            location.SetBounds((min + max) * 0.5f, max - min);
+            location.SetWorldBounds(bounds);
         }
     }
 }

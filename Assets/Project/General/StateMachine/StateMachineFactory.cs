@@ -19,7 +19,6 @@ namespace Assets.Scripts.General.StateMachine
             List<Type> allStateTypes = configurations.Select(x => x.State.GetType()).ToList();
             List<IState> allStates = configurations.Select(x => x.State).ToList();
 
-            // Register states and their transitions
             foreach (var config in configurations)
             {
                 foreach (var transition in config.Transitions)
@@ -36,15 +35,7 @@ namespace Assets.Scripts.General.StateMachine
             }
 
             IState initialState = allStates[allStateTypes.IndexOf(initialStateType)];
-            // Set initial state
-            if (initialState != null)
-            {
-                _stateMachine.SetState(initialState);
-            }
-            else
-            {
-                Debug.LogError("Initial state is null.");
-            }
+            _stateMachine.SetState(initialState);
         }
     }
 }

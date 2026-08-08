@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Project.Scripts.Generation.Procedural;
+using Project.Scripts.Infrastracture.GameLoop;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -10,9 +11,10 @@ namespace Project.Scripts.Generation
     /// Sequence: basic tutorials (prefabs) -> N procedural levels -> advanced
     /// tutorials (prefabs) -> endless procedural levels with growing difficulty.
     /// </summary>
-    public class LocationsGenerator : MonoBehaviour
+    public class LocationsGenerator : MonoBehaviour, IGameStartable
     {
         [SerializeField] private Location _startLocation;
+        [SerializeField] private bool _skipTutorial;
         [SerializeField] private List<Location> _basicTutorialLocations;
         [SerializeField] private List<Location> _advancedTutorialLocations;
         [SerializeField] private ProceduralLevelsConfig _proceduralConfig;
@@ -21,20 +23,19 @@ namespace Project.Scripts.Generation
         private readonly List<Location> _currentLocations = new List<Location>();
         private int _currentLocationIndex;
         private bool _initialized;
+        private bool _startLocationCommitted;
         private Location _lastProceduralLocation;
-        public event Action<Vector3, Vector3> LocationEntered;
+        public event Action<Bounds> LocationEntered;
 
-        private void Start()
+        public void GameStart()
         {
-            EnsureInitialized();
+            if (!EnsureInitialized())
+                return;
+
+            if (!_startLocationCommitted)
+                GenerateNextLocation();
         }
 
-        /// <summary>
-        /// Sets up the procedural builder and seeds the current-location list.
-        /// Safe to call multiple times (e.g. from the editor "Generate Next
-        /// Location" button before Start() has run, or when it runs outside
-        /// Play mode) and retries if the config wasn't found yet.
-        /// </summary>
         private bool EnsureInitialized()
         {
             if (_initialized)
@@ -56,10 +57,6 @@ namespace Project.Scripts.Generation
 
             _proceduralBuilder = new ProceduralLevelBuilder(_proceduralConfig);
             _currentLocations.Add(_startLocation);
-            // The start location is hand-authored and already has its own commit trigger
-            // wired in the scene; subscribe the same way every procedurally built location
-            // does, so the very first transition follows the identical lazy build-on-commit
-            // path as all the rest instead of being pre-seeded ahead of time.
             _startLocation.LocationEntered += OnLocationEntered;
             _initialized = true;
             return true;
@@ -67,6 +64,9 @@ namespace Project.Scripts.Generation
 
         private Location CreateNextLocation(Vector3 fromPosition)
         {
+            if (_skipTutorial)
+                return BuildProceduralLocation(fromPosition);
+
             int index = _currentLocationIndex;
 
             if (index < _basicTutorialLocations.Count)
@@ -126,9 +126,7 @@ namespace Project.Scripts.Generation
             _currentLocations.Add(rebuilt);
             rebuilt.LocationEntered += OnLocationEntered;
 
-            rebuilt.CalculateBounds();
-            rebuilt.GetLocationSize(out Vector3 center, out Vector3 size);
-            LocationEntered?.Invoke(center - size / 2, size);
+            NotifyLocationBounds(rebuilt);
         }
 
         public void GenerateNextLocation()
@@ -181,6 +179,9 @@ namespace Project.Scripts.Generation
         /// </summary>
         private void OnLocationEntered(Location committedLocation)
         {
+            if (committedLocation == _startLocation)
+                _startLocationCommitted = true;
+
             foreach (var location in _currentLocations)
             {
                 if (location == committedLocation)
@@ -198,10 +199,14 @@ namespace Project.Scripts.Generation
                 _currentLocations.Add(next);
                 next.LocationEntered += OnLocationEntered;
 
-                next.CalculateBounds();
-                next.GetLocationSize(out Vector3 center, out Vector3 size);
-                LocationEntered?.Invoke(center - size / 2, size);
+                NotifyLocationBounds(next);
             }
+        }
+
+        private void NotifyLocationBounds(Location location)
+        {
+            location.CalculateBounds();
+            LocationEntered?.Invoke(location.WorldBounds);
         }
 
         private Vector3 GetNextLocationPosition(Vector3 fromPosition, Location toLocation)
