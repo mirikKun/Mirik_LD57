@@ -12,21 +12,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0de5eed000aaaaa8888bbbbcccc000a, type: 3}
   m_Name: Ceiling_StalactiteField
   m_EditorClassIdentifier: 
-  LengthRange: {x: 70, y: 110}
-  StepDistanceRange: {x: 5, y: 6}
-  StepDownRange: {x: 1.5, y: 3}
-  PlateauChance: 0.2
-  MeanderAngleRange: {x: 8, y: 20}
-  CurvatureBiasRange: {x: 0, y: 2}
-  PlatformSizeRange: {x: 2.5, y: 4}
+  LengthRange: {x: 70, y: 200}
+  StepDistanceRange: {x: 10, y: 15}
+  StepDownRange: {x: 3, y: 6}
+  PlateauChance: 0
+  MeanderAngleRange: {x: 8, y: 26}
+  CurvatureBiasRange: {x: 0, y: 20}
+  PlatformSizeRange: {x: 5, y: 8}
   DifficultyGapBonus: 1.2
   DifficultyPlatformShrink: 1
   SceneryScale: 1
-  SceneryDensity: 1.2
+  SceneryDensity: 0
   LightEveryNthPlatform: 4
   Palette: {fileID: 11400000, guid: c0de5eed1001aaaa8888bbbbcccc1001, type: 2}
   LootChancePerLevel: 0.6
   HealChancePerLevel: 0.35
+  BranchChance: 0.442
+  ExtraCandidatesRange: {x: 1, y: 3}
+  BranchLateralOffsetRange: {x: 5, y: 16}
+  BranchDistanceMultiplierRange: {x: 1.05, y: 1.35}
   ClearanceRange: {x: 10, y: 16}
   CeilingHalfWidthRange: {x: 18, y: 28}
   CeilingThicknessRange: {x: 2, y: 5}

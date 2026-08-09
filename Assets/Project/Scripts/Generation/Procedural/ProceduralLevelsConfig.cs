@@ -41,6 +41,12 @@ namespace Project.Scripts.Generation.Procedural
         public Vector2 EntryPlatformSize = new Vector2(10f, 10f);
         [Tooltip("Height above the tunnel mouth where the darkness seal barrier closes after commit.")]
         public float BarrierHeight = 8f;
+        [Tooltip("Length of the exit tunnel stub that connects to the next level's entry shaft.")]
+        public float ExitTunnelLength = 3f;
+        [Tooltip("Forward distance from the last platform center to the exit tunnel mouth.")]
+        public float ExitTunnelForwardOffset = 8f;
+        public LocationEntryTunnel EntryTunnelPrefab;
+        public LocationExitTunnel ExitTunnelPrefab;
 
         [Header("Shared Prefabs")]
         public GameObject DarknessPlanePrefab;

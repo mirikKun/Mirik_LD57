@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0de5eed000aaaaa8888bbbbcccc000a, type: 3}
   m_Name: Ceiling_MushroomForest
   m_EditorClassIdentifier: 
-  LengthRange: {x: 60, y: 95}
-  StepDistanceRange: {x: 4.5, y: 5.5}
-  StepDownRange: {x: 1.5, y: 2.5}
-  PlateauChance: 0.25
+  LengthRange: {x: 60, y: 139}
+  StepDistanceRange: {x: 6, y: 15}
+  StepDownRange: {x: 2, y: 5}
+  PlateauChance: 0
   MeanderAngleRange: {x: 15, y: 30}
   CurvatureBiasRange: {x: 0, y: 4}
-  PlatformSizeRange: {x: 2, y: 3.5}
+  PlatformSizeRange: {x: 5, y: 7}
   DifficultyGapBonus: 1
   DifficultyPlatformShrink: 0.8
   SceneryScale: 1.3
@@ -27,6 +27,10 @@ MonoBehaviour:
   Palette: {fileID: 11400000, guid: c0de5eed1002aaaa8888bbbbcccc1002, type: 2}
   LootChancePerLevel: 0.7
   HealChancePerLevel: 0.45
+  BranchChance: 0.135
+  ExtraCandidatesRange: {x: 1, y: 2}
+  BranchLateralOffsetRange: {x: 5, y: 25}
+  BranchDistanceMultiplierRange: {x: 1.05, y: 3}
   ClearanceRange: {x: 14, y: 20}
   CeilingHalfWidthRange: {x: 22, y: 34}
   CeilingThicknessRange: {x: 3, y: 6}

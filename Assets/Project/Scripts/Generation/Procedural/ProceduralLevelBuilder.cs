@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Scripts.ActionObjects;
 using Scripts.LevelObjects;
 using UnityEngine;
 
@@ -197,21 +196,12 @@ namespace Project.Scripts.Generation.Procedural
             return go.transform;
         }
 
-        /// <summary>
-        /// The vertical pipe this level hangs from: it continues the previous level's
-        /// tunnel stub (the root sits at the stub bottom) and descends far enough to
-        /// pierce this level's own overhead geometry, so the exit is always in open air.
-        /// </summary>
         private static void BuildEntryShaft(LevelBuildContext ctx, float depth)
         {
-            // Start slightly above the root to overlap the previous level's stub seam.
-            BuildTunnelShaft(ctx.Entrance, ctx, Vector3.up * 0.5f, Vector3.down * depth, TunnelRadius);
-
-            // Faint exit glow so the player sees the opening rush toward them in the dark.
-            LevelGeometry.CreatePointLight(
-                ctx.Entrance, "ShaftExitLight",
-                Vector3.down * (depth - 1f),
-                ctx.Palette.GuideLightColor, 3f, 10f);
+            LocationEntryTunnel tunnel = UnityEngine.Object.Instantiate(ctx.Config.EntryTunnelPrefab, ctx.Entrance);
+            tunnel.transform.localPosition = Vector3.up * 0.5f;
+            tunnel.transform.localRotation = Quaternion.identity;
+            tunnel.SetHeight(depth + 0.5f);
         }
 
         /// <summary>
@@ -268,96 +258,24 @@ namespace Project.Scripts.Generation.Procedural
             }
         }
 
-        private const float TunnelRadius = 2.2f;
-        private const float TunnelStubLength = 3f;
-
         /// <summary>
-        /// Builds this level's exit: a glowing mouth ring at the edge of the last
-        /// platform, a short stub of pipe, a commit trigger at the mouth (fires the
-        /// moment the player's collider enters the pipe, not when they land) and a seal
-        /// barrier that closes once committed. Only a stub is built here because the
-        /// real shaft depth depends on the NEXT level's overhead geometry - the next
-        /// level continues the pipe itself from this location's EndPoint (stub bottom).
+        /// Builds this level's exit stub: prefab with commit trigger and seal barrier.
+        /// Only a stub is placed here because the real shaft depth depends on the NEXT
+        /// level's overhead geometry - the next level continues the pipe from EndPoint.
         /// </summary>
         private static Transform BuildTunnelExit(LevelBuildContext ctx, PathPoint last, out LocationEnteredTrigger enterTrigger)
         {
             ProceduralLevelsConfig config = ctx.Config;
-            Vector3 mouth = last.Position + last.Forward * 1.6f;
-            Vector3 stubBottom = mouth + Vector3.down * TunnelStubLength;
+            Vector3 mouth = last.Position + last.Forward * config.ExitTunnelForwardOffset;
 
-            // Glowing ring marks the jump target clearly against the dark.
-            LevelGeometry.CreateCylinder(
-                ctx.Exit, "TunnelMouthRing",
-                mouth + Vector3.down * 0.05f,
-                Quaternion.identity,
-                TunnelRadius * 2f + 0.6f, 0.3f,
-                ctx.Palette.GlowMaterial,
-                withCollider: false);
+            LocationExitTunnel tunnel = UnityEngine.Object.Instantiate(config.ExitTunnelPrefab, ctx.Exit);
+            tunnel.transform.localPosition = mouth;
+            tunnel.transform.localRotation = Quaternion.identity;
+            tunnel.SetHeight(config.ExitTunnelLength);
+            tunnel.Configure(config.BarrierHeight, ctx.DeathFloor);
 
-            LevelGeometry.CreatePointLight(
-                ctx.Exit, "TunnelLight",
-                mouth + Vector3.down * 1.5f,
-                ctx.Palette.GuideLightColor, 4f, 12f);
-
-            BuildTunnelShaft(ctx.Exit, ctx, mouth, stubBottom, TunnelRadius);
-
-            // Commit trigger: fires the instant the player's collider enters the pipe mouth,
-            // while still falling - this is what tells LocationsGenerator to build the next level.
-            var gate = new GameObject("TunnelEnterTrigger");
-            gate.transform.SetParent(ctx.Exit, false);
-            gate.transform.localPosition = mouth + Vector3.down * 0.6f;
-            var gateCollider = gate.AddComponent<BoxCollider>();
-            gateCollider.isTrigger = true;
-            gateCollider.size = new Vector3(TunnelRadius * 1.6f, 1.6f, TunnelRadius * 1.6f);
-            var trigger = gate.AddComponent<LocationEnteredTrigger>();
-
-            // Seal barrier: inactive until commit, then closes the shaft above so there is
-            // no climbing back up out of the tunnel.
-            var barrier = new GameObject("TunnelSealBarrier");
-            barrier.transform.SetParent(ctx.Exit, false);
-            barrier.transform.localPosition = mouth + Vector3.up * config.BarrierHeight;
-            var barrierCollider = barrier.AddComponent<BoxCollider>();
-            barrierCollider.isTrigger = true;
-            barrierCollider.size = new Vector3(TunnelRadius * 2.4f, 1.5f, TunnelRadius * 2.4f);
-            barrier.AddComponent<DeathZone>();
-            TileDarknessPlanes(ctx, barrier.transform, ctx.Config.DarknessPlanePrefab, TunnelRadius * 2.4f, TunnelRadius * 2.4f);
-            barrier.SetActive(false);
-
-            trigger.InitializeRuntime(
-                new[] { barrier },
-                Array.Empty<LightFader>(),
-                respawnOffset: -1f);
-
-            // Once the player commits they are sealed inside the pipe and the next level
-            // hangs below this floor's plane - switch the floor off so the transition
-            // fall (and the next level's deeper platforms) can never touch it.
-            GameObject deathFloor = ctx.DeathFloor;
-            if (deathFloor != null)
-                trigger.LocationEntered += () => deathFloor.SetActive(false);
-
-            enterTrigger = trigger;
-            return CreateAnchor(ctx.Exit, "EndPoint", stubBottom);
-        }
-
-        /// <summary>A ring of vertical slabs forming the walls of the fall-through shaft.</summary>
-        private static void BuildTunnelShaft(Transform parent, LevelBuildContext ctx, Vector3 top, Vector3 bottom, float radius)
-        {
-            const int slabCount = 8;
-            float height = Vector3.Distance(top, bottom);
-            Vector3 mid = (top + bottom) * 0.5f;
-
-            for (int i = 0; i < slabCount; i++)
-            {
-                float angle = i * (360f / slabCount);
-                Quaternion rot = Quaternion.Euler(0f, angle, 0f);
-                Vector3 offset = rot * Vector3.forward * radius;
-                LevelGeometry.CreateBox(
-                    parent, $"TunnelSlab_{i}",
-                    mid + offset,
-                    rot,
-                    new Vector3(radius * 0.85f, height, 0.4f),
-                    ctx.Palette.StructureMaterial);
-            }
+            enterTrigger = tunnel.EnterTrigger;
+            return tunnel.EndPoint;
         }
 
         private static void SpawnPickups(LevelBuildContext ctx, LevelArchetype archetype)
