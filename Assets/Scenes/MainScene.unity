@@ -2403,6 +2403,7 @@ MonoBehaviour:
   _respawnOffset: -2
   _objectsToAppear: []
   _lightsToFade: []
+  _setRespawnOnTrigger: 1
 --- !u!1 &394522142
 GameObject:
   m_ObjectHideFlags: 0
@@ -7014,7 +7015,7 @@ MonoBehaviour:
   - {fileID: 7586372245869605210, guid: bab29acecd4805b40a124458c4cc05b2, type: 3}
   - {fileID: 7586372245869605210, guid: e1d7bec9b2b480f4a9d19cf48463b5c6, type: 3}
   - {fileID: 7586372245869605210, guid: fa2b88c26875bcd4e815c5109f502335, type: 3}
-  _proceduralConfig: {fileID: 0}
+  _proceduralConfig: {fileID: 11400000, guid: c0de5eed1000aaaa8888bbbbcccc1000, type: 2}
 --- !u!4 &1116786454
 Transform:
   m_ObjectHideFlags: 0
@@ -15841,6 +15842,7 @@ MonoBehaviour:
   _colliderOffset: {x: 0, y: 0, z: 0}
   _adjustmentVelocityMultiplier: 0.5
   _isInDebugMode: 0
+  _groundCheckRadiusRatio: 0.9
 --- !u!4 &1604174766377653357
 Transform:
   m_ObjectHideFlags: 0
@@ -16534,10 +16536,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50f87defc39342a5b0731a874a99c526, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerCamera: {fileID: 1732805414}
+  _playerCamera: {fileID: 1916200426}
   _cameraHolder: {fileID: 5139657563743215122}
+  _cameraPositionReturnSpeed: 3
   _walkShakeIntensityVertical: 0.1
   _walkShakeIntensityHorizontal: 0.06
+  _walkShakeIntensityForward: 0.03
   _walkShakeCycleTime: 0.07
   _walkShakeVerticalCurve:
     serializedVersion: 2
@@ -16587,13 +16591,66 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _walkShakeForwardCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.25
+      value: 0.5
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.5
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.75
+      value: -0.5
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   _enableWalkShake: 0
-  _wallRunTiltAngle: 9
-  _wallRunTiltSpeed: 60
-  _enableWallRunTilt: 1
-  _defaultFOV: 60
-  _maxFOV: 70
-  _speedToFOVCurve:
+  _fallMaxHeight: 20
+  _heightMultiplier: 3
+  _fallShakeMaxDuration: 0.4
+  _fallShakeMaxPower: 0.04
+  _fallBounceMaxDuration: 1.3
+  _fallBounceMaxPower: -0.4
+  _fallBounceMaxRotation: 5
+  _fallBounceAnimationCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
@@ -16617,6 +16674,15 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _enableFallBounce: 1
+  _defaultCameraShakePower: 0.01
+  _defaultCameraShakeDuration: 0.3
+  _enableCameraShake: 1
+  _wallRunTiltAngle: 9
+  _wallRunTiltSpeed: 60
+  _enableWallRunTilt: 1
+  _defaultFOV: 60
+  _maxFOV: 70
   _fovChangeSpeed: 135
   _enableFOVChange: 1
 --- !u!114 &4405140952381837477

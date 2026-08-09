@@ -5,36 +5,48 @@ using UnityEngine;
 
 namespace Assets.Scripts.Player.PlayerStateMachine.States
 {
-    public class FallingState : BaseAirState {
+    public class FallingState : BaseAirState
+    {
+        private Vector3 _fallStartPosition;
 
         public FallingState(PlayerController controller) : base(controller)
         {
         }
 
-        public override void OnEnter() {
+        public override void OnEnter()
+        {
+            _fallStartPosition = _controller.Tr.position;
             _controller.OnFallStart();
         }
-        public override void FixedUpdate() {
-            
+
+        public void OnExit()
+        {
+            Vector3 fallingDistance = _fallStartPosition - _controller.Tr.position;
+            float fallingHeight = Vector3.Dot(fallingDistance, _controller.Tr.up);
+            if (FallingToGrounded())
+            {
+                _controller.PlayerEffects.CameraMovingEffects.StartFallEffect(fallingHeight);
+            }
+        }
+
+        public override void FixedUpdate()
+        {
             Vector3 momentum = _controller.GetMomentum();
             Vector3 verticalMomentum = VectorMath.ExtractDotVector(momentum, _controller.Tr.up);
             Vector3 horizontalMomentum = momentum - verticalMomentum;
             verticalMomentum -= _controller.Tr.up * (_controller.Gravity * Time.fixedDeltaTime);
-            
-            horizontalMomentum = AdjustHorizontalAirMomentum( horizontalMomentum, _controller.CalculateMovementVelocity());
 
-            
+            horizontalMomentum = AdjustHorizontalAirMomentum(horizontalMomentum, _controller.CalculateMovementVelocity());
+
             float friction = _controller.AirFriction;
             horizontalMomentum = Vector3.MoveTowards(horizontalMomentum, Vector3.zero, friction * Time.deltaTime);
             momentum = horizontalMomentum + verticalMomentum;
-            
+
             _controller.SetMomentum(momentum);
-            
         }
 
         public bool FallingToRising() => _controller.IsRising();
         public bool FallingToGrounded() => _controller.IsGrounded() && !_controller.IsGroundTooSteep();
         public bool FallingToSliding() => _controller.IsGrounded() && _controller.IsGroundTooSteep();
-
     }
 }

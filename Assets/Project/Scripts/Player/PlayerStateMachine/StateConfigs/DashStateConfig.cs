@@ -14,7 +14,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.StateConfigs
         [field: SerializeField] public float DashExitSpeed { get; private set; } = 10f;
         [field: SerializeField] public float DashDuration { get; private set; } = 0.4f;
         
-        [field: SerializeField] public float UpdatedFov { get; private set; } =70;
+        [field: SerializeField] public float UpdatedFov { get; private set; } =77;
 
         [field: Space]
         [field: SerializeField] public float AfterDashHoveringDuration { get; private set; } = 0.67f;
