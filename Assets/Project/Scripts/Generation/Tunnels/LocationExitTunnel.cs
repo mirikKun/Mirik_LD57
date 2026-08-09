@@ -33,10 +33,11 @@ namespace Project.Scripts.Generation.Procedural
             _enterTrigger.InitializeRuntime(
                 new[] { _sealBarrier.gameObject },
                 Array.Empty<LightFader>(),
-                respawnOffset: -1f);
+                respawnOffset: -1f,
+                setRespawnOnTrigger: true);
 
             if (deathFloor != null)
-                _enterTrigger.LocationEntered += () => deathFloor.SetActive(false);
+                _enterTrigger.LocationEntered += _ => deathFloor.SetActive(false);
         }
 
         private void OnValidate()

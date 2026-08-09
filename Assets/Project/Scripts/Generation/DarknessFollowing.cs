@@ -12,6 +12,7 @@ namespace Project.Scripts.Generation
         [SerializeField] private float _impulseSpeedChange = -20;
         [SerializeField] private Vector3 _offset;
         [SerializeField] private Vector3 _newLocationOffset;
+        [SerializeField] private float _tunnelEntryDarknessDrop = 5f;
         [Space]
         [SerializeField] private DescentController _descentController;
 
@@ -23,6 +24,8 @@ namespace Project.Scripts.Generation
         [SerializeField] private Transform _darknessPlainsPrefab;
         [SerializeField] private List<Transform> _darknessPlainsPool = new List<Transform>();
         private float _currentSpeed;
+        private bool _hasMaxY;
+        private float _maxDarknessY;
 
         public void GameStart()
         {
@@ -36,8 +39,17 @@ namespace Project.Scripts.Generation
             _locationsGenerator.LocationEntered -= OnLocationEntered;
         }
 
-        private void OnLocationEntered(Bounds locationBounds)
+        private void OnLocationEntered(Bounds locationBounds, Transform entryPlatform)
         {
+            if (entryPlatform != null)
+            {
+                float targetY = entryPlatform.position.y - _tunnelEntryDarknessDrop;
+                _maxDarknessY = _hasMaxY ? Mathf.Min(_maxDarknessY, targetY) : targetY;
+                _hasMaxY = true;
+                transform.position = new Vector3(transform.position.x, targetY, transform.position.z);
+                _currentSpeed = 0f;
+            }
+
             _darknessPlainsPool.AddRange(_availableDarknessPlains);
             _availableDarknessPlains.Clear();
 
@@ -78,7 +90,15 @@ namespace Project.Scripts.Generation
             if (accelerationSign != speedSign)
                 _currentSpeed /= _deceleration;
 
-            transform.position = new Vector3(transform.position.x, transform.position.y + _currentSpeed * Time.deltaTime, transform.position.z);
+            float newY = transform.position.y + _currentSpeed * Time.deltaTime;
+            if (_hasMaxY && newY > _maxDarknessY)
+            {
+                newY = _maxDarknessY;
+                if (_currentSpeed > 0f)
+                    _currentSpeed = 0f;
+            }
+
+            transform.position = new Vector3(transform.position.x, newY, transform.position.z);
         }
 
         private void OnCharacterGrounded()
@@ -91,10 +111,16 @@ namespace Project.Scripts.Generation
 
         private Vector3 GetTargetPosition()
         {
+            Vector3 target;
             if (_locationsGenerator.TryGetNearestLocationEnterPoint(_descentController.LastGroundPosition, _offset.magnitude, out Vector3 locationEnter))
-                return locationEnter + _newLocationOffset;
+                target = locationEnter + _newLocationOffset;
+            else
+                target = new Vector3(0, _descentController.LastGroundPosition.y, 0) + _offset;
 
-            return new Vector3(0, _descentController.LastGroundPosition.y, 0) + _offset;
+            if (_hasMaxY)
+                target.y = Mathf.Min(target.y, _maxDarknessY);
+
+            return target;
         }
     }
 }

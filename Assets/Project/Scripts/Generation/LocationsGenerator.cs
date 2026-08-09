@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Assets.Scripts.Player.Controller;
 using Project.Scripts.Generation.Procedural;
 using Project.Scripts.Infrastracture.GameLoop;
 using UnityEngine;
@@ -10,22 +11,29 @@ namespace Project.Scripts.Generation
     /// <summary>
     /// Sequence: basic tutorials (prefabs) -> N procedural levels -> advanced
     /// tutorials (prefabs) -> endless procedural levels with growing difficulty.
+    /// Keeps the committed location plus two ahead so the next level's tunnel is
+    /// already visible while playing the current one.
     /// </summary>
     public class LocationsGenerator : MonoBehaviour, IGameStartable
     {
+        private const int LookaheadDepth = 2;
+        private const float EntryPlatformRespawnOffset = 1f;
+
         [SerializeField] private Location _startLocation;
         [SerializeField] private bool _skipTutorial;
+        [SerializeField] private bool _generateDecorations = true;
         [SerializeField] private List<Location> _basicTutorialLocations;
         [SerializeField] private List<Location> _advancedTutorialLocations;
         [SerializeField] private ProceduralLevelsConfig _proceduralConfig;
 
         private ProceduralLevelBuilder _proceduralBuilder;
         private readonly List<Location> _currentLocations = new List<Location>();
+        private readonly Dictionary<Location, List<Location>> _childrenByLocation = new Dictionary<Location, List<Location>>();
         private int _currentLocationIndex;
         private bool _initialized;
         private bool _startLocationCommitted;
         private Location _lastProceduralLocation;
-        public event Action<Bounds> LocationEntered;
+        public event Action<Bounds, Transform> LocationEntered;
 
         public void GameStart()
         {
@@ -55,7 +63,7 @@ namespace Project.Scripts.Generation
                 return false;
             }
 
-            _proceduralBuilder = new ProceduralLevelBuilder(_proceduralConfig);
+            _proceduralBuilder = new ProceduralLevelBuilder(_proceduralConfig, _generateDecorations);
             _currentLocations.Add(_startLocation);
             _startLocation.LocationEntered += OnLocationEntered;
             _initialized = true;
@@ -90,8 +98,6 @@ namespace Project.Scripts.Generation
 
         private Location BuildProceduralLocation(Vector3 fromPosition)
         {
-            // Procedural levels keep their start anchor at the root origin, so the
-            // root goes exactly to the previous location's end point.
             _lastProceduralLocation = _proceduralBuilder.BuildNext(fromPosition, Quaternion.Euler(0, Random.Range(0, 360), 0));
             return _lastProceduralLocation;
         }
@@ -114,8 +120,13 @@ namespace Project.Scripts.Generation
             }
 
             Location old = _lastProceduralLocation;
+            Location parent = FindParent(old);
+            int listIndex = _currentLocations.IndexOf(old);
+            int childIndex = parent != null ? _childrenByLocation[parent].IndexOf(old) : -1;
+
             old.LocationEntered -= OnLocationEntered;
             _currentLocations.Remove(old);
+            _childrenByLocation.Remove(old);
             Destroy(old.gameObject);
 
             Location rebuilt = _proceduralBuilder.RebuildLast(newSeed);
@@ -123,8 +134,11 @@ namespace Project.Scripts.Generation
                 return;
 
             _lastProceduralLocation = rebuilt;
-            _currentLocations.Add(rebuilt);
+            _currentLocations.Insert(listIndex, rebuilt);
             rebuilt.LocationEntered += OnLocationEntered;
+
+            if (parent != null && childIndex >= 0)
+                _childrenByLocation[parent][childIndex] = rebuilt;
 
             NotifyLocationBounds(rebuilt);
         }
@@ -140,7 +154,7 @@ namespace Project.Scripts.Generation
                 return;
             }
 
-            OnLocationEntered(_currentLocations[^1]);
+            OnLocationEntered(_currentLocations[^1], null);
         }
 
         public bool TryGetNearestLocationEnterPoint(Vector3 position, float maxDistance, out Vector3 enterPoint)
@@ -170,43 +184,126 @@ namespace Project.Scripts.Generation
         }
 
         /// <summary>
-        /// Called when a location's own commit trigger fires - for procedural levels
-        /// that's the tunnel mouth at its exit, entered mid-fall, not its entry. At that
-        /// moment: drop anything left over from before the committed location (it's now
-        /// unreachable, sealed behind the tunnel's darkness barrier), and build whatever
-        /// comes next, anchored at the committed location's end point(s). Darkness retiles
-        /// around the newly built location, since that's where the player is headed.
+        /// Called when a location's commit trigger fires - for procedural levels
+        /// that's the tunnel mouth at its exit, entered mid-fall. Drops anything
+        /// behind the committed location, keeps/creates two levels ahead so the
+        /// next tunnel is already visible, and points respawn at the destination
+        /// entry platform.
         /// </summary>
-        private void OnLocationEntered(Location committedLocation)
+        private void OnLocationEntered(Location committedLocation, PlayerController player)
         {
             if (committedLocation == _startLocation)
                 _startLocationCommitted = true;
 
-            foreach (var location in _currentLocations)
+            int commitIndex = _currentLocations.IndexOf(committedLocation);
+            if (commitIndex < 0)
             {
-                if (location == committedLocation)
+                Debug.LogWarning("LocationsGenerator: committed location is not in the active list.");
+                return;
+            }
+
+            for (int i = 0; i < commitIndex; i++)
+                DestroyLocation(_currentLocations[i]);
+            _currentLocations.RemoveRange(0, commitIndex);
+
+            List<Location> immediateNext = EnsureDepth(committedLocation, LookaheadDepth);
+
+            var keep = new HashSet<Location> { committedLocation };
+            CollectDescendants(committedLocation, LookaheadDepth, keep);
+
+            for (int i = _currentLocations.Count - 1; i >= 0; i--)
+            {
+                Location location = _currentLocations[i];
+                if (keep.Contains(location))
                     continue;
-                Destroy(location.gameObject);
+
+                DestroyLocation(location);
+                _currentLocations.RemoveAt(i);
             }
 
-            _currentLocations.Clear();
-            _currentLocations.Add(committedLocation);
-
-            foreach (var endPoint in committedLocation.LocationEndPoints)
-            {
-                Location next = CreateNextLocation(endPoint.position);
-                _currentLocationIndex++;
-                _currentLocations.Add(next);
-                next.LocationEntered += OnLocationEntered;
-
+            foreach (Location next in immediateNext)
                 NotifyLocationBounds(next);
+
+            if (player != null)
+                SetRespawnToEntryPlatforms(player, immediateNext);
+        }
+
+        private List<Location> EnsureDepth(Location parent, int depth)
+        {
+            if (depth <= 0)
+                return new List<Location>();
+
+            if (!_childrenByLocation.TryGetValue(parent, out List<Location> children))
+            {
+                children = new List<Location>();
+                foreach (Transform endPoint in parent.LocationEndPoints)
+                {
+                    Location next = CreateNextLocation(endPoint.position);
+                    _currentLocationIndex++;
+                    _currentLocations.Add(next);
+                    next.LocationEntered += OnLocationEntered;
+                    children.Add(next);
+                }
+
+                _childrenByLocation[parent] = children;
             }
+
+            if (depth == 1)
+                return children;
+
+            foreach (Location child in children)
+                EnsureDepth(child, depth - 1);
+
+            return children;
+        }
+
+        private void CollectDescendants(Location parent, int depth, HashSet<Location> keep)
+        {
+            if (depth <= 0 || !_childrenByLocation.TryGetValue(parent, out List<Location> children))
+                return;
+
+            foreach (Location child in children)
+            {
+                keep.Add(child);
+                CollectDescendants(child, depth - 1, keep);
+            }
+        }
+
+        private void SetRespawnToEntryPlatforms(PlayerController player, List<Location> destinations)
+        {
+            foreach (Location destination in destinations)
+            {
+                Transform entry = destination.EntryPlatformPoint;
+                if (entry == null)
+                    continue;
+
+                player.PlayerRespawner.SetRespawnPosition(entry.position + Vector3.up * EntryPlatformRespawnOffset);
+                return;
+            }
+        }
+
+        private Location FindParent(Location child)
+        {
+            foreach (KeyValuePair<Location, List<Location>> pair in _childrenByLocation)
+            {
+                if (pair.Value.Contains(child))
+                    return pair.Key;
+            }
+
+            return null;
+        }
+
+        private void DestroyLocation(Location location)
+        {
+            location.LocationEntered -= OnLocationEntered;
+            _childrenByLocation.Remove(location);
+            Destroy(location.gameObject);
         }
 
         private void NotifyLocationBounds(Location location)
         {
             location.CalculateBounds();
-            LocationEntered?.Invoke(location.WorldBounds);
+            LocationEntered?.Invoke(location.WorldBounds, location.EntryPlatformPoint);
         }
 
         private Vector3 GetNextLocationPosition(Vector3 fromPosition, Location toLocation)

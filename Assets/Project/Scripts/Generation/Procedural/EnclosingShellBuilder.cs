@@ -23,12 +23,15 @@ namespace Project.Scripts.Generation.Procedural
             if (path.Count == 0)
                 return;
 
-            if (!ctx.HasLeftWall)
-                BuildFarSideWall(ctx, path, sideSign: -1f);
-            if (!ctx.HasRightWall)
-                BuildFarSideWall(ctx, path, sideSign: 1f);
-            if (!ctx.HasCeiling)
-                BuildFarCeiling(ctx, path);
+            if (ctx.GenerateDecorations)
+            {
+                if (!ctx.HasLeftWall)
+                    BuildFarSideWall(ctx, path, sideSign: -1f);
+                if (!ctx.HasRightWall)
+                    BuildFarSideWall(ctx, path, sideSign: 1f);
+                if (!ctx.HasCeiling)
+                    BuildFarCeiling(ctx, path);
+            }
 
             BuildDeathFloor(ctx, path);
         }

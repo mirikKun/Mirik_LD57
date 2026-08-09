@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Assets.Scripts.Player.Controller;
 using UnityEngine;
 
 namespace Project.Scripts.Generation
@@ -15,6 +16,7 @@ namespace Project.Scripts.Generation
         [SerializeField] private Transform _locationEntrance;
         [SerializeField] private Transform _locationExit;
         [SerializeField] private Transform _decorations;
+        [SerializeField] private Transform _entryPlatformPoint;
 
         [SerializeField] private Bounds _worldBounds;
         [Space] [SerializeField] private bool _visualizeBounds = true;
@@ -22,7 +24,7 @@ namespace Project.Scripts.Generation
 
         private bool _boundsLocked;
 
-        public event Action<Location> LocationEntered;
+        public event Action<Location, PlayerController> LocationEntered;
 
         public Transform LocationStartPoint => _locationStartPoint;
         public List<Transform> LocationEndPoints => _locationEndPoints;
@@ -32,6 +34,7 @@ namespace Project.Scripts.Generation
         public Transform LocationEntrance => _locationEntrance;
         public Transform LocationExit => _locationExit;
         public Transform Decorations => _decorations;
+        public Transform EntryPlatformPoint => _entryPlatformPoint;
 
         public void InitializeRuntime(
             Transform startPoint,
@@ -40,7 +43,8 @@ namespace Project.Scripts.Generation
             Transform levelElements,
             Transform locationEntrance,
             Transform locationExit,
-            Transform decorations)
+            Transform decorations,
+            Transform entryPlatformPoint)
         {
             _locationStartPoint = startPoint;
             _locationEndPoints = new List<Transform>(endPoints);
@@ -49,6 +53,7 @@ namespace Project.Scripts.Generation
             _locationEntrance = locationEntrance;
             _locationExit = locationExit;
             _decorations = decorations;
+            _entryPlatformPoint = entryPlatformPoint;
         }
 
         public void SetWorldBounds(Bounds worldBounds)
@@ -69,9 +74,9 @@ namespace Project.Scripts.Generation
                 _locationEnterTrigger.LocationEntered -= HandleLocationEntered;
         }
 
-        private void HandleLocationEntered()
+        private void HandleLocationEntered(PlayerController player)
         {
-            LocationEntered?.Invoke(this);
+            LocationEntered?.Invoke(this, player);
         }
 
         [ContextMenu("CalculateBounds")]
@@ -91,21 +96,19 @@ namespace Project.Scripts.Generation
 
         public static Bounds ComputeBoundsUnder(Transform root)
         {
-            bool hasBounds = false;
-            Bounds bounds = default;
+            if (TryEncapsulateRenderers(root, out Bounds rendererBounds))
+                return rendererBounds;
 
-            foreach (Collider collider in root.GetComponentsInChildren<Collider>())
-            {
-                if (!hasBounds)
-                {
-                    bounds = collider.bounds;
-                    hasBounds = true;
-                }
-                else
-                {
-                    bounds.Encapsulate(collider.bounds);
-                }
-            }
+            if (TryEncapsulateColliders(root, out Bounds colliderBounds))
+                return colliderBounds;
+
+            return new Bounds(root.position, Vector3.zero);
+        }
+
+        private static bool TryEncapsulateRenderers(Transform root, out Bounds bounds)
+        {
+            bool hasBounds = false;
+            bounds = default;
 
             foreach (Renderer renderer in root.GetComponentsInChildren<Renderer>())
             {
@@ -123,10 +126,28 @@ namespace Project.Scripts.Generation
                 }
             }
 
-            if (!hasBounds)
-                return new Bounds(root.position, Vector3.zero);
+            return hasBounds;
+        }
 
-            return bounds;
+        private static bool TryEncapsulateColliders(Transform root, out Bounds bounds)
+        {
+            bool hasBounds = false;
+            bounds = default;
+
+            foreach (Collider collider in root.GetComponentsInChildren<Collider>())
+            {
+                if (!hasBounds)
+                {
+                    bounds = collider.bounds;
+                    hasBounds = true;
+                }
+                else
+                {
+                    bounds.Encapsulate(collider.bounds);
+                }
+            }
+
+            return hasBounds;
         }
 
         private void OnDrawGizmos()

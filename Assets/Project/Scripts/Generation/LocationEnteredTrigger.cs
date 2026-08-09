@@ -10,18 +10,20 @@ namespace Project.Scripts.Generation
         [SerializeField] private float _respawnOffset = -2;
         [SerializeField] private GameObject[] _objectsToAppear;
         [SerializeField] private LightFader[] _lightsToFade;
+        [SerializeField] private bool _setRespawnOnTrigger = true;
         
         private bool _triggered;
-        public event Action LocationEntered;
+        public event Action<PlayerController> LocationEntered;
 
         /// <summary>
         /// Wires a runtime-constructed trigger (used by the procedural level builder).
         /// </summary>
-        public void InitializeRuntime(GameObject[] objectsToAppear, LightFader[] lightsToFade, float respawnOffset)
+        public void InitializeRuntime(GameObject[] objectsToAppear, LightFader[] lightsToFade, float respawnOffset, bool setRespawnOnTrigger = true)
         {
             _objectsToAppear = objectsToAppear;
             _lightsToFade = lightsToFade;
             _respawnOffset = respawnOffset;
+            _setRespawnOnTrigger = setRespawnOnTrigger;
         }
 
         private void OnTriggerEnter(Collider other)
@@ -31,10 +33,12 @@ namespace Project.Scripts.Generation
 
             if (other.TryGetComponent<PlayerController>(out var playerController))
             {
-                playerController.PlayerRespawner.SetRespawnPosition(transform.position + Vector3.up * _respawnOffset);
+                if (_setRespawnOnTrigger)
+                    playerController.PlayerRespawner.SetRespawnPosition(transform.position + Vector3.up * _respawnOffset);
+
                 playerController.PlayerInventory.ApplyTempSpentAbilities();
 
-                LocationEntered?.Invoke();
+                LocationEntered?.Invoke(playerController);
                 foreach (var obj in _objectsToAppear)
                 {
                     obj.SetActive(true);

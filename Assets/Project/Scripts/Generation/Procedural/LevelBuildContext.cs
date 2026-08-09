@@ -23,6 +23,7 @@ namespace Project.Scripts.Generation.Procedural
         public Transform Decorations;
         public ModulePalette Palette;
         public ProceduralLevelsConfig Config;
+        public bool GenerateDecorations = true;
 
         /// <summary>
         /// Local-space positions of walkable platform tops along the guide path,

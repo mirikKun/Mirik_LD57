@@ -14,6 +14,7 @@ namespace Project.Scripts.Generation.Procedural
     {
         private readonly ProceduralLevelsConfig _config;
         private readonly System.Random _rng;
+        private readonly bool _generateDecorations;
         private LevelArchetype _lastPicked;
         private int _builtCount;
 
@@ -30,9 +31,10 @@ namespace Project.Scripts.Generation.Procedural
         private BuildParams _lastBuild;
         private bool _hasLastBuild;
 
-        public ProceduralLevelBuilder(ProceduralLevelsConfig config)
+        public ProceduralLevelBuilder(ProceduralLevelsConfig config, bool generateDecorations = true)
         {
             _config = config;
+            _generateDecorations = generateDecorations;
             int seed = config.Seed == 0 ? Environment.TickCount : config.Seed;
             _rng = new System.Random(seed);
         }
@@ -53,7 +55,7 @@ namespace Project.Scripts.Generation.Procedural
             };
             _hasLastBuild = true;
 
-            Location location = Build(_config, archetype, worldPosition, rotation, _lastBuild.Seed, _builtCount, difficulty);
+            Location location = Build(_config, archetype, worldPosition, rotation, _lastBuild.Seed, _builtCount, difficulty, _generateDecorations);
             _builtCount++;
             return location;
         }
@@ -72,7 +74,7 @@ namespace Project.Scripts.Generation.Procedural
                 _lastBuild.Seed = _rng.Next();
 
             return Build(_config, _lastBuild.Archetype, _lastBuild.Position, _lastBuild.Rotation,
-                _lastBuild.Seed, _lastBuild.LevelIndex, _lastBuild.Difficulty);
+                _lastBuild.Seed, _lastBuild.LevelIndex, _lastBuild.Difficulty, _generateDecorations);
         }
 
         private LevelArchetype PickArchetype()
@@ -109,7 +111,7 @@ namespace Project.Scripts.Generation.Procedural
         /// <summary>
         /// Stateless build used both at runtime and by the editor preview.
         /// </summary>
-        public static Location Build(ProceduralLevelsConfig config, LevelArchetype archetype, Vector3 worldPosition, Quaternion rotation, int seed, int levelIndex, float difficulty)
+        public static Location Build(ProceduralLevelsConfig config, LevelArchetype archetype, Vector3 worldPosition, Quaternion rotation, int seed, int levelIndex, float difficulty, bool generateDecorations = true)
         {
             var rootGo = new GameObject($"ProceduralLevel_{archetype.name}_{seed}");
             rootGo.transform.SetPositionAndRotation(worldPosition, rotation);
@@ -131,11 +133,12 @@ namespace Project.Scripts.Generation.Procedural
                 Decorations = decorations,
                 Palette = archetype.Palette,
                 Config = config,
+                GenerateDecorations = generateDecorations,
             };
 
             List<PathPoint> path = archetype.BuildPath(ctx);
 
-            BuildEntryLanding(ctx, path[0]);
+            Transform entryPlatformPoint = BuildEntryLanding(ctx, path[0]);
             archetype.BuildGeometry(ctx, path);
             EnclosingShellBuilder.Build(ctx, path);
 
@@ -172,7 +175,8 @@ namespace Project.Scripts.Generation.Procedural
                 levelElements,
                 entrance,
                 exit,
-                decorations);
+                decorations,
+                entryPlatformPoint);
             ApplyBounds(ctx, location);
 
             if (Application.isPlaying)
@@ -204,13 +208,7 @@ namespace Project.Scripts.Generation.Procedural
             tunnel.SetHeight(depth + 0.5f);
         }
 
-        /// <summary>
-        /// Entry landing: just the platform and a stamina safe zone below the entry
-        /// shaft's exit. The commit trigger and darkness seal live at THIS level's own
-        /// tunnel exit (built by BuildTunnelExit below), not here - the previous level
-        /// already sealed itself off the moment the player jumped into it.
-        /// </summary>
-        private static void BuildEntryLanding(LevelBuildContext ctx, PathPoint entry)
+        private static Transform BuildEntryLanding(LevelBuildContext ctx, PathPoint entry)
         {
             ProceduralLevelsConfig config = ctx.Config;
             Vector3 top = entry.Position;
@@ -226,7 +224,8 @@ namespace Project.Scripts.Generation.Procedural
 
             ctx.PlatformTops.Add(top);
 
-            // Safe zone: holds the darkness while the player gets their bearings after the fall.
+            Transform entryPlatformPoint = CreateAnchor(ctx.LevelElements, "EntryPlatformPoint", top);
+
             var staminaZone = new GameObject("StaminaReplenishZone");
             staminaZone.transform.SetParent(ctx.LevelElements, false);
             staminaZone.transform.localPosition = top;
@@ -235,6 +234,8 @@ namespace Project.Scripts.Generation.Procedural
             staminaCollider.center = Vector3.up * 5f;
             staminaCollider.size = new Vector3(width, 12f, depth);
             staminaZone.AddComponent<StaminaReplenishZone>();
+
+            return entryPlatformPoint;
         }
 
         /// <summary>Tiles 10x10 darkness planes over an area. Shared with EnclosingShellBuilder.</summary>
