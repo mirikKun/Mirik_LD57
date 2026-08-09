@@ -108,6 +108,7 @@ namespace Project.Scripts.Generation.Procedural
             floor.transform.SetParent(ctx.LevelElements, false);
             floor.transform.localPosition = center;
             var collider = floor.AddComponent<BoxCollider>();
+            collider.sharedMaterial = LevelGeometry.ColliderPhysicsMaterial;
             collider.isTrigger = true;
             collider.size = new Vector3(sizeX, 2f, sizeZ);
             floor.AddComponent<DeathZone>();

@@ -54,5 +54,9 @@ namespace Project.Scripts.Generation.Procedural
         public GameObject DeathZoneDarknessPlanePrefab;
         public GameObject LootRandomizerPrefab;
         public GameObject HealPrefab;
+
+        [Header("Physics")]
+        [Tooltip("Assigned to colliders of all procedurally created (non-prefab) geometry.")]
+        public PhysicsMaterial ColliderPhysicsMaterial;
     }
 }

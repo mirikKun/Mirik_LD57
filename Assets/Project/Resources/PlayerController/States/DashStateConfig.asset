@@ -16,3 +16,6 @@ MonoBehaviour:
   <DashExitSpeed>k__BackingField: 2
   <DashDuration>k__BackingField: 0.32
   <UpdatedFov>k__BackingField: 70
+  <AfterDashHoveringDuration>k__BackingField: 0.67
+  <AfterDashHoveringGravity>k__BackingField: 9
+  <AfterDashHoveringSpeed>k__BackingField: 19

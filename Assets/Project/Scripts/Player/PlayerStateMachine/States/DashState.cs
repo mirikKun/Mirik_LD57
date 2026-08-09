@@ -11,7 +11,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
     {
         private readonly PlayerController _controller;
         private readonly DashStateConfig _dashStateConfig;
- 
+
 
 
         private Vector3 _dashDirection;
@@ -70,8 +70,8 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
         public bool GroundToDash() => _jumpKeyIsPressed;
 
         public bool AirToToDash() => _jumpKeyIsPressed&&_controller.HaveStateBeforeStateInHistory<IGroundState,DashState>();
-        public bool DashToRising() => (_dashTimer.IsFinished )&&_controller.IsRising();
-        public bool DashToFalling() => (_dashTimer.IsFinished || _controller.HitCeiling());
+        public bool EndOfDash() => _dashTimer.IsFinished;
+        public bool DashToFalling() => _controller.HitCeiling();
 
         public bool WallClingingToDash() => _jumpKeyIsPressed;
     }

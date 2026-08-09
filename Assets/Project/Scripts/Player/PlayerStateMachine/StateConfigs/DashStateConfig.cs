@@ -16,12 +16,18 @@ namespace Assets.Scripts.Player.PlayerStateMachine.StateConfigs
         
         [field: SerializeField] public float UpdatedFov { get; private set; } =70;
 
+        [field: Space]
+        [field: SerializeField] public float AfterDashHoveringDuration { get; private set; } = 0.67f;
+        [field: SerializeField] public float AfterDashHoveringGravity { get; private set; } = 9f;
+        [field: SerializeField] public float AfterDashHoveringSpeed { get; private set; } = 19f;
+
 
         public override List<StateConfiguration> GetStateConfiguration(PlayerController playerController)
         {
             List<StateConfiguration> jumpStateConfigurations = new List<StateConfiguration>()
             {
-                GetDashConfiguration(playerController)
+                GetDashConfiguration(playerController),
+                GetAfterDashHoveringConfiguration(playerController)
             };
             return jumpStateConfigurations;
 
@@ -34,13 +40,28 @@ namespace Assets.Scripts.Player.PlayerStateMachine.StateConfigs
                 State = dash,
                 Transitions = new List<TransitionConfiguration>()
                 {
-                    //TransitionConfiguration.GetConfiguration<DashState,GroundedState>(dash.DashToGround),
                     TransitionConfiguration.GetConfiguration<RisingState,DashState>(dash.AirToToDash),
                     TransitionConfiguration.GetConfiguration<FallingState,DashState>(dash.AirToToDash),
-                    TransitionConfiguration.GetConfiguration<DashState,RisingState>(dash.DashToRising),
+                    TransitionConfiguration.GetConfiguration<DashState,AfterDashHoveringState>(dash.EndOfDash),
                     TransitionConfiguration.GetConfiguration<DashState,FallingState>(dash.DashToFalling),
                     TransitionConfiguration.GetConfiguration<GroundedState,DashState>(dash.GroundToDash),
                     TransitionConfiguration.GetConfiguration<WallClingingState,DashState>(dash.WallClingingToDash)
+                }
+            };
+            return configuration;
+        }
+
+        private StateConfiguration GetAfterDashHoveringConfiguration(PlayerController playerController)
+        {
+            var hovering = new AfterDashHoveringState(playerController, this);
+            StateConfiguration configuration = new StateConfiguration
+            {
+                State = hovering,
+                Transitions = new List<TransitionConfiguration>()
+                {
+                    TransitionConfiguration.GetConfiguration<AfterDashHoveringState,RisingState>(hovering.HoveringToRising),
+                    TransitionConfiguration.GetConfiguration<AfterDashHoveringState,FallingState>(hovering.HoveringToFalling),
+                    TransitionConfiguration.GetConfiguration<AfterDashHoveringState,GroundedState>(hovering.HoveringToGrounded),
                 }
             };
             return configuration;

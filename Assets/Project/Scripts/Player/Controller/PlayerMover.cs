@@ -20,7 +20,7 @@ namespace Assets.Scripts.Player.Controller
         private Rigidbody _rb;
         private Transform _tr;
         private CapsuleCollider _col;
-        private RaycastSensor _sensor;
+        private SphereCastSensor _sensor;
 
         private float _baseColliderHeight;
 
@@ -35,6 +35,9 @@ namespace Assets.Scripts.Player.Controller
 
         [Header("Sensor Settings:")] [SerializeField]
         private bool _isInDebugMode;
+
+        [Range(0.5f, 1f)] [SerializeField]
+        private float _groundCheckRadiusRatio = 0.9f;
 
         private bool _isUsingExtendedSensorRange = true; // Use extended range for smoother ground transitions
 
@@ -112,7 +115,12 @@ namespace Assets.Scripts.Player.Controller
         public Vector3 GetGroundNormal() => _sensor.GetNormal();
 
         // NOTE: Older versions of Unity use rb.velocity instead
-        public void SetVelocity(Vector3 velocity) => _rb.linearVelocity = velocity + _currentGroundAdjustmentVelocity;
+        public void SetVelocity(Vector3 velocity)
+        {
+            Vector3 adjustment = _isUsingExtendedSensorRange ? _currentGroundAdjustmentVelocity : Vector3.zero;
+            _rb.linearVelocity = velocity + adjustment;
+        }
+
         public void SetExtendSensorRange(bool isExtended) => _isUsingExtendedSensorRange = isExtended;
 
         private void Setup()
@@ -147,10 +155,11 @@ namespace Assets.Scripts.Player.Controller
 
         private void RecalibrateSensor()
         {
-            _sensor ??= new RaycastSensor(_tr);
+            _sensor ??= new SphereCastSensor(_tr);
 
             _sensor.SetCastOrigin(_col.bounds.center);
-            _sensor.SetCastDirection(RaycastSensor.CastDirection.Down);
+            _sensor.SetCastDirection(SphereCastSensor.CastDirection.Down);
+            _sensor.castRadius = _col.radius * _tr.localScale.x * _groundCheckRadiusRatio;
             RecalculateSensorLayerMask();
 
             const float

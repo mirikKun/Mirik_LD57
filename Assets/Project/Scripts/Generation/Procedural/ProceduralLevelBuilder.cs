@@ -113,6 +113,8 @@ namespace Project.Scripts.Generation.Procedural
         /// </summary>
         public static Location Build(ProceduralLevelsConfig config, LevelArchetype archetype, Vector3 worldPosition, Quaternion rotation, int seed, int levelIndex, float difficulty, bool generateDecorations = true)
         {
+            LevelGeometry.ColliderPhysicsMaterial = config.ColliderPhysicsMaterial;
+
             var rootGo = new GameObject($"ProceduralLevel_{archetype.name}_{seed}");
             rootGo.transform.SetPositionAndRotation(worldPosition, rotation);
 
@@ -230,6 +232,7 @@ namespace Project.Scripts.Generation.Procedural
             staminaZone.transform.SetParent(ctx.LevelElements, false);
             staminaZone.transform.localPosition = top;
             var staminaCollider = staminaZone.AddComponent<BoxCollider>();
+            staminaCollider.sharedMaterial = LevelGeometry.ColliderPhysicsMaterial;
             staminaCollider.isTrigger = true;
             staminaCollider.center = Vector3.up * 5f;
             staminaCollider.size = new Vector3(width, 12f, depth);

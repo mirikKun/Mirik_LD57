@@ -42,6 +42,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States {
             
             
             Vector3 momentum = _controller.GetMomentum();
+
             Vector3 horizontalMomentum = momentum -VectorMath.ExtractDotVector(momentum, _controller.Tr.up);
             horizontalMomentum = AdjustHorizontalAirMomentum( horizontalMomentum, _controller.CalculateMovementVelocity());
 

@@ -8,6 +8,8 @@ namespace Project.Scripts.Generation.Procedural
     /// </summary>
     public static class LevelGeometry
     {
+        public static PhysicsMaterial ColliderPhysicsMaterial;
+
         public static Transform CreateBox(Transform parent, string name, Vector3 localPosition, Quaternion localRotation, Vector3 size, Material material, bool withCollider = true)
         {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -53,6 +55,11 @@ namespace Project.Scripts.Generation.Procedural
                 // The cylinder mesh is 2 units tall in local space.
                 var box = go.AddComponent<BoxCollider>();
                 box.size = new Vector3(1f, 2f, 1f);
+                box.sharedMaterial = ColliderPhysicsMaterial;
+            }
+            else
+            {
+                go.GetComponent<Collider>().sharedMaterial = ColliderPhysicsMaterial;
             }
 
             return tr;
