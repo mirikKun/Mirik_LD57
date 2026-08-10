@@ -52,7 +52,8 @@ namespace Project.Scripts.Generation.Procedural
                     }
                 }
 
-                BuildSceneryAround(ctx, path, i);
+                if (ctx.GenerateDecorations)
+                    BuildSceneryAround(ctx, path, i);
             }
         }
 
@@ -128,7 +129,7 @@ namespace Project.Scripts.Generation.Procedural
                     : ctx.Range(-20f, 5f) - height * 0.5f;
 
                 LevelGeometry.CreateBox(
-                    ctx.LevelElements, hanging ? "SceneryMonolith" : "SceneryColumn",
+                    ctx.Decorations, hanging ? "SceneryMonolith" : "SceneryColumn",
                     anchor + Vector3.up * yCenter,
                     Quaternion.Euler(0f, ctx.Range(0f, 360f), 0f),
                     new Vector3(width, height, width * ctx.Range(0.8f, 1.4f)),

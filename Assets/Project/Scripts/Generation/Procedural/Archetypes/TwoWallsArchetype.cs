@@ -81,7 +81,8 @@ namespace Project.Scripts.Generation.Procedural
                     BuildWallSegment(ctx, mid, segmentForward, right, gap * 0.5f, segmentLength, heightAbove, depthBelow, sideSign: -1f, i);
                     BuildWallSegment(ctx, mid, segmentForward, right, gap * 0.5f, segmentLength, heightAbove, depthBelow, sideSign: 1f, i);
 
-                    BuildCrissCross(ctx, mid, right, gap, heightAbove, depthBelow);
+                    if (ctx.GenerateDecorations)
+                        BuildCrissCross(ctx, mid, right, gap, heightAbove, depthBelow);
                 }
             }
         }
@@ -134,7 +135,7 @@ namespace Project.Scripts.Generation.Procedural
                 float thickness = ctx.Range(0.5f, 1.3f);
 
                 LevelGeometry.CreateBox(
-                    ctx.LevelElements, "CrissCrossBeam",
+                    ctx.Decorations, "CrissCrossBeam",
                     (a + b) * 0.5f,
                     Quaternion.FromToRotation(Vector3.right, direction.normalized),
                     new Vector3(direction.magnitude + 2f, thickness, thickness),

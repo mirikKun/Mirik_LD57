@@ -1,34 +1,83 @@
-using System.Collections.Generic;
+using Assets.Scripts.Player.Controller;
+using Project.Scripts.Generation.Darkness;
 using Project.Scripts.Infrastracture.GameLoop;
 using Scripts.Player.DescentContorller;
+using Scripts.Player.Health;
 using UnityEngine;
 
 namespace Project.Scripts.Generation
 {
     public class DarknessFollowing : MonoBehaviour, IGameStartable, IGameUpdatable
     {
-        [SerializeField] private float _acceleration = 13f;
-        [SerializeField] private float _deceleration = 1.3f;
-        [SerializeField] private float _impulseSpeedChange = -20;
         [SerializeField] private Vector3 _offset;
         [SerializeField] private Vector3 _newLocationOffset;
         [SerializeField] private float _tunnelEntryDarknessDrop = 5f;
-        [Space]
         [SerializeField] private DescentController _descentController;
-
         [SerializeField] private LocationsGenerator _locationsGenerator;
-        [SerializeField] private AnimationCurve _speedCurve;
-        [Space]
-        [SerializeField] private Vector2 _darknessPlainsSize = new Vector2(10, 10);
-        [SerializeField] private List<Transform> _availableDarknessPlains;
-        [SerializeField] private Transform _darknessPlainsPrefab;
-        [SerializeField] private List<Transform> _darknessPlainsPool = new List<Transform>();
-        private float _currentSpeed;
-        private bool _hasMaxY;
-        private float _maxDarknessY;
+        [SerializeField] private PlayerHealth _playerHealth;
+        [SerializeField] private PlayerController _playerController;
+        [SerializeField] private MeshFilter _meshFilter;
+        [SerializeField] private MeshRenderer _meshRenderer;
+        [SerializeField] private Material _darknessMaterial;
+        [SerializeField] private DarknessChaseState _chase = new DarknessChaseState();
+        [SerializeField] private DarknessClearAnchors _anchors = new DarknessClearAnchors();
+        [SerializeField] private DarknessVolumeField _field = new DarknessVolumeField();
+        [SerializeField] private float _fieldCenterYSmoothTime = 0.12f;
+        [SerializeField] private int _fieldRebuildInterval = 2;
+        [SerializeField] private int _meshRebuildInterval = 3;
+        [SerializeField] private float _isoLevel = 0.5f;
+        [SerializeField] private bool _killEnabled = true;
+        [SerializeField] private float _killThreshold = 0.5f;
+        [SerializeField] private float _velocityLookAhead = 1.5f;
+        [SerializeField] private int _killDamage = 20;
+
+        private DarknessMeshBuilder _meshBuilder;
+        private DarknessKillSampler _killSampler;
+        private int _fieldFrameCounter;
+        private int _meshFrameCounter;
+        private float _accumulatedFieldDeltaTime;
+        private Vector3 _smoothedFieldCenter;
+        private float _fieldCenterYVelocity;
+        private bool _hasSmoothedFieldCenter;
 
         public void GameStart()
         {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            _anchors.ApplyWebProfile();
+            _field.ApplyWebProfile();
+            _fieldRebuildInterval = 4;
+            _meshRebuildInterval = 6;
+            _velocityLookAhead = 2f;
+#endif
+            _meshBuilder = new DarknessMeshBuilder();
+            _meshFilter.sharedMesh = _meshBuilder.Mesh;
+            _meshRenderer.sharedMaterial = _darknessMaterial;
+            _meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            _meshRenderer.receiveShadows = false;
+            _meshRenderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
+            _meshRenderer.reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
+
+            _anchors.EnsureInitialized();
+            _field.EnsureInitialized();
+            Vector3 playerPos = _playerController.transform.position;
+            _chase.SetChaseY(playerPos.y + _offset.y);
+            _anchors.AddGroundedAnchor(playerPos);
+            _smoothedFieldCenter = playerPos;
+            _hasSmoothedFieldCenter = true;
+            _field.Rebuild(playerPos, _anchors, _chase, 0f, true);
+            _meshBuilder.Build(_field, _meshFilter.transform, _isoLevel);
+
+            _killSampler = new DarknessKillSampler(
+                _field,
+                _anchors,
+                _chase,
+                _playerHealth,
+                _playerController.transform,
+                _playerController,
+                _killThreshold,
+                _velocityLookAhead,
+                _killDamage);
+
             _descentController.Grounded += OnCharacterGrounded;
             _locationsGenerator.LocationEntered += OnLocationEntered;
         }
@@ -43,83 +92,95 @@ namespace Project.Scripts.Generation
         {
             if (entryPlatform != null)
             {
-                float targetY = entryPlatform.position.y - _tunnelEntryDarknessDrop;
-                _maxDarknessY = _hasMaxY ? Mathf.Min(_maxDarknessY, targetY) : targetY;
-                _hasMaxY = true;
-                transform.position = new Vector3(transform.position.x, targetY, transform.position.z);
-                _currentSpeed = 0f;
+                float sealY = entryPlatform.position.y - _tunnelEntryDarknessDrop;
+                _chase.SealAt(sealY);
             }
-
-            _darknessPlainsPool.AddRange(_availableDarknessPlains);
-            _availableDarknessPlains.Clear();
-
-            float plainWidth = _darknessPlainsSize.x;
-            float plainDepth = _darknessPlainsSize.y;
-            int countX = Mathf.Max(1, Mathf.CeilToInt(locationBounds.size.x / plainWidth)) + 2;
-            int countZ = Mathf.Max(1, Mathf.CeilToInt(locationBounds.size.z / plainDepth)) + 2;
-            float startX = locationBounds.min.x - plainWidth;
-            float startZ = locationBounds.min.z - plainDepth;
-            float y = transform.position.y;
-
-            for (int i = 0; i < countX; i++)
-            {
-                for (int j = 0; j < countZ; j++)
-                {
-                    if (_darknessPlainsPool.Count == 0)
-                        _darknessPlainsPool.Add(Instantiate(_darknessPlainsPrefab, transform));
-
-                    Transform darknessPlain = _darknessPlainsPool[0];
-                    _darknessPlainsPool.RemoveAt(0);
-                    darknessPlain.position = new Vector3(startX + i * plainWidth, y, startZ + j * plainDepth);
-                    darknessPlain.gameObject.SetActive(true);
-                    _availableDarknessPlains.Add(darknessPlain);
-                }
-            }
-
-            foreach (var darknessPlain in _darknessPlainsPool)
-                darknessPlain.gameObject.SetActive(false);
         }
 
         public void GameUpdate()
         {
+            float deltaTime = Time.deltaTime;
             Vector3 targetPosition = GetTargetPosition();
+            _chase.Tick(targetPosition.y, deltaTime);
 
-            int accelerationSign = (int)Mathf.Sign(targetPosition.y - transform.position.y);
-            int speedSign = (int)Mathf.Sign(_currentSpeed);
-            _currentSpeed += _acceleration * accelerationSign * Time.deltaTime;
-            if (accelerationSign != speedSign)
-                _currentSpeed /= _deceleration;
+            _anchors.TickDecay(deltaTime);
+            _anchors.TickGrowth(deltaTime);
+            UpdateGroundFollow();
 
-            float newY = transform.position.y + _currentSpeed * Time.deltaTime;
-            if (_hasMaxY && newY > _maxDarknessY)
+            Vector3 playerPos = _playerController.transform.position;
+            if (!_hasSmoothedFieldCenter)
             {
-                newY = _maxDarknessY;
-                if (_currentSpeed > 0f)
-                    _currentSpeed = 0f;
+                _smoothedFieldCenter = playerPos;
+                _hasSmoothedFieldCenter = true;
+            }
+            else
+            {
+                float smoothedY = Mathf.SmoothDamp(
+                    _smoothedFieldCenter.y,
+                    playerPos.y,
+                    ref _fieldCenterYVelocity,
+                    _fieldCenterYSmoothTime);
+                _smoothedFieldCenter = new Vector3(playerPos.x, smoothedY, playerPos.z);
             }
 
-            transform.position = new Vector3(transform.position.x, newY, transform.position.z);
+            _accumulatedFieldDeltaTime += deltaTime;
+            _fieldFrameCounter++;
+            if (_fieldFrameCounter >= _fieldRebuildInterval)
+            {
+                _field.Rebuild(
+                    _smoothedFieldCenter,
+                    _anchors,
+                    _chase,
+                    _accumulatedFieldDeltaTime);
+                _fieldFrameCounter = 0;
+                _accumulatedFieldDeltaTime = 0f;
+            }
+
+            _meshFrameCounter++;
+            if (_meshFrameCounter >= _meshRebuildInterval)
+            {
+                _meshFrameCounter = 0;
+                _meshBuilder.Build(_field, _meshFilter.transform, _isoLevel);
+            }
+
+            if (_killEnabled)
+                _killSampler.Tick();
+        }
+
+        private void UpdateGroundFollow()
+        {
+            bool grounded = Vector3.Distance(
+                _descentController.LastGroundPosition,
+                _playerController.transform.position) < 0.75f;
+
+            if (!grounded)
+            {
+                _anchors.ReleaseFollow();
+                return;
+            }
+
+            _anchors.TickFollow(_descentController.LastGroundPosition, Time.deltaTime);
         }
 
         private void OnCharacterGrounded()
         {
-            var targetPosition = GetTargetPosition();
-            float speedOffset = _impulseSpeedChange * _speedCurve.Evaluate(Mathf.Abs(targetPosition.y - transform.position.y) / _offset.magnitude);
-
-            _currentSpeed += speedOffset;
+            Vector3 targetPosition = GetTargetPosition();
+            _chase.ApplyGroundedImpulse(targetPosition.y, _offset.magnitude);
+            _anchors.AddGrowingGroundedAnchor(_descentController.LastGroundPosition);
         }
 
         private Vector3 GetTargetPosition()
         {
             Vector3 target;
-            if (_locationsGenerator.TryGetNearestLocationEnterPoint(_descentController.LastGroundPosition, _offset.magnitude, out Vector3 locationEnter))
+            if (_locationsGenerator.TryGetNearestLocationEnterPoint(
+                    _descentController.LastGroundPosition,
+                    _offset.magnitude,
+                    out Vector3 locationEnter))
                 target = locationEnter + _newLocationOffset;
             else
-                target = new Vector3(0, _descentController.LastGroundPosition.y, 0) + _offset;
+                target = new Vector3(0f, _descentController.LastGroundPosition.y, 0f) + _offset;
 
-            if (_hasMaxY)
-                target.y = Mathf.Min(target.y, _maxDarknessY);
-
+            target.y = _chase.ClampTargetY(target.y);
             return target;
         }
     }

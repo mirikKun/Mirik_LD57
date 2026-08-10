@@ -73,7 +73,8 @@ namespace Project.Scripts.Generation.Procedural
                     Vector3 mid = (path[i].Position + path[i + 1].Position) * 0.5f + toWall * offset;
                     float segmentLength = Vector3.Distance(path[i].Position, path[i + 1].Position) * 1.7f;
                     BuildWallSegment(ctx, mid, path[i].Forward, toWall, segmentLength, heightAbove, depthBelow, tilt, i);
-                    BuildDecorProtrusions(ctx, mid, path[i].Forward, toWall, segmentLength, heightAbove, depthBelow);
+                    if (ctx.GenerateDecorations)
+                        BuildDecorProtrusions(ctx, mid, path[i].Forward, toWall, segmentLength, heightAbove, depthBelow);
                 }
             }
         }
@@ -146,7 +147,7 @@ namespace Project.Scripts.Generation.Procedural
                 Vector3 pos = faceMid + forward * ctx.Range(-length * 0.4f, length * 0.4f) + Vector3.up * y - toWall * ctx.Range(0.5f, 2.5f);
                 Vector3 size = new Vector3(ctx.Range(0.8f, 2.5f), ctx.Range(0.8f, 2.5f), ctx.Range(1.5f, 4f));
                 LevelGeometry.CreateBox(
-                    ctx.LevelElements, "WallDecor",
+                    ctx.Decorations, "WallDecor",
                     pos,
                     Quaternion.LookRotation(-toWall) * Quaternion.Euler(ctx.Range(-10f, 10f), ctx.Range(-10f, 10f), ctx.Range(0f, 360f)),
                     size, ctx.Palette.SceneryMaterial);

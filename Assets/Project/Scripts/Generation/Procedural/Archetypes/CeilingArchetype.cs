@@ -68,7 +68,8 @@ namespace Project.Scripts.Generation.Procedural
                 {
                     Vector3 nextCeiling = path[i + 1].Position + Vector3.up * clearance;
                     BuildCeilingSegment(ctx, ceilingPoint, nextCeiling, path[i].Forward, halfWidth, i);
-                    BuildDecorStalactites(ctx, ceilingPoint, nextCeiling, path[i].Forward, halfWidth);
+                    if (ctx.GenerateDecorations)
+                        BuildDecorStalactites(ctx, ceilingPoint, nextCeiling, path[i].Forward, halfWidth);
                 }
             }
         }
@@ -154,7 +155,7 @@ namespace Project.Scripts.Generation.Procedural
                 float length = ctx.Range(2f, 14f) * SceneryScale;
                 float diameter = ctx.Range(0.6f, 2.4f);
                 LevelGeometry.CreateBox(
-                    ctx.LevelElements, "DecorStalactite",
+                    ctx.Decorations, "DecorStalactite",
                     anchor + Vector3.down * (length * 0.5f),
                     Quaternion.Euler(ctx.Range(-4f, 4f), ctx.Range(0f, 360f), ctx.Range(-4f, 4f)),
                     new Vector3(diameter, length, diameter),
