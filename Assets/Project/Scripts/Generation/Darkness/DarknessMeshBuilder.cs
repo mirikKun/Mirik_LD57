@@ -5,8 +5,11 @@ namespace Project.Scripts.Generation.Darkness
 {
     public class DarknessMeshBuilder
     {
+        private const float WeldQuantize = 1000f;
+
         private readonly List<Vector3> _vertices = new List<Vector3>(8192);
         private readonly List<int> _triangles = new List<int>(16384);
+        private readonly Dictionary<Vector3Int, int> _weldMap = new Dictionary<Vector3Int, int>(8192);
         private readonly Vector3[] _cornerPositions = new Vector3[8];
         private readonly float[] _cornerValues = new float[8];
         private readonly Vector3[] _edgeVerts = new Vector3[12];
@@ -31,6 +34,7 @@ namespace Project.Scripts.Generation.Darkness
         {
             _vertices.Clear();
             _triangles.Clear();
+            _weldMap.Clear();
 
             int res = field.Resolution;
             float cell = field.CellSize;
@@ -118,16 +122,33 @@ namespace Project.Scripts.Generation.Darkness
                 int i0 = TriTable[cubeIndex, i];
                 int i1 = TriTable[cubeIndex, i + 1];
                 int i2 = TriTable[cubeIndex, i + 2];
-                int baseIndex = _vertices.Count;
-                _vertices.Add(meshTransform.InverseTransformPoint(_edgeVerts[i0]));
-                _vertices.Add(meshTransform.InverseTransformPoint(_edgeVerts[i1]));
-                _vertices.Add(meshTransform.InverseTransformPoint(_edgeVerts[i2]));
-                _triangles.Add(baseIndex);
-                _triangles.Add(baseIndex + 2);
-                _triangles.Add(baseIndex + 1);
+                int v0 = AddWeldedVertex(meshTransform.InverseTransformPoint(_edgeVerts[i0]));
+                int v1 = AddWeldedVertex(meshTransform.InverseTransformPoint(_edgeVerts[i1]));
+                int v2 = AddWeldedVertex(meshTransform.InverseTransformPoint(_edgeVerts[i2]));
+                if (v0 == v1 || v1 == v2 || v2 == v0)
+                    continue;
+
+                _triangles.Add(v0);
+                _triangles.Add(v2);
+                _triangles.Add(v1);
             }
         }
 
+        private int AddWeldedVertex(Vector3 localPosition)
+        {
+            Vector3Int key = new Vector3Int(
+                Mathf.RoundToInt(localPosition.x * WeldQuantize),
+                Mathf.RoundToInt(localPosition.y * WeldQuantize),
+                Mathf.RoundToInt(localPosition.z * WeldQuantize));
+
+            if (_weldMap.TryGetValue(key, out int index))
+                return index;
+
+            index = _vertices.Count;
+            _vertices.Add(localPosition);
+            _weldMap.Add(key, index);
+            return index;
+        }
         private Vector3 VertexInterp(float isoLevel, int a, int b)
         {
             float va = _cornerValues[a];

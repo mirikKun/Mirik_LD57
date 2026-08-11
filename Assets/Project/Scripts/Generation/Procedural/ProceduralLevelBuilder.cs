@@ -15,6 +15,7 @@ namespace Project.Scripts.Generation.Procedural
         private readonly ProceduralLevelsConfig _config;
         private readonly System.Random _rng;
         private readonly bool _generateDecorations;
+        private readonly LevelArchetype _testArchetype;
         private LevelArchetype _lastPicked;
         private int _builtCount;
 
@@ -31,17 +32,22 @@ namespace Project.Scripts.Generation.Procedural
         private BuildParams _lastBuild;
         private bool _hasLastBuild;
 
-        public ProceduralLevelBuilder(ProceduralLevelsConfig config, bool generateDecorations = true)
+        public ProceduralLevelBuilder(ProceduralLevelsConfig config, bool generateDecorations = true, LevelArchetype testArchetype = null)
         {
             _config = config;
             _generateDecorations = generateDecorations;
+            _testArchetype = testArchetype;
             int seed = config.Seed == 0 ? Environment.TickCount : config.Seed;
             _rng = new System.Random(seed);
         }
 
         public Location BuildNext(Vector3 worldPosition, Quaternion rotation)
         {
-            LevelArchetype archetype = PickArchetype();
+            LevelArchetype archetype = _builtCount == 0 && _testArchetype != null
+                ? _testArchetype
+                : PickArchetype();
+            if (_builtCount == 0 && _testArchetype != null)
+                _lastPicked = _testArchetype;
             float difficulty = Mathf.Clamp01((float)_builtCount / Mathf.Max(1, _config.LevelsToMaxDifficulty));
 
             _lastBuild = new BuildParams

@@ -58,6 +58,16 @@ namespace Project.Scripts.Generation.Darkness
             _currentSpeed = 0f;
         }
 
+        public void SnapBelow(float y)
+        {
+            if (_chaseY <= y)
+                return;
+
+            _chaseY = y;
+            if (_currentSpeed > 0f)
+                _currentSpeed = 0f;
+        }
+
         public float ClampTargetY(float targetY)
         {
             if (_hasMaxY)

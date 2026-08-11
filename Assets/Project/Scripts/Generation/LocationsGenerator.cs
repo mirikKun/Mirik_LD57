@@ -20,6 +20,7 @@ namespace Project.Scripts.Generation
         private const float EntryPlatformRespawnOffset = 1f;
 
         [SerializeField] private Location _startLocation;
+        [SerializeField] private LevelArchetype _testArchetype;
         [SerializeField] private bool _skipTutorial;
         [SerializeField] private bool _generateDecorations = true;
         [SerializeField] private List<Location> _basicTutorialLocations;
@@ -63,7 +64,7 @@ namespace Project.Scripts.Generation
                 return false;
             }
 
-            _proceduralBuilder = new ProceduralLevelBuilder(_proceduralConfig, _generateDecorations);
+            _proceduralBuilder = new ProceduralLevelBuilder(_proceduralConfig, _generateDecorations, _testArchetype);
             _currentLocations.Add(_startLocation);
             _startLocation.LocationEntered += OnLocationEntered;
             _initialized = true;

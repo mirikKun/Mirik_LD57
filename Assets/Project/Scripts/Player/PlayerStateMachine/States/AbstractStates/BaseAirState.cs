@@ -14,6 +14,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States.AbstractStates
 
         public virtual void FixedUpdate(){}
         public virtual void OnEnter() { }
+        public virtual void OnExit() { }
 
         protected Vector3 AdjustHorizontalAirMomentum( Vector3 horizontalMomentum, Vector3 movementVelocity)
         {

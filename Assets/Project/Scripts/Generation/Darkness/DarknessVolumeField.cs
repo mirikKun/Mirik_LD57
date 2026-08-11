@@ -7,10 +7,10 @@ namespace Project.Scripts.Generation.Darkness
     public class DarknessVolumeField
     {
         [SerializeField] private int _resolution = 24;
-        [SerializeField] private float _coverageDiameterFactor = 2.35f;
+        [SerializeField] private float _coverageDiameterFactor = 2.4f;
         [SerializeField] private float _chaseBlendRadiusFactor = 0.15f;
-        [SerializeField] private float _noiseStrengthFactor = 0.045f;
-        [SerializeField] private float _noiseScale = 0.028f;
+        [SerializeField] private float _noiseStrengthFactor = 0.04f;
+        [SerializeField] private float _noiseScale = 0.022f;
         [SerializeField] private float _densitySmoothSpeed = 6f;
 
         private float _cellSize = 7.83f;

@@ -19,14 +19,15 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
             _controller.OnFallStart();
         }
 
-        public void OnExit()
+        public override void OnExit()
         {
             Vector3 fallingDistance = _fallStartPosition - _controller.Tr.position;
             float fallingHeight = Vector3.Dot(fallingDistance, _controller.Tr.up);
             if (FallingToGrounded())
             {
-                _controller.PlayerEffects.CameraMovingEffects.StartFallEffect(fallingHeight);
+                _controller.PlayerEffects.OnLandedFromFall(fallingHeight);
             }
+            Debug.Log($"Falling to grounded: {FallingToGrounded()} | Falling to rising: {FallingToRising()} | Falling to sliding: {FallingToSliding()}");
         }
 
         public override void FixedUpdate()

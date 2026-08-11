@@ -12,6 +12,10 @@ namespace Project.Scripts.Generation
         [SerializeField] private Vector3 _offset;
         [SerializeField] private Vector3 _newLocationOffset;
         [SerializeField] private float _tunnelEntryDarknessDrop = 5f;
+        [SerializeField] private float _deathClearDrop = 8f;
+        [SerializeField] private float _tunnelPathSpacing = 18f;
+        [SerializeField] private float _tunnelPathWeight = 1f;
+        [SerializeField] private float _tunnelPathRadiusScale = 0.85f;
         [SerializeField] private DescentController _descentController;
         [SerializeField] private LocationsGenerator _locationsGenerator;
         [SerializeField] private PlayerHealth _playerHealth;
@@ -80,21 +84,77 @@ namespace Project.Scripts.Generation
 
             _descentController.Grounded += OnCharacterGrounded;
             _locationsGenerator.LocationEntered += OnLocationEntered;
+            _playerController.PlayerRespawner.Respawned += OnPlayerRespawned;
         }
 
         private void OnDestroy()
         {
             _descentController.Grounded -= OnCharacterGrounded;
             _locationsGenerator.LocationEntered -= OnLocationEntered;
+            _playerController.PlayerRespawner.Respawned -= OnPlayerRespawned;
+        }
+
+        private void OnPlayerRespawned()
+        {
+            Vector3 position = _playerController.transform.position;
+            _chase.SnapBelow(position.y - _deathClearDrop);
+            _anchors.AddGroundedAnchor(position);
+            ForceFieldRebuild(position);
         }
 
         private void OnLocationEntered(Bounds locationBounds, Transform entryPlatform)
         {
+            Vector3 playerPos = _playerController.transform.position;
+            Vector3 pathEnd = entryPlatform != null ? entryPlatform.position : playerPos;
             if (entryPlatform != null)
             {
                 float sealY = entryPlatform.position.y - _tunnelEntryDarknessDrop;
                 _chase.SealAt(sealY);
             }
+
+            AddClearPath(
+                playerPos,
+                pathEnd,
+                _tunnelPathSpacing,
+                _tunnelPathWeight,
+                _tunnelPathRadiusScale);
+        }
+
+        public void SnapClearAt(Vector3 position)
+        {
+            _anchors.SnapClear(position);
+            ForceFieldRebuild(position);
+        }
+
+        public void AddClearBurst(Vector3 position, float weight = -1f, float radiusScale = -1f)
+        {
+            float burstWeight = weight > 0f ? weight : 1f;
+            float burstScale = radiusScale > 0f ? radiusScale : 1f;
+            _anchors.AddClearBurst(position, burstWeight, burstScale);
+            ForceFieldRebuild(position);
+        }
+
+        public void AddClearPath(
+            Vector3 from,
+            Vector3 to,
+            float spacing = -1f,
+            float weight = -1f,
+            float radiusScale = -1f)
+        {
+            _anchors.AddClearPath(from, to, spacing, weight, radiusScale);
+            ForceFieldRebuild(Vector3.Lerp(from, to, 0.5f));
+        }
+
+        private void ForceFieldRebuild(Vector3 center)
+        {
+            _smoothedFieldCenter = center;
+            _fieldCenterYVelocity = 0f;
+            _hasSmoothedFieldCenter = true;
+            _field.Rebuild(center, _anchors, _chase, 0f, true);
+            _meshBuilder.Build(_field, _meshFilter.transform, _isoLevel);
+            _fieldFrameCounter = 0;
+            _meshFrameCounter = 0;
+            _accumulatedFieldDeltaTime = 0f;
         }
 
         public void GameUpdate()
