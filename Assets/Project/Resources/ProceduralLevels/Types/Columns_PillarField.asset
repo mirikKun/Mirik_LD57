@@ -18,20 +18,17 @@ MonoBehaviour:
   PlateauChance: 0.2
   MeanderAngleRange: {x: 15, y: 35}
   CurvatureBiasRange: {x: 0, y: 0}
-  PlatformSizeRange: {x: 3, y: 5}
   DifficultyGapBonus: 1.2
-  DifficultyPlatformShrink: 1.2
-  SceneryScale: 1
-  SceneryDensity: 1
   LightEveryNthPlatform: 4
   Palette: {fileID: 11400000, guid: c0de5eed1001aaaa8888bbbbcccc1001, type: 2}
-  LootChancePerLevel: 0.55
-  HealChancePerLevel: 0.3
+  BranchChance: 0.35
+  ExtraCandidatesRange: {x: 1, y: 2}
+  BranchDistanceMultiplierRange: {x: 1.05, y: 1.35}
+  PlatformSizeRange: {x: 3, y: 5}
+  DifficultyPlatformShrink: 1.2
   HangingChance: 0.15
   ColumnDiameterRange: {x: 3, y: 6}
   ColumnDepthRange: {x: 45, y: 80}
   MonolithWidthRange: {x: 3, y: 6}
   MonolithHeightRange: {x: 35, y: 55}
-  SceneryPerStep: 1.5
-  SceneryDistanceRange: {x: 14, y: 40}
-  SceneryWidthRange: {x: 4, y: 12}
+  BranchLateralOffsetRange: {x: 2.5, y: 5}

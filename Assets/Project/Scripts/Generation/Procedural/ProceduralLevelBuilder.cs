@@ -14,7 +14,6 @@ namespace Project.Scripts.Generation.Procedural
     {
         private readonly ProceduralLevelsConfig _config;
         private readonly System.Random _rng;
-        private readonly bool _generateDecorations;
         private readonly LevelArchetype _testArchetype;
         private LevelArchetype _lastPicked;
         private int _builtCount;
@@ -32,10 +31,9 @@ namespace Project.Scripts.Generation.Procedural
         private BuildParams _lastBuild;
         private bool _hasLastBuild;
 
-        public ProceduralLevelBuilder(ProceduralLevelsConfig config, bool generateDecorations = true, LevelArchetype testArchetype = null)
+        public ProceduralLevelBuilder(ProceduralLevelsConfig config, LevelArchetype testArchetype = null)
         {
             _config = config;
-            _generateDecorations = generateDecorations;
             _testArchetype = testArchetype;
             int seed = config.Seed == 0 ? Environment.TickCount : config.Seed;
             _rng = new System.Random(seed);
@@ -61,7 +59,7 @@ namespace Project.Scripts.Generation.Procedural
             };
             _hasLastBuild = true;
 
-            Location location = Build(_config, archetype, worldPosition, rotation, _lastBuild.Seed, _builtCount, difficulty, _generateDecorations);
+            Location location = Build(_config, archetype, worldPosition, rotation, _lastBuild.Seed, _builtCount, difficulty);
             _builtCount++;
             return location;
         }
@@ -80,7 +78,7 @@ namespace Project.Scripts.Generation.Procedural
                 _lastBuild.Seed = _rng.Next();
 
             return Build(_config, _lastBuild.Archetype, _lastBuild.Position, _lastBuild.Rotation,
-                _lastBuild.Seed, _lastBuild.LevelIndex, _lastBuild.Difficulty, _generateDecorations);
+                _lastBuild.Seed, _lastBuild.LevelIndex, _lastBuild.Difficulty);
         }
 
         private LevelArchetype PickArchetype()
@@ -117,7 +115,7 @@ namespace Project.Scripts.Generation.Procedural
         /// <summary>
         /// Stateless build used both at runtime and by the editor preview.
         /// </summary>
-        public static Location Build(ProceduralLevelsConfig config, LevelArchetype archetype, Vector3 worldPosition, Quaternion rotation, int seed, int levelIndex, float difficulty, bool generateDecorations = true)
+        public static Location Build(ProceduralLevelsConfig config, LevelArchetype archetype, Vector3 worldPosition, Quaternion rotation, int seed, int levelIndex, float difficulty)
         {
             LevelGeometry.ColliderPhysicsMaterial = config.ColliderPhysicsMaterial;
 
@@ -127,7 +125,6 @@ namespace Project.Scripts.Generation.Procedural
             Transform levelElements = CreateCategoryParent(rootGo.transform, "LevelElements");
             Transform entrance = CreateCategoryParent(rootGo.transform, "Entrance");
             Transform exit = CreateCategoryParent(rootGo.transform, "Exit");
-            Transform decorations = CreateCategoryParent(rootGo.transform, "Decorations");
 
             var ctx = new LevelBuildContext
             {
@@ -138,10 +135,8 @@ namespace Project.Scripts.Generation.Procedural
                 LevelElements = levelElements,
                 Entrance = entrance,
                 Exit = exit,
-                Decorations = decorations,
                 Palette = archetype.Palette,
                 Config = config,
-                GenerateDecorations = generateDecorations,
             };
 
             List<PathPoint> path = archetype.BuildPath(ctx);
@@ -166,14 +161,11 @@ namespace Project.Scripts.Generation.Procedural
             }
 
             levelElements.localPosition += Vector3.down * totalSink;
-            decorations.localPosition += Vector3.down * totalSink;
 
             BuildEntryShaft(ctx, entryShaftDepth);
 
             Transform startPoint = CreateAnchor(ctx.Entrance, "StartPoint", Vector3.zero);
             Transform endPoint = BuildTunnelExit(ctx, path[path.Count - 1], out LocationEnteredTrigger enterTrigger);
-
-            SpawnPickups(ctx, archetype);
 
             Location location = rootGo.AddComponent<Location>();
             location.InitializeRuntime(
@@ -183,8 +175,9 @@ namespace Project.Scripts.Generation.Procedural
                 levelElements,
                 entrance,
                 exit,
-                decorations,
+                null,
                 entryPlatformPoint);
+            location.SetPath(path);
             ApplyBounds(ctx, location);
 
             if (Application.isPlaying)
@@ -248,7 +241,7 @@ namespace Project.Scripts.Generation.Procedural
         }
 
         /// <summary>Tiles 10x10 darkness planes over an area. Shared with EnclosingShellBuilder.</summary>
-        internal static void TileDarknessPlanes(LevelBuildContext ctx, Transform parent, GameObject planePrefab, float sizeX, float sizeZ)
+        internal static void TileDarknessPlanes(Transform parent, GameObject planePrefab, float sizeX, float sizeZ)
         {
             if (planePrefab == null)
                 return;
@@ -286,26 +279,6 @@ namespace Project.Scripts.Generation.Procedural
 
             enterTrigger = tunnel.EnterTrigger;
             return tunnel.EndPoint;
-        }
-
-        private static void SpawnPickups(LevelBuildContext ctx, LevelArchetype archetype)
-        {
-            if (ctx.PlatformTops.Count < 4 || !Application.isPlaying)
-                return;
-
-            if (ctx.Config.LootRandomizerPrefab != null && ctx.Chance(archetype.LootChancePerLevel))
-                SpawnOnRandomPlatform(ctx, ctx.Config.LootRandomizerPrefab);
-
-            if (ctx.Config.HealPrefab != null && ctx.Chance(archetype.HealChancePerLevel))
-                SpawnOnRandomPlatform(ctx, ctx.Config.HealPrefab);
-        }
-
-        private static void SpawnOnRandomPlatform(LevelBuildContext ctx, GameObject prefab)
-        {
-            int index = ctx.RangeInt(1, ctx.PlatformTops.Count - 1);
-            Vector3 top = ctx.PlatformTops[index];
-            GameObject instance = UnityEngine.Object.Instantiate(prefab, ctx.LevelElements);
-            instance.transform.localPosition = top + Vector3.up * 1f;
         }
 
         private static void ApplyBounds(LevelBuildContext ctx, Location location)

@@ -52,8 +52,6 @@ namespace Project.Scripts.Generation.Procedural
         public GameObject DarknessPlanePrefab;
         [Tooltip("Opaque darkness plane used to visualize death zones, same as the tutorial levels.")]
         public GameObject DeathZoneDarknessPlanePrefab;
-        public GameObject LootRandomizerPrefab;
-        public GameObject HealPrefab;
 
         [Header("Physics")]
         [Tooltip("Assigned to colliders of all procedurally created (non-prefab) geometry.")]

@@ -3,36 +3,22 @@ using UnityEngine;
 
 namespace Project.Scripts.Generation.Procedural
 {
+    [System.Serializable]
     public struct PathPoint
     {
-        /// <summary>Local-space position of the walkable surface (platform top).</summary>
         public Vector3 Position;
-
-        /// <summary>Horizontal direction toward the next point.</summary>
         public Vector3 Forward;
     }
 
     public class PathSettings
     {
-        /// <summary>Total horizontal distance the path should cover.</summary>
-        public float Length = 80f;
-
-        /// <summary>Horizontal center-to-center distance between consecutive platforms.</summary>
-        public float StepDistance = 6f;
-
-        /// <summary>Average vertical drop per step.</summary>
-        public float StepDown = 2.5f;
-
-        /// <summary>Random +- variation applied to StepDown.</summary>
+        public FloatRange Length;
+        public FloatRange StepDistance;
+        public float StepDistanceDifficultyBonus;
+        public FloatRange StepDown;
         public float StepDownJitter = 1f;
-
-        /// <summary>Max random heading change per step, in degrees.</summary>
-        public float MeanderAngle = 20f;
-
-        /// <summary>Constant turn per step in degrees; produces arcs/spirals. Sign matters.</summary>
-        public float CurvatureBias = 0f;
-
-        /// <summary>Chance a step keeps the current height (a breather).</summary>
+        public FloatRange MeanderAngle;
+        public FloatRange CurvatureBias;
         public float PlateauChance = 0.15f;
     }
 
@@ -51,24 +37,25 @@ namespace Project.Scripts.Generation.Procedural
         {
             var points = new List<PathPoint>();
 
-            float stepDistance = settings.StepDistance;
-            int stepCount = Mathf.Max(3, Mathf.CeilToInt(settings.Length / stepDistance));
+            float stepDistance = settings.StepDistance.Sample(rng) + settings.StepDistanceDifficultyBonus;
+            int stepCount = Mathf.Max(3, Mathf.CeilToInt(settings.Length.Sample(rng) / stepDistance));
+            float curvatureBias = settings.CurvatureBias.Sample(rng) * (rng.NextDouble() < 0.5 ? -1f : 1f);
 
             Vector3 position = Vector3.zero;
-            float heading = 0f; // degrees around Y, 0 = +Z
-            float curvatureSign = rng.NextDouble() < 0.5 ? -1f : 1f;
+            float heading = 0f;
 
             for (int i = 0; i <= stepCount; i++)
             {
                 Vector3 forward = Quaternion.Euler(0f, heading, 0f) * Vector3.forward;
                 points.Add(new PathPoint { Position = position, Forward = forward });
 
-                heading += settings.CurvatureBias * curvatureSign;
-                heading += Mathf.Lerp(-settings.MeanderAngle, settings.MeanderAngle, (float)rng.NextDouble());
+                float meanderAngle = settings.MeanderAngle.Sample(rng);
+                heading += curvatureBias;
+                heading += Mathf.Lerp(-meanderAngle, meanderAngle, (float)rng.NextDouble());
 
                 Vector3 nextForward = Quaternion.Euler(0f, heading, 0f) * Vector3.forward;
 
-                float drop = settings.StepDown + Mathf.Lerp(-settings.StepDownJitter, settings.StepDownJitter, (float)rng.NextDouble());
+                float drop = settings.StepDown.Sample(rng) + Mathf.Lerp(-settings.StepDownJitter, settings.StepDownJitter, (float)rng.NextDouble());
                 if (rng.NextDouble() < settings.PlateauChance)
                     drop = 0f;
 

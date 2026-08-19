@@ -30,16 +30,10 @@ namespace Project.Scripts.Editor
             if (GUILayout.Button("Generate Next Location", GUILayout.Height(30)))
             {
                 _locationsGenerator.GenerateNextLocation();
-            
-                EditorUtility.SetDirty(_locationsGenerator);
-            
-                if (Application.isPlaying)
-                {
-                    SceneView.RepaintAll();
-                }
+                SceneView.RepaintAll();
             }
 
-            GUI.enabled = Application.isPlaying;
+            GUI.enabled = Application.isPlaying || _locationsGenerator.CanRegenerateLastLocation;
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("Regenerate Last (Same Seed)", GUILayout.Height(24)))
             {
@@ -53,6 +47,13 @@ namespace Project.Scripts.Editor
             }
             EditorGUILayout.EndHorizontal();
             GUI.enabled = true;
+
+            if (!Application.isPlaying)
+            {
+                EditorGUILayout.HelpBox(
+                    "Edit mode: Generate builds a single level from Start Location. Regenerate rebuilds that same level.",
+                    MessageType.Info);
+            }
 
             if (EditorGUI.EndChangeCheck())
             {

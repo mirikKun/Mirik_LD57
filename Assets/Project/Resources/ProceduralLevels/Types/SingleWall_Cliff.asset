@@ -12,26 +12,50 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0de5eed0009aaaa8888bbbbcccc0009, type: 3}
   m_Name: SingleWall_Cliff
   m_EditorClassIdentifier: 
-  LengthRange: {x: 70, y: 110}
-  StepDistanceRange: {x: 5, y: 6}
-  StepDownRange: {x: 2, y: 3.5}
+  LengthRange:
+    x: 70
+    y: 110
+  StepDistanceRange:
+    x: 5
+    y: 6
+  StepDownRange:
+    x: 2
+    y: 3.5
   PlateauChance: 0.15
-  MeanderAngleRange: {x: 4, y: 12}
-  CurvatureBiasRange: {x: 0, y: 3}
-  PlatformSizeRange: {x: 2.5, y: 4.5}
+  MeanderAngleRange:
+    x: 4
+    y: 12
+  CurvatureBiasRange:
+    x: 0
+    y: 3
   DifficultyGapBonus: 1.2
-  DifficultyPlatformShrink: 1
-  SceneryScale: 1
-  SceneryDensity: 1
   LightEveryNthPlatform: 4
   Palette: {fileID: 11400000, guid: c0de5eed1001aaaa8888bbbbcccc1001, type: 2}
-  LootChancePerLevel: 0.6
-  HealChancePerLevel: 0.35
-  WallHeightAboveRange: {x: 35, y: 60}
-  WallDepthBelowRange: {x: 30, y: 50}
-  WallThicknessRange: {x: 3, y: 6}
-  WallTiltRange: {x: 0, y: 3}
+  BranchChance: 0.35
+  ExtraCandidatesRange:
+    x: 1
+    y: 2
+  BranchDistanceMultiplierRange:
+    x: 1.05
+    y: 1.35
+  PlatformSizeRange:
+    x: 2.5
+    y: 11
+  DifficultyPlatformShrink: 1
+  WallHeightAboveRange:
+    x: 35
+    y: 60
+  WallDepthBelowRange:
+    x: 30
+    y: 50
+  WallThicknessRange:
+    x: 3
+    y: 6
+  WallTiltRange:
+    x: 0
+    y: 3
   WallRoughness: 1.2
   RockChance: 0.65
-  ProtrusionLengthRange: {x: 2.5, y: 4.5}
-  DecorPerStep: 2
+  ProtrusionLengthRange:
+    x: 0
+    y: 0

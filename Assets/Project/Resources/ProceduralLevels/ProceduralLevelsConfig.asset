@@ -38,11 +38,9 @@ MonoBehaviour:
   EntryPlatformSize: {x: 10, y: 10}
   BarrierHeight: 8
   ExitTunnelLength: 3
-  ExitTunnelForwardOffset: 8
+  ExitTunnelForwardOffset: 12
   EntryTunnelPrefab: {fileID: 8331201522234814793, guid: 923dd62f028a50947921c1ed1b91ad2b, type: 3}
   ExitTunnelPrefab: {fileID: 2033575462659183021, guid: fc89a09029b948b459201b031869e8d8, type: 3}
   DarknessPlanePrefab: {fileID: 4435916920760830742, guid: b14babc51426bf04f8f23ac41c8f5415, type: 3}
   DeathZoneDarknessPlanePrefab: {fileID: 4435916920760830742, guid: 736b15288adae994e8965547ee34b5d1, type: 3}
-  LootRandomizerPrefab: {fileID: 2310189391056254033, guid: 7fcc02f56ec51ba4ca87555fdba6268a, type: 3}
-  HealPrefab: {fileID: 5228506880158682456, guid: fdf89d0005a62764c971a231b57659a0, type: 3}
   ColliderPhysicsMaterial: {fileID: 13400000, guid: db383c2d940f720418329d2d2551e834, type: 2}

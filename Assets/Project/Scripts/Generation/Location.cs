@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Assets.Scripts.Player.Controller;
+using Project.Scripts.Generation.Procedural;
 using UnityEngine;
 
 namespace Project.Scripts.Generation
@@ -21,6 +22,9 @@ namespace Project.Scripts.Generation
         [SerializeField] private Bounds _worldBounds;
         [Space] [SerializeField] private bool _visualizeBounds = true;
         [SerializeField] private Color _boundsColor = Color.green;
+        [SerializeField] private bool _visualizePath = true;
+        [SerializeField] private Color _pathColor = Color.cyan;
+        [SerializeField] private List<PathPoint> _path;
 
         private bool _boundsLocked;
 
@@ -60,6 +64,11 @@ namespace Project.Scripts.Generation
         {
             _worldBounds = worldBounds;
             _boundsLocked = true;
+        }
+
+        public void SetPath(List<PathPoint> path)
+        {
+            _path = path;
         }
 
         private void Start()
@@ -158,6 +167,25 @@ namespace Project.Scripts.Generation
             Gizmos.color = _boundsColor;
             Gizmos.DrawWireCube(_worldBounds.center, _worldBounds.size);
             Gizmos.DrawSphere(_worldBounds.center, 0.05f);
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            if (!_visualizePath || _path == null || _path.Count == 0)
+                return;
+
+            Gizmos.color = _pathColor;
+            Gizmos.matrix = transform.localToWorldMatrix;
+            for (int i = 0; i < _path.Count; i++)
+            {
+                PathPoint point = _path[i];
+                Gizmos.DrawSphere(point.Position, 0.25f);
+                Gizmos.DrawRay(point.Position, point.Forward * 1.5f);
+                if (i > 0)
+                    Gizmos.DrawLine(_path[i - 1].Position, point.Position);
+            }
+
+            Gizmos.matrix = Matrix4x4.identity;
         }
     }
 }

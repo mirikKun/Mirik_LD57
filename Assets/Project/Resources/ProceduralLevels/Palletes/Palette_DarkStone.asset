@@ -13,8 +13,7 @@ MonoBehaviour:
   m_Name: Palette_DarkStone
   m_EditorClassIdentifier: 
   StructureMaterial: {fileID: 2100000, guid: 4df1cefd9038ffe4a8084fb53298662b, type: 2}
-  PlatformMaterial: {fileID: 2100000, guid: f75446a7058330c4692e1ca9fc22f6fa, type: 2}
-  AccentMaterial: {fileID: 2100000, guid: 7f731804961c8d34b9297890e0511a42, type: 2}
-  SceneryMaterial: {fileID: 2100000, guid: 5d2bbc68786a87b419c93c78fd4f3c03, type: 2}
+  PlatformMaterial: {fileID: 2100000, guid: a2b5ec8629ee4ee48828c42a4c0daafd, type: 2}
+  AccentMaterial: {fileID: 2100000, guid: d6921c46af271ff43918e28f2b3ff168, type: 2}
   GlowMaterial: {fileID: 2100000, guid: 736c4b6729ee61b469e8cce3d807c192, type: 2}
   GuideLightColor: {r: 1, g: 0.63, b: 0.2, a: 1}

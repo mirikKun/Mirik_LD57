@@ -7279,6 +7279,9 @@ MonoBehaviour:
     m_Extent: {x: 0, y: 0, z: 0}
   _visualizeBounds: 1
   _boundsColor: {r: 0, g: 1, b: 0, a: 1}
+  _visualizePath: 1
+  _pathColor: {r: 0, g: 1, b: 1, a: 1}
+  _path: []
 --- !u!4 &641397000
 Transform:
   m_ObjectHideFlags: 0
@@ -14456,9 +14459,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _startLocation: {fileID: 641396999}
-  _testArchetype: {fileID: 11400000, guid: c0de5eed1005aaaa8888bbbbcccc1005, type: 2}
+  _testArchetype: {fileID: 11400000, guid: c0de5eed1006aaaa8888bbbbcccc1006, type: 2}
   _skipTutorial: 1
-  _generateDecorations: 0
   _basicTutorialLocations:
   - {fileID: 7586372245869605210, guid: 7fb87133ce6b6204f9a3998f4b7a3a8f, type: 3}
   - {fileID: 3581949287121331594, guid: 9a2356c649ba47848b516ad33f7fd6d2, type: 3}

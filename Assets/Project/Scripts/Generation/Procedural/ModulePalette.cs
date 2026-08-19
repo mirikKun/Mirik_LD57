@@ -9,7 +9,6 @@ namespace Project.Scripts.Generation.Procedural
         public Material StructureMaterial;
         public Material PlatformMaterial;
         public Material AccentMaterial;
-        public Material SceneryMaterial;
         public Material GlowMaterial;
 
         [Header("Lighting")]

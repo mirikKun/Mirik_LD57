@@ -22,18 +22,17 @@ namespace Project.Scripts.Generation
         [SerializeField] private Location _startLocation;
         [SerializeField] private LevelArchetype _testArchetype;
         [SerializeField] private bool _skipTutorial;
-        [SerializeField] private bool _generateDecorations = true;
         [SerializeField] private List<Location> _basicTutorialLocations;
         [SerializeField] private List<Location> _advancedTutorialLocations;
         [SerializeField] private ProceduralLevelsConfig _proceduralConfig;
 
-        private ProceduralLevelBuilder _proceduralBuilder;
-        private readonly List<Location> _currentLocations = new List<Location>();
-        private readonly Dictionary<Location, List<Location>> _childrenByLocation = new Dictionary<Location, List<Location>>();
-        private int _currentLocationIndex;
-        private bool _initialized;
-        private bool _startLocationCommitted;
-        private Location _lastProceduralLocation;
+        [NonSerialized] private ProceduralLevelBuilder _proceduralBuilder;
+        [NonSerialized] private readonly List<Location> _currentLocations = new List<Location>();
+        [NonSerialized] private readonly Dictionary<Location, List<Location>> _childrenByLocation = new Dictionary<Location, List<Location>>();
+        [NonSerialized] private int _currentLocationIndex;
+        [NonSerialized] private bool _initialized;
+        [NonSerialized] private bool _startLocationCommitted;
+        [NonSerialized] private Location _lastProceduralLocation;
         public event Action<Bounds, Transform> LocationEntered;
 
         public void GameStart()
@@ -64,7 +63,7 @@ namespace Project.Scripts.Generation
                 return false;
             }
 
-            _proceduralBuilder = new ProceduralLevelBuilder(_proceduralConfig, _generateDecorations, _testArchetype);
+            _proceduralBuilder = new ProceduralLevelBuilder(_proceduralConfig, _testArchetype);
             _currentLocations.Add(_startLocation);
             _startLocation.LocationEntered += OnLocationEntered;
             _initialized = true;
@@ -103,11 +102,8 @@ namespace Project.Scripts.Generation
             return _lastProceduralLocation;
         }
 
-        /// <summary>
-        /// Testing tool (editor inspector button): replaces the most recently generated
-        /// procedural location in place, using the same archetype and anchor, with
-        /// either the same seed or a new one.
-        /// </summary>
+        public bool CanRegenerateLastLocation => _lastProceduralLocation != null;
+
         public void RegenerateLastLocation(bool newSeed)
         {
             if (!EnsureInitialized())
@@ -125,15 +121,15 @@ namespace Project.Scripts.Generation
             int listIndex = _currentLocations.IndexOf(old);
             int childIndex = parent != null ? _childrenByLocation[parent].IndexOf(old) : -1;
 
-            old.LocationEntered -= OnLocationEntered;
             _currentLocations.Remove(old);
             _childrenByLocation.Remove(old);
-            Destroy(old.gameObject);
+            DestroyLocationObject(old);
 
             Location rebuilt = _proceduralBuilder.RebuildLast(newSeed);
             if (rebuilt == null)
                 return;
 
+            ApplyEditorHideFlags(rebuilt);
             _lastProceduralLocation = rebuilt;
             _currentLocations.Insert(listIndex, rebuilt);
             rebuilt.LocationEntered += OnLocationEntered;
@@ -149,9 +145,9 @@ namespace Project.Scripts.Generation
             if (!EnsureInitialized())
                 return;
 
-            if (_currentLocations.Count == 0)
+            if (!Application.isPlaying)
             {
-                Debug.LogWarning("LocationsGenerator: no current location to advance from.");
+                GenerateSingleEditorLocation();
                 return;
             }
 
@@ -294,11 +290,70 @@ namespace Project.Scripts.Generation
             return null;
         }
 
+        private void GenerateSingleEditorLocation()
+        {
+            ClearGeneratedEditorLocations();
+            _proceduralBuilder = new ProceduralLevelBuilder(_proceduralConfig, _testArchetype);
+
+            Transform endPoint = _startLocation.LocationEndPoints[0];
+            Location next = BuildProceduralLocation(endPoint.position);
+            _currentLocations.Add(next);
+            next.LocationEntered += OnLocationEntered;
+            ApplyEditorHideFlags(next);
+            _childrenByLocation[_startLocation] = new List<Location> { next };
+            NotifyLocationBounds(next);
+        }
+
+        private void ClearGeneratedEditorLocations()
+        {
+            for (int i = _currentLocations.Count - 1; i >= 0; i--)
+            {
+                Location location = _currentLocations[i];
+                if (location == _startLocation)
+                    continue;
+
+                _currentLocations.RemoveAt(i);
+                DestroyLocation(location);
+            }
+
+            _childrenByLocation.Clear();
+            _lastProceduralLocation = null;
+            DestroyOrphanProceduralLevels();
+        }
+
+        private void DestroyOrphanProceduralLevels()
+        {
+            Location[] locations = FindObjectsByType<Location>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            foreach (Location location in locations)
+            {
+                if (location == _startLocation)
+                    continue;
+                if (!location.gameObject.name.StartsWith("ProceduralLevel_"))
+                    continue;
+
+                DestroyLocationObject(location);
+            }
+        }
+
         private void DestroyLocation(Location location)
         {
-            location.LocationEntered -= OnLocationEntered;
             _childrenByLocation.Remove(location);
-            Destroy(location.gameObject);
+            DestroyLocationObject(location);
+        }
+
+        private void DestroyLocationObject(Location location)
+        {
+            location.LocationEntered -= OnLocationEntered;
+            if (Application.isPlaying)
+                Destroy(location.gameObject);
+            else
+                DestroyImmediate(location.gameObject);
+        }
+
+        private static void ApplyEditorHideFlags(Location location)
+        {
+            if (!Application.isPlaying)
+                location.gameObject.hideFlags = HideFlags.DontSaveInEditor;
         }
 
         private void NotifyLocationBounds(Location location)
