@@ -45,10 +45,6 @@ namespace Project.Scripts.Generation.Procedural
         public float StalactitePlatformDownOffset = 0.3f;
         public float StalactitePlatformThickness = 0.6f;
 
-        [Header("Branching")]
-        [Tooltip("Sideways offset applied to extra candidates, meters (min..max).")]
-        public FloatRange BranchLateralOffsetRange = new FloatRange(2.5f, 5f);
-
         /// <summary>
         /// The incoming shaft must pierce below the ceiling slab; use the worst-case
         /// clearance/thickness rolls plus a margin so the exit is always in open air.
@@ -66,16 +62,7 @@ namespace Project.Scripts.Generation.Procedural
                 Vector3 ceilingPoint = path[i].Position + Vector3.up * clearance;
 
                 if (i > 0)
-                {
-                    bool allowBranch = i < path.Count - 1;
-                    List<PathPoint> candidates = GenerateJumpCandidates(ctx, path[i - 1], path[i], allowBranch, BranchLateralOffsetRange);
-                    for (int c = 0; c < candidates.Count; c++)
-                    {
-                        bool isPrimary = c == 0;
-                        Vector3 candCeiling = candidates[c].Position + Vector3.up * clearance;
-                        BuildHangingPlatform(ctx, candidates[c], candCeiling, i, c, isPrimary);
-                    }
-                }
+                    BuildHangingPlatform(ctx, path[i], ceilingPoint, i);
 
                 if (i > 0 && i < path.Count - 1)
                 {
@@ -85,7 +72,7 @@ namespace Project.Scripts.Generation.Procedural
             }
         }
 
-        private void BuildHangingPlatform(LevelBuildContext ctx, PathPoint point, Vector3 ceilingPoint, int index, int candidateIndex, bool isPrimary)
+        private void BuildHangingPlatform(LevelBuildContext ctx, PathPoint point, Vector3 ceilingPoint, int index)
         {
             float platformSize = RollPlatformSize(ctx, PlatformSizeRange, DifficultyPlatformShrink);
             float stemDiameter = ctx.Range(StemDiameterRange);
@@ -95,12 +82,12 @@ namespace Project.Scripts.Generation.Procedural
             {
                 float capThickness = ctx.Range(MushroomCapThicknessRange);
                 LevelGeometry.CreateCylinder(
-                    ctx.LevelElements, $"MushroomStem_{index}_{candidateIndex}",
+                    ctx.LevelElements, $"MushroomStem_{index}",
                     point.Position + Vector3.up * (hangLength * 0.5f + capThickness),
                     Quaternion.identity,
                     stemDiameter * MushroomStemDiameterScale, hangLength, ctx.Palette.StructureMaterial);
                 LevelGeometry.CreateCylinder(
-                    ctx.LevelElements, $"MushroomCap_{index}_{candidateIndex}",
+                    ctx.LevelElements, $"MushroomCap_{index}",
                     point.Position + Vector3.down * (capThickness * 0.5f),
                     Quaternion.identity,
                     platformSize * MushroomCapSizeScale, capThickness, ctx.Palette.AccentMaterial);
@@ -115,7 +102,7 @@ namespace Project.Scripts.Generation.Procedural
                     float diameter = Mathf.Lerp(stemDiameter * StalactiteTopDiameterScale, stemDiameter, t);
                     float centerY = ceilingPoint.y - sectionHeight * (s + 0.5f);
                     LevelGeometry.CreateBox(
-                        ctx.LevelElements, $"Stalactite_{index}_{candidateIndex}_{s}",
+                        ctx.LevelElements, $"Stalactite_{index}_{s}",
                         new Vector3(point.Position.x, centerY, point.Position.z),
                         Quaternion.Euler(0f, ctx.Range(StalactiteYawRange), 0f),
                         new Vector3(diameter, sectionHeight + StalactiteSectionOverlap, diameter),
@@ -123,14 +110,14 @@ namespace Project.Scripts.Generation.Procedural
                 }
 
                 LevelGeometry.CreateBox(
-                    ctx.LevelElements, $"StalactitePlatform_{index}_{candidateIndex}",
+                    ctx.LevelElements, $"StalactitePlatform_{index}",
                     point.Position + Vector3.down * StalactitePlatformDownOffset,
                     Quaternion.Euler(0f, ctx.Range(0f, 360f), 0f),
                     new Vector3(platformSize, StalactitePlatformThickness, platformSize),
                     ctx.Palette.PlatformMaterial);
             }
 
-            RegisterWalkable(ctx, point.Position, index, isPrimary);
+            RegisterWalkable(ctx, point.Position, index);
         }
 
         private void BuildCeilingSegment(LevelBuildContext ctx, Vector3 from, Vector3 to, float halfWidth, int index)

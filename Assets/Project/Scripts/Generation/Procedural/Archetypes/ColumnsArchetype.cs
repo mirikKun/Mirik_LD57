@@ -40,51 +40,38 @@ namespace Project.Scripts.Generation.Procedural
         public float LedgeWidthScale = 1.4f;
         public float LedgeThickness = 0.7f;
 
-        [Header("Branching")]
-        [Tooltip("Sideways offset applied to extra candidates, meters (min..max).")]
-        public FloatRange BranchLateralOffsetRange = new FloatRange(2.5f, 5f);
-
         public override void BuildGeometry(LevelBuildContext ctx, List<PathPoint> path)
         {
-            for (int i = 0; i < path.Count; i++)
+            for (int i = 1; i < path.Count; i++)
             {
-                if (i > 0)
-                {
-                    bool allowBranch = i < path.Count - 1;
-                    List<PathPoint> candidates = GenerateJumpCandidates(ctx, path[i - 1], path[i], allowBranch, BranchLateralOffsetRange);
-                    for (int c = 0; c < candidates.Count; c++)
-                    {
-                        bool isPrimary = c == 0;
-                        if (ctx.Chance(HangingChance))
-                            BuildHangingMonolith(ctx, candidates[c], i, c, isPrimary);
-                        else
-                            BuildStandingColumn(ctx, candidates[c], i, c, isPrimary);
-                    }
-                }
+                if (ctx.Chance(HangingChance))
+                    BuildHangingMonolith(ctx, path[i], i);
+                else
+                    BuildStandingColumn(ctx, path[i], i);
             }
         }
 
-        private void BuildStandingColumn(LevelBuildContext ctx, PathPoint point, int index, int candidateIndex, bool isPrimary)
+        private void BuildStandingColumn(LevelBuildContext ctx, PathPoint point, int index)
         {
             float diameter = Mathf.Max(RollPlatformSize(ctx, PlatformSizeRange, DifficultyPlatformShrink), ctx.Range(ColumnDiameterRange));
             float depth = ctx.Range(ColumnDepthRange);
 
             LevelGeometry.CreateCylinder(
-                ctx.LevelElements, $"Column_{index}_{candidateIndex}",
+                ctx.LevelElements, $"Column_{index}",
                 point.Position + Vector3.down * (depth * 0.5f),
                 Quaternion.identity,
                 diameter, depth, ctx.Palette.StructureMaterial);
 
             LevelGeometry.CreateCylinder(
-                ctx.LevelElements, $"ColumnCap_{index}_{candidateIndex}",
+                ctx.LevelElements, $"ColumnCap_{index}",
                 point.Position + Vector3.down * ColumnCapDownOffset,
                 Quaternion.identity,
                 diameter * ColumnCapDiameterScale, ColumnCapHeight, ctx.Palette.PlatformMaterial);
 
-            RegisterWalkable(ctx, point.Position, index, isPrimary);
+            RegisterWalkable(ctx, point.Position, index);
         }
 
-        private void BuildHangingMonolith(LevelBuildContext ctx, PathPoint point, int index, int candidateIndex, bool isPrimary)
+        private void BuildHangingMonolith(LevelBuildContext ctx, PathPoint point, int index)
         {
             float width = ctx.Range(MonolithWidthRange);
             float height = ctx.Range(MonolithHeightRange);
@@ -97,20 +84,20 @@ namespace Project.Scripts.Generation.Procedural
                                  + Vector3.up * (height * 0.5f - MonolithBodyDrop);
 
             LevelGeometry.CreateBox(
-                ctx.LevelElements, $"Monolith_{index}_{candidateIndex}",
+                ctx.LevelElements, $"Monolith_{index}",
                 bodyCenter,
                 Quaternion.LookRotation(point.Forward) * Quaternion.Euler(0f, ctx.Range(MonolithYawJitterRange), 0f),
                 new Vector3(width, height, width * ctx.Range(MonolithDepthScaleRange)),
                 ctx.Palette.StructureMaterial);
 
             LevelGeometry.CreateBox(
-                ctx.LevelElements, $"MonolithLedge_{index}_{candidateIndex}",
+                ctx.LevelElements, $"MonolithLedge_{index}",
                 point.Position + Vector3.down * LedgeDownOffset,
                 Quaternion.LookRotation(point.Forward),
                 new Vector3(ledgeSize * LedgeWidthScale, LedgeThickness, ledgeSize),
                 ctx.Palette.PlatformMaterial);
 
-            RegisterWalkable(ctx, point.Position, index, isPrimary);
+            RegisterWalkable(ctx, point.Position, index);
         }
     }
 }

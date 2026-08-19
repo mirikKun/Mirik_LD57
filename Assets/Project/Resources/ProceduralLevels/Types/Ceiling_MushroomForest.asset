@@ -31,13 +31,6 @@ MonoBehaviour:
   DifficultyGapBonus: 1
   LightEveryNthPlatform: 3
   Palette: {fileID: 11400000, guid: c0de5eed1002aaaa8888bbbbcccc1002, type: 2}
-  BranchChance: 0.135
-  ExtraCandidatesRange:
-    x: 1
-    y: 2
-  BranchDistanceMultiplierRange:
-    x: 1.05
-    y: 3
   PlatformSizeRange:
     x: 5
     y: 7
@@ -58,6 +51,3 @@ MonoBehaviour:
   MushroomCapThicknessRange:
     x: 1
     y: 2
-  BranchLateralOffsetRange:
-    x: 5
-    y: 25

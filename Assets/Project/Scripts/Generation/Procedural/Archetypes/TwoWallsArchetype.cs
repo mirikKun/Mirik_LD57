@@ -29,7 +29,6 @@ namespace Project.Scripts.Generation.Procedural
         public FloatRange BeamWidthRange = new FloatRange(1.2f, 2.4f);
         [Tooltip("Walkable beam vertical thickness (min..max).")]
         public FloatRange BeamThicknessRange = new FloatRange(0.6f, 1.4f);
-        public float BranchBeamWidthScale = 0.8f;
         public float BeamLengthOverhang = 3f;
 
         [Header("Wall Construction")]
@@ -52,21 +51,15 @@ namespace Project.Scripts.Generation.Procedural
 
                 if (i > 0)
                 {
-                    bool allowBranch = i < path.Count - 1;
-                    List<PathPoint> candidates = GenerateJumpCandidates(ctx, path[i - 1], path[i], allowBranch);
-                    for (int c = 0; c < candidates.Count; c++)
-                    {
-                        bool isPrimary = c == 0;
-                        float beamWidth = ctx.Range(BeamWidthRange) * (isPrimary ? 1f : BranchBeamWidthScale);
-                        float beamThickness = ctx.Range(BeamThicknessRange);
-                        LevelGeometry.CreateBox(
-                            ctx.LevelElements, $"Beam_{i}_{c}",
-                            candidates[c].Position + Vector3.down * (beamThickness * 0.5f),
-                            Quaternion.LookRotation(candidates[c].Forward),
-                            new Vector3(gap + BeamLengthOverhang, beamThickness, beamWidth),
-                            ctx.Palette.StructureMaterial);
-                        RegisterWalkable(ctx, candidates[c].Position, i, isPrimary);
-                    }
+                    float beamWidth = ctx.Range(BeamWidthRange);
+                    float beamThickness = ctx.Range(BeamThicknessRange);
+                    LevelGeometry.CreateBox(
+                        ctx.LevelElements, $"Beam_{i}",
+                        path[i].Position + Vector3.down * (beamThickness * 0.5f),
+                        Quaternion.LookRotation(path[i].Forward),
+                        new Vector3(gap + BeamLengthOverhang, beamThickness, beamWidth),
+                        ctx.Palette.StructureMaterial);
+                    RegisterWalkable(ctx, path[i].Position, i);
                 }
 
                 if (i < path.Count - 1)

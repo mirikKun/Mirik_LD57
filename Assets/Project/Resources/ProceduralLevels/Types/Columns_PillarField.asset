@@ -21,9 +21,6 @@ MonoBehaviour:
   DifficultyGapBonus: 1.2
   LightEveryNthPlatform: 4
   Palette: {fileID: 11400000, guid: c0de5eed1001aaaa8888bbbbcccc1001, type: 2}
-  BranchChance: 0.35
-  ExtraCandidatesRange: {x: 1, y: 2}
-  BranchDistanceMultiplierRange: {x: 1.05, y: 1.35}
   PlatformSizeRange: {x: 3, y: 5}
   DifficultyPlatformShrink: 1.2
   HangingChance: 0.15
@@ -31,4 +28,3 @@ MonoBehaviour:
   ColumnDepthRange: {x: 45, y: 80}
   MonolithWidthRange: {x: 3, y: 6}
   MonolithHeightRange: {x: 35, y: 55}
-  BranchLateralOffsetRange: {x: 2.5, y: 5}

@@ -49,14 +49,6 @@ namespace Project.Scripts.Generation.Procedural
         [Header("Palette")]
         public ModulePalette Palette;
 
-        [Header("Branching")]
-        [Tooltip("Chance a given step (never the last one before the tunnel) offers extra jump candidates besides the safe primary target.")]
-        [Range(0f, 1f)] public float BranchChance = 0.35f;
-        [Tooltip("How many extra candidates get added when a step branches (min..max, inclusive).")]
-        public IntRange ExtraCandidatesRange = new IntRange(1, 2);
-        [Tooltip("Extra candidate distance from the previous point, as a multiplier of the primary jump distance (min..max). Above 1 = a longer, riskier jump.")]
-        public FloatRange BranchDistanceMultiplierRange = new FloatRange(1.05f, 1.35f);
-
         public virtual List<PathPoint> BuildPath(LevelBuildContext ctx)
         {
             return DescentPathGenerator.Generate(new PathSettings
@@ -85,54 +77,6 @@ namespace Project.Scripts.Generation.Procedural
         {
             float size = ctx.Range(sizeRange) - difficultyShrink * ctx.Difficulty;
             return Mathf.Max(MinPlatformSize, size);
-        }
-
-        /// <summary>
-        /// Returns the primary jump target plus, on a branch roll, extra candidates
-        /// the player may choose instead. Extras are always reachable from <paramref name="previous"/>
-        /// with a running jump (capped distance) - they are risk/reward variety, never dead ends.
-        /// Pass <paramref name="allowBranch"/> false for the final step into the tunnel to keep a
-        /// guaranteed, single-file approach.
-        /// Pass <paramref name="lateralOffsetRange"/> to spread extras sideways; omit it for
-        /// archetypes that only vary jump distance (a beam spanning a corridor, a wall protrusion).
-        /// </summary>
-        protected List<PathPoint> GenerateJumpCandidates(
-            LevelBuildContext ctx,
-            PathPoint previous,
-            PathPoint primary,
-            bool allowBranch,
-            FloatRange? lateralOffsetRange = null,
-            Vector3? lateralAxisOverride = null)
-        {
-            var candidates = new List<PathPoint> { primary };
-            if (!allowBranch || !ctx.Chance(BranchChance))
-                return candidates;
-
-            Vector3 flatPrev = new Vector3(previous.Position.x, 0f, previous.Position.z);
-            Vector3 flatPrimary = new Vector3(primary.Position.x, 0f, primary.Position.z);
-            Vector3 flatDelta = flatPrimary - flatPrev;
-            float baseDistance = flatDelta.magnitude;
-            Vector3 dir = baseDistance > 0.01f ? flatDelta / baseDistance : primary.Forward;
-
-            int extraCount = ctx.RangeInt(ExtraCandidatesRange);
-            for (int e = 0; e < extraCount; e++)
-            {
-                float distanceMul = ctx.Range(BranchDistanceMultiplierRange);
-                float cappedDistance = baseDistance * distanceMul;
-                Vector3 flatPos = flatPrev + dir * cappedDistance;
-
-                if (lateralOffsetRange.HasValue)
-                {
-                    Vector3 lateralAxis = lateralAxisOverride ?? Vector3.Cross(Vector3.up, dir).normalized;
-                    float lateralSign = ctx.Chance(0.5f) ? -1f : 1f;
-                    flatPos += lateralAxis * (ctx.Range(lateralOffsetRange.Value) * lateralSign);
-                }
-
-                Vector3 pos = new Vector3(flatPos.x, primary.Position.y, flatPos.z);
-                candidates.Add(new PathPoint { Position = pos, Forward = primary.Forward });
-            }
-
-            return candidates;
         }
 
         /// <summary>
