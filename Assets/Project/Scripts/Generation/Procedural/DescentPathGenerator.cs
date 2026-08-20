@@ -14,6 +14,7 @@ namespace Project.Scripts.Generation.Procedural
     {
         public FloatRange Length;
         public FloatRange StepDistance;
+        public float FirstStepDistance;
         public float StepDistanceDifficultyBonus;
         public FloatRange StepDown;
         public float StepDownJitter = 1f;
@@ -59,7 +60,10 @@ namespace Project.Scripts.Generation.Procedural
                 if (rng.NextDouble() < settings.PlateauChance)
                     drop = 0f;
 
-                position += nextForward * stepDistance + Vector3.down * drop;
+                float distance = i == 0 && settings.FirstStepDistance > 0f
+                    ? settings.FirstStepDistance
+                    : stepDistance;
+                position += nextForward * distance + Vector3.down * drop;
             }
 
             // Make every point's forward look at the actual next point (horizontal only).

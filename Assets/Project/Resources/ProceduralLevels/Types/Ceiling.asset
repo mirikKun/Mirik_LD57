@@ -12,20 +12,70 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0de5eed000aaaaa8888bbbbcccc000a, type: 3}
   m_Name: Ceiling
   m_EditorClassIdentifier: 
-  LengthRange: {x: 70, y: 200}
-  StepDistanceRange: {x: 14, y: 20}
-  StepDownRange: {x: 3, y: 6}
+  LengthRange:
+    x: 70
+    y: 200
+  StepDistanceRange:
+    x: 22
+    y: 32
+  FirstStepDistance: 9
+  StepDownRange:
+    x: 4
+    y: 8
   PlateauChance: 0
-  MeanderAngleRange: {x: 8, y: 26}
-  CurvatureBiasRange: {x: 0, y: 20}
+  MeanderAngleRange:
+    x: 8
+    y: 26
+  CurvatureBiasRange:
+    x: 0
+    y: 20
+  StepDownJitter: 1
   DifficultyGapBonus: 1.2
+  MinPlatformSize: 1.5
   LightEveryNthPlatform: 4
+  GuideLightHeight: 2
+  GuideLightIntensity: 2.5
+  GuideLightRange: 10
+  GuideMarkerOffsetRange:
+    x: -0.6
+    y: 0.6
+  GuideMarkerYOffset: 0.06
+  GuideMarkerSize: {x: 0.5, y: 0.12, z: 0.5}
+  GuideMarkerYawRange:
+    x: 0
+    y: 90
   Palette: {fileID: 11400000, guid: c0de5eed1001aaaa8888bbbbcccc1001, type: 2}
-  PlatformSizeRange: {x: 5, y: 8}
   DifficultyPlatformShrink: 1
-  ClearanceRange: {x: 10, y: 16}
-  CeilingHalfWidthRange: {x: 30, y: 35}
-  CeilingThicknessRange: {x: 2, y: 5}
-  MushroomChance: 0.2
-  StemDiameterRange: {x: 0.8, y: 1.8}
-  MushroomCapThicknessRange: {x: 0.5, y: 1}
+  ClearanceRange:
+    x: 13
+    y: 20
+  CeilingHalfWidthRange:
+    x: 30
+    y: 35
+  CeilingThicknessRange:
+    x: 2
+    y: 5
+  CeilingSegmentLengthMultiplier: 1.5
+  EntryOverheadMargin: 2
+  Protrusions:
+  - Weight: 0.7
+    Prefab: {fileID: 2378212508396588339, guid: b138dec461c9b1f40af3844fd7ccad36, type: 3}
+    PlatformSizeRange:
+      min: {x: 5, y: 2, z: 5}
+      max: {x: 9, y: 3, z: 9}
+    ColumnSizeRange:
+      min: {x: 1, y: -5, z: 1}
+      max: {x: 3, y: 3, z: 3}
+  - Weight: 0.3
+    Prefab: {fileID: 5975232817302344390, guid: f3d6d8aea23684547a2c766653a862a0, type: 3}
+    PlatformSizeRange:
+      min: {x: 6, y: 1, z: 6}
+      max: {x: 14, y: 3, z: 14}
+    ColumnSizeRange:
+      min: {x: 1, y: -5, z: 1}
+      max: {x: 3, y: 4, z: 3}
+  MinRange: 12
+  MaxPossibleRange: 35
+  ExtraLateralRange:
+    x: -35
+    y: 35

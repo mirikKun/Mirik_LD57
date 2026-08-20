@@ -1,19 +1,28 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Project.Scripts.Generation.Procedural
 {
     /// <summary>
-    /// Only a ceiling, no walls: a vast slab tilted slightly downward. Stalactites
-    /// capped with platforms and hanging mushrooms grow from it; the player jumps
-    /// between them following the ceiling into the depth.
+    /// Only a ceiling, no walls: a vast slab over the descent. Prefab protrusions
+    /// hang from it; extras branch sideways under the slab.
     /// </summary>
     [CreateAssetMenu(menuName = "Procedural Levels/Archetypes/Ceiling", fileName = "CeilingArchetype")]
     public class CeilingArchetype : LevelArchetype
     {
+        [Serializable]
+        public class CeilingProtrusionSettings
+        {
+            public float Weight = 1f;
+            public CeilingProtrusion Prefab;
+            [Tooltip("X = width, Y = thickness, Z = depth.")]
+            public Vector3Range PlatformSizeRange;
+            [Tooltip("X/Z = column cross-section. Y is extra height added on top of clearance.")]
+            public Vector3Range ColumnSizeRange;
+        }
+
         [Header("Platforms")]
-        [Tooltip("Width of walkable stalactite/mushroom caps (min..max).")]
-        public FloatRange PlatformSizeRange = new FloatRange(2.5f, 4.5f);
         [Tooltip("Platform size removed at difficulty 1.")]
         public float DifficultyPlatformShrink = 1f;
 
@@ -27,28 +36,31 @@ namespace Project.Scripts.Generation.Procedural
         public float CeilingSegmentLengthMultiplier = 1.5f;
         public float EntryOverheadMargin = 2f;
 
-        [Header("Hanging Growth")]
-        [Range(0f, 1f)]
-        [Tooltip("Chance a waypoint grows a mushroom instead of a stalactite.")]
-        public float MushroomChance = 0.35f;
-        [Tooltip("Stalactite/stem diameter (min..max).")]
-        public FloatRange StemDiameterRange = new FloatRange(0.8f, 1.8f);
-        [Tooltip("Mushroom cap thickness (min..max).")]
-        public FloatRange MushroomCapThicknessRange = new FloatRange(0.5f, 1f);
-        public float MushroomStemDiameterScale = 0.6f;
-        public float MushroomCapSizeScale = 1.2f;
-        public IntRange StalactiteSectionCountRange = new IntRange(2, 3);
-        public float StalactiteTipReserve = 0.6f;
-        public float StalactiteTopDiameterScale = 2.2f;
-        public float StalactiteSectionOverlap = 0.3f;
-        public FloatRange StalactiteYawRange = new FloatRange(0f, 90f);
-        public float StalactitePlatformDownOffset = 0.3f;
-        public float StalactitePlatformThickness = 0.6f;
+        [Header("Protrusions")]
+        public List<CeilingProtrusionSettings> Protrusions = new List<CeilingProtrusionSettings>
+        {
+            new CeilingProtrusionSettings
+            {
+                Weight = 0.7f,
+                PlatformSizeRange = new Vector3Range(new Vector3(5f, 0.5f, 5f), new Vector3(8f, 0.8f, 8f)),
+                ColumnSizeRange = new Vector3Range(new Vector3(0.8f, 1f, 0.8f), new Vector3(1.8f, 1f, 1.8f)),
+            },
+            new CeilingProtrusionSettings
+            {
+                Weight = 0.3f,
+                PlatformSizeRange = new Vector3Range(new Vector3(6f, 0.4f, 6f), new Vector3(10f, 1f, 10f)),
+                ColumnSizeRange = new Vector3Range(new Vector3(1.2f, 1f, 1.2f), new Vector3(2.4f, 1f, 2.4f)),
+            },
+        };
 
-        /// <summary>
-        /// The incoming shaft must pierce below the ceiling slab; use the worst-case
-        /// clearance/thickness rolls plus a margin so the exit is always in open air.
-        /// </summary>
+        [Header("Extras")]
+        [Tooltip("Minimum 3D distance between any two landings, meters.")]
+        public float MinRange = 4f;
+        [Tooltip("Maximum 3D distance from an extra to the nearest path point, meters.")]
+        public float MaxPossibleRange = 8f;
+        [Tooltip("Lateral offset from the path, meters (min..max). Negative = left, positive = right.")]
+        public FloatRange ExtraLateralRange = new FloatRange(-6f, 6f);
+
         public override float RollEntryOverheadHeight(LevelBuildContext ctx)
             => ClearanceRange.y + CeilingThicknessRange.y + EntryOverheadMargin;
 
@@ -62,7 +74,7 @@ namespace Project.Scripts.Generation.Procedural
                 Vector3 ceilingPoint = path[i].Position + Vector3.up * clearance;
 
                 if (i > 0)
-                    BuildHangingPlatform(ctx, path[i], ceilingPoint, i);
+                    BuildProtrusion(ctx, path[i], ceilingPoint, i, isPrimary: true);
 
                 if (i > 0 && i < path.Count - 1)
                 {
@@ -70,54 +82,52 @@ namespace Project.Scripts.Generation.Procedural
                     BuildCeilingSegment(ctx, ceilingPoint, nextCeiling, halfWidth, i);
                 }
             }
+
+            List<PathPoint> extras = WallExtraSampler.Sample(
+                path, MinRange, MaxPossibleRange, ExtraLateralRange, ctx.Rng, offsetAlongRight: true);
+            for (int e = 0; e < extras.Count; e++)
+            {
+                Vector3 extraCeiling = extras[e].Position + Vector3.up * clearance;
+                BuildProtrusion(ctx, extras[e], extraCeiling, e, isPrimary: false);
+            }
         }
 
-        private void BuildHangingPlatform(LevelBuildContext ctx, PathPoint point, Vector3 ceilingPoint, int index)
+        private void BuildProtrusion(LevelBuildContext ctx, PathPoint point, Vector3 ceilingPoint, int index, bool isPrimary)
         {
-            float platformSize = RollPlatformSize(ctx, PlatformSizeRange, DifficultyPlatformShrink);
-            float stemDiameter = ctx.Range(StemDiameterRange);
-            float hangLength = ceilingPoint.y - point.Position.y;
+            CeilingProtrusionSettings settings = Protrusions[PickProtrusionIndex(ctx)];
+            Vector3 platformSize = ctx.RangeEven(settings.PlatformSizeRange);
+            float shrink = DifficultyPlatformShrink * ctx.Difficulty;
+            platformSize.x = Mathf.Max(MinPlatformSize, platformSize.x - shrink);
+            platformSize.z = Mathf.Max(MinPlatformSize, platformSize.z - shrink);
+            Vector3 columnSize = ctx.RangeEven(settings.ColumnSizeRange);
+            float height = ceilingPoint.y - point.Position.y;
 
-            if (ctx.Chance(MushroomChance))
-            {
-                float capThickness = ctx.Range(MushroomCapThicknessRange);
-                LevelGeometry.CreateCylinder(
-                    ctx.LevelElements, $"MushroomStem_{index}",
-                    point.Position + Vector3.up * (hangLength * 0.5f + capThickness),
-                    Quaternion.identity,
-                    stemDiameter * MushroomStemDiameterScale, hangLength, ctx.Palette.StructureMaterial);
-                LevelGeometry.CreateCylinder(
-                    ctx.LevelElements, $"MushroomCap_{index}",
-                    point.Position + Vector3.down * (capThickness * 0.5f),
-                    Quaternion.identity,
-                    platformSize * MushroomCapSizeScale, capThickness, ctx.Palette.AccentMaterial);
-            }
-            else
-            {
-                int sections = ctx.RangeInt(StalactiteSectionCountRange);
-                float sectionHeight = (hangLength - StalactiteTipReserve) / sections;
-                for (int s = 0; s < sections; s++)
-                {
-                    float t = (float)s / sections;
-                    float diameter = Mathf.Lerp(stemDiameter * StalactiteTopDiameterScale, stemDiameter, t);
-                    float centerY = ceilingPoint.y - sectionHeight * (s + 0.5f);
-                    LevelGeometry.CreateBox(
-                        ctx.LevelElements, $"Stalactite_{index}_{s}",
-                        new Vector3(point.Position.x, centerY, point.Position.z),
-                        Quaternion.Euler(0f, ctx.Range(StalactiteYawRange), 0f),
-                        new Vector3(diameter, sectionHeight + StalactiteSectionOverlap, diameter),
-                        ctx.Palette.StructureMaterial);
-                }
+            CeilingProtrusion instance = Instantiate(settings.Prefab, ctx.LevelElements);
+            instance.name = $"{settings.Prefab.name}_{index}";
+            Transform tr = instance.transform;
+            tr.localPosition = ceilingPoint;
+            tr.localRotation = Quaternion.identity;
+            Vector3 walkableLocal = instance.Apply(
+                height, platformSize, columnSize,
+                ctx.Palette.StructureMaterial, ctx.Palette.PlatformMaterial);
+            RegisterWalkable(ctx, tr.localPosition + tr.localRotation * walkableLocal, index, isPrimary);
+        }
 
-                LevelGeometry.CreateBox(
-                    ctx.LevelElements, $"StalactitePlatform_{index}",
-                    point.Position + Vector3.down * StalactitePlatformDownOffset,
-                    Quaternion.Euler(0f, ctx.Range(0f, 360f), 0f),
-                    new Vector3(platformSize, StalactitePlatformThickness, platformSize),
-                    ctx.Palette.PlatformMaterial);
+        private int PickProtrusionIndex(LevelBuildContext ctx)
+        {
+            float totalWeight = 0f;
+            for (int i = 0; i < Protrusions.Count; i++)
+                totalWeight += Mathf.Max(0f, Protrusions[i].Weight);
+
+            float roll = (float)ctx.Rng.NextDouble() * totalWeight;
+            for (int i = 0; i < Protrusions.Count; i++)
+            {
+                roll -= Mathf.Max(0f, Protrusions[i].Weight);
+                if (roll <= 0f)
+                    return i;
             }
 
-            RegisterWalkable(ctx, point.Position, index);
+            return 0;
         }
 
         private void BuildCeilingSegment(LevelBuildContext ctx, Vector3 from, Vector3 to, float halfWidth, int index)

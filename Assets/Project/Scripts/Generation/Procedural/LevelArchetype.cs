@@ -15,6 +15,8 @@ namespace Project.Scripts.Generation.Procedural
         public FloatRange LengthRange = new FloatRange(60f, 110f);
         [Tooltip("Horizontal center-to-center distance between platforms (min..max).")]
         public FloatRange StepDistanceRange = new FloatRange(5f, 6.5f);
+        [Tooltip("Horizontal length of the first step, meters. 0 = use Step Distance Range like the rest.")]
+        public float FirstStepDistance = 0f;
         [Tooltip("Vertical drop per platform (min..max).")]
         public FloatRange StepDownRange = new FloatRange(1.5f, 3.5f);
         [Range(0f, 0.6f)] public float PlateauChance = 0.15f;
@@ -55,6 +57,7 @@ namespace Project.Scripts.Generation.Procedural
             {
                 Length = LengthRange,
                 StepDistance = StepDistanceRange,
+                FirstStepDistance = FirstStepDistance,
                 StepDistanceDifficultyBonus = DifficultyGapBonus * ctx.Difficulty,
                 StepDown = StepDownRange,
                 StepDownJitter = StepDownJitter,

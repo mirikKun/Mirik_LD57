@@ -16,8 +16,9 @@ namespace Project.Scripts.Generation.Procedural
             IReadOnlyList<PathPoint> path,
             float minRange,
             float maxPossibleRange,
-            FloatRange heightOffsetRange,
-            System.Random rng)
+            FloatRange offsetRange,
+            System.Random rng,
+            bool offsetAlongRight = false)
         {
             var extras = new List<PathPoint>();
             if (path.Count < 3 || minRange <= 0f || maxPossibleRange < minRange)
@@ -32,8 +33,8 @@ namespace Project.Scripts.Generation.Procedural
             if (sMax <= sMin)
                 return extras;
 
-            float hMin = heightOffsetRange.x;
-            float hMax = heightOffsetRange.y;
+            float hMin = offsetRange.x;
+            float hMax = offsetRange.y;
 
             var occupied = new List<Vector3>(path.Count);
             for (int i = 0; i < path.Count; i++)
@@ -63,7 +64,7 @@ namespace Project.Scripts.Generation.Procedural
                     if (s < sMin || s > sMax || h < hMin || h > hMax)
                         continue;
 
-                    PathPoint mapped = Map(path, lengths, s, h);
+                    PathPoint mapped = Map(path, lengths, s, h, offsetAlongRight);
                     if (NearestPathDistance(path, mapped.Position) > maxPossibleRange)
                         continue;
 
@@ -95,7 +96,7 @@ namespace Project.Scripts.Generation.Procedural
             return extras;
         }
 
-        private static PathPoint Map(IReadOnlyList<PathPoint> path, float[] lengths, float s, float h)
+        private static PathPoint Map(IReadOnlyList<PathPoint> path, float[] lengths, float s, float h, bool offsetAlongRight)
         {
             int i = 0;
             while (i < path.Count - 2 && lengths[i + 1] < s)
@@ -103,12 +104,16 @@ namespace Project.Scripts.Generation.Procedural
 
             float span = lengths[i + 1] - lengths[i];
             float t = span > 0.0001f ? (s - lengths[i]) / span : 0f;
-            Vector3 position = Vector3.Lerp(path[i].Position, path[i + 1].Position, t) + Vector3.up * h;
             Vector3 forward = Vector3.Slerp(path[i].Forward, path[i + 1].Forward, t).normalized;
             if (forward.sqrMagnitude < 0.001f)
                 forward = path[i].Forward;
 
-            return new PathPoint { Position = position, Forward = forward };
+            Vector3 alongPath = Vector3.Lerp(path[i].Position, path[i + 1].Position, t);
+            Vector3 offset = offsetAlongRight
+                ? Vector3.Cross(Vector3.up, forward).normalized * h
+                : Vector3.up * h;
+
+            return new PathPoint { Position = alongPath + offset, Forward = forward };
         }
 
         private static float NearestPathDistance(IReadOnlyList<PathPoint> path, Vector3 position)
