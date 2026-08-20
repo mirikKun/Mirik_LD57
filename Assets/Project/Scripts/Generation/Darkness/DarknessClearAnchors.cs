@@ -6,343 +6,146 @@ namespace Project.Scripts.Generation.Darkness
     [Serializable]
     public class DarknessClearAnchors
     {
-        [SerializeField] private int _maxAnchors = 48;
         [SerializeField] private float _radiusHorizontal = 140f;
         [SerializeField] private float _radiusVertical = 80f;
-        [SerializeField] private float _anchorBoostWeight = 1f;
-        [SerializeField] private float _trailWeight = 0.45f;
-        [SerializeField] private float _decayPerSecond = 0.1f;
-        [SerializeField] private float _minWeight = 0.05f;
-        [SerializeField] private float _mergeDistance = 14f;
-        [SerializeField] private float _growSpeed = 3.5f;
-        [SerializeField] private float _landingStartWeight = 0.2f;
-        [SerializeField] private float _landingStartRadiusFactor = 0.3f;
-        [SerializeField] private float _followMoveSpeed = 32f;
-        [SerializeField] private float _trailSpacing = 20f;
-        [SerializeField] private float _trailRadiusFactor = 0.75f;
+        [SerializeField] private float _maxRadiusScale = 1.25f;
+        [SerializeField] private float _followMoveSpeed = 18f;
+        [SerializeField] private float _recedeMoveSpeed = 55f;
+        [SerializeField] private float _growSpeed = 8f;
+        [SerializeField] private float _shrinkSpeed = 0.22f;
+        [SerializeField] private float _recedeNormalized = 0.72f;
 
-        private Anchor[] _anchors;
-        private int _count;
-        private int _followIndex = -1;
-        private Vector3 _lastTrailDropPosition;
-        private bool _hasTrailDropPosition;
+        private Vector3 _position;
+        private float _radiusScale = 1f;
+        private bool _hasState;
 
-        public float TargetClearRadius => Mathf.Max(_radiusHorizontal, _radiusVertical);
-        public float RadiusHorizontal => _radiusHorizontal;
-        public float RadiusVertical => _radiusVertical;
-        public float TrailSpacing => _trailSpacing;
-        public float TrailWeight => _trailWeight;
-        public float TrailRadiusFactor => _trailRadiusFactor;
+        public float TargetClearRadius =>
+            Mathf.Max(_radiusHorizontal, _radiusVertical) * _maxRadiusScale;
+
+        public Vector3 Position => _position;
+        public float RadiusScale => _radiusScale;
+        public float CurrentRadiusHorizontal => _radiusHorizontal * _radiusScale;
+        public float CurrentRadiusVertical => _radiusVertical * _radiusScale;
 
         public void ApplyWebProfile()
         {
-            _maxAnchors = 28;
-            _anchors = null;
-            _count = 0;
-            _followIndex = -1;
-            _hasTrailDropPosition = false;
+            _maxRadiusScale = 1.15f;
+            _growSpeed = 6f;
+            _hasState = false;
         }
 
-        private struct Anchor
+        public void Snap(Vector3 position)
         {
-            public Vector3 Position;
-            public float Weight;
-            public float TargetWeight;
-            public float RadiusScale;
-            public float TargetRadiusScale;
-            public bool IsFollow;
+            _position = position;
+            _radiusScale = 1f;
+            _hasState = true;
         }
 
-        public void EnsureInitialized()
+        public void CoverPoint(Vector3 position, float radiusScale)
         {
-            if (_anchors != null && _anchors.Length == _maxAnchors)
-                return;
-            _anchors = new Anchor[_maxAnchors];
-            _count = 0;
-            _followIndex = -1;
+            _position = position;
+            _radiusScale = Mathf.Clamp(Mathf.Max(_radiusScale, radiusScale), 0.01f, _maxRadiusScale);
+            _hasState = true;
         }
 
-        public void AddGroundedAnchor(Vector3 position)
+        public void CoverPath(Vector3 from, Vector3 to)
         {
-            BeginFollow(position, true);
-        }
-
-        public void AddGrowingGroundedAnchor(Vector3 position)
-        {
-            BeginFollow(position, false);
-        }
-
-        public void SnapClear(Vector3 position)
-        {
-            AddOrBoost(position, _anchorBoostWeight, _anchorBoostWeight, 1f, 1f, false);
-        }
-
-        public void AddClearBurst(Vector3 position, float weight, float radiusScale)
-        {
-            float clampedWeight = Mathf.Max(weight, _minWeight);
-            float clampedScale = Mathf.Max(0.01f, radiusScale);
-            AddOrBoost(position, clampedWeight, clampedWeight, clampedScale, clampedScale, false);
-        }
-
-        public void AddClearPath(
-            Vector3 from,
-            Vector3 to,
-            float spacing = -1f,
-            float weight = -1f,
-            float radiusScale = -1f)
-        {
-            EnsureInitialized();
-
-            float step = spacing > 0.01f ? spacing : _trailSpacing;
-            float pathWeight = weight > 0f ? weight : _anchorBoostWeight;
-            float pathScale = radiusScale > 0f ? radiusScale : 1f;
-
+            Vector3 mid = Vector3.Lerp(from, to, 0.5f);
             Vector3 delta = to - from;
-            float length = delta.magnitude;
-            if (length <= 0.01f)
+            float nx = Mathf.Abs(delta.x) * 0.5f / Mathf.Max(1f, _radiusHorizontal);
+            float ny = Mathf.Abs(delta.y) * 0.5f / Mathf.Max(1f, _radiusVertical);
+            float nz = Mathf.Abs(delta.z) * 0.5f / Mathf.Max(1f, _radiusHorizontal);
+            float needed = Mathf.Sqrt(nx * nx + ny * ny + nz * nz) + 0.12f;
+            CoverPoint(mid, needed);
+        }
+
+        public void Tick(Vector3 target, float deltaTime)
+        {
+            if (!_hasState)
             {
-                AddClearBurst(from, pathWeight, pathScale);
+                Snap(target);
                 return;
             }
 
-            int segments = Mathf.Max(1, Mathf.CeilToInt(length / step));
-            for (int i = 0; i <= segments; i++)
+            float normalized = NormalizedDistance(target);
+            bool receding = normalized > _recedeNormalized;
+            float moveSpeed = receding ? _recedeMoveSpeed : _followMoveSpeed;
+            float moveBlend = 1f - Mathf.Exp(-moveSpeed * deltaTime);
+            _position = Vector3.Lerp(_position, target, moveBlend);
+
+            normalized = NormalizedDistance(target);
+            float targetScale = 1f;
+            if (normalized > 1f)
+                targetScale = Mathf.Min(_maxRadiusScale, _radiusScale * normalized * 1.05f);
+            else if (receding)
+                targetScale = Mathf.Min(_maxRadiusScale, Mathf.Max(1f, _radiusScale));
+
+            if (targetScale > _radiusScale)
             {
-                float t = i / (float)segments;
-                AddClearBurst(Vector3.Lerp(from, to, t), pathWeight, pathScale);
-            }
-        }
-
-        public void TickFollow(Vector3 position, float deltaTime)
-        {
-            EnsureInitialized();
-            if (_followIndex < 0 || _followIndex >= _count || !_anchors[_followIndex].IsFollow)
-                BeginFollow(position, true);
-
-            Anchor follow = _anchors[_followIndex];
-            Vector3 previous = follow.Position;
-            float moveBlend = 1f - Mathf.Exp(-_followMoveSpeed * deltaTime);
-            follow.Position = Vector3.Lerp(follow.Position, position, moveBlend);
-            follow.TargetWeight = Mathf.Max(follow.TargetWeight, _anchorBoostWeight);
-            follow.TargetRadiusScale = Mathf.Max(follow.TargetRadiusScale, 1f);
-            follow.IsFollow = true;
-            _anchors[_followIndex] = follow;
-
-            if (!_hasTrailDropPosition)
-            {
-                _lastTrailDropPosition = previous;
-                _hasTrailDropPosition = true;
+                _radiusScale = Mathf.MoveTowards(_radiusScale, targetScale, _growSpeed * deltaTime);
+                return;
             }
 
-            if (Vector3.Distance(follow.Position, _lastTrailDropPosition) >= _trailSpacing)
-            {
-                AddTrailAnchor(_lastTrailDropPosition);
-                _lastTrailDropPosition = follow.Position;
-            }
-        }
+            if (_radiusScale <= 1.0001f)
+                return;
 
-        public void ReleaseFollow()
-        {
-            if (_followIndex >= 0 && _followIndex < _count)
-            {
-                Anchor follow = _anchors[_followIndex];
-                follow.IsFollow = false;
-                _anchors[_followIndex] = follow;
-            }
-
-            _followIndex = -1;
-            _hasTrailDropPosition = false;
-        }
-
-        public void TickGrowth(float deltaTime)
-        {
-            EnsureInitialized();
-            float blend = 1f - Mathf.Exp(-_growSpeed * deltaTime);
-            for (int i = 0; i < _count; i++)
-            {
-                Anchor anchor = _anchors[i];
-                anchor.Weight = Mathf.Lerp(anchor.Weight, anchor.TargetWeight, blend);
-                anchor.RadiusScale = Mathf.Lerp(anchor.RadiusScale, anchor.TargetRadiusScale, blend);
-                _anchors[i] = anchor;
-            }
-        }
-
-        public void TickDecay(float deltaTime)
-        {
-            EnsureInitialized();
-            float decay = _decayPerSecond * deltaTime;
-            int write = 0;
-            int newFollow = -1;
-            for (int i = 0; i < _count; i++)
-            {
-                Anchor anchor = _anchors[i];
-                if (!anchor.IsFollow)
-                {
-                    anchor.Weight -= decay;
-                    anchor.TargetWeight -= decay;
-                }
-
-                if (anchor.TargetWeight < _minWeight && anchor.Weight < _minWeight)
-                    continue;
-                if (anchor.TargetWeight < _minWeight)
-                    anchor.TargetWeight = _minWeight;
-
-                if (anchor.IsFollow)
-                    newFollow = write;
-                _anchors[write++] = anchor;
-            }
-
-            _count = write;
-            _followIndex = newFollow;
+            float shrunk = Mathf.MoveTowards(_radiusScale, 1f, _shrinkSpeed * deltaTime);
+            float previous = _radiusScale;
+            _radiusScale = shrunk;
+            if (NormalizedDistance(target) > 1f)
+                _radiusScale = previous;
         }
 
         public float SampleClear(Vector3 worldPosition)
         {
-            EnsureInitialized();
-            if (_count == 0)
+            if (!_hasState)
                 return 0f;
 
-            float clear = 0f;
-            for (int i = 0; i < _count; i++)
-            {
-                float scale = _anchors[i].RadiusScale;
-                if (scale <= 0.0001f)
-                    continue;
+            float radiusX = _radiusHorizontal * _radiusScale;
+            float radiusY = _radiusVertical * _radiusScale;
+            if (radiusX <= 0.0001f || radiusY <= 0.0001f)
+                return 0f;
 
-                float radiusX = _radiusHorizontal * scale;
-                float radiusY = _radiusVertical * scale;
-                if (radiusX <= 0.0001f || radiusY <= 0.0001f)
-                    continue;
+            Vector3 delta = worldPosition - _position;
+            float nx = delta.x / radiusX;
+            float ny = delta.y / radiusY;
+            float nz = delta.z / radiusX;
+            float distSq = nx * nx + ny * ny + nz * nz;
+            if (distSq >= 1f)
+                return 0f;
 
-                Vector3 delta = worldPosition - _anchors[i].Position;
-                float nx = delta.x / radiusX;
-                float ny = delta.y / radiusY;
-                float nz = delta.z / radiusX;
-                float normalizedDistSq = nx * nx + ny * ny + nz * nz;
-                if (normalizedDistSq > 1f)
-                    continue;
-
-                float t = 1f - Mathf.Sqrt(normalizedDistSq);
-                float falloff = t * t * (3f - 2f * t);
-                clear = Mathf.Max(clear, falloff * Mathf.Clamp01(_anchors[i].Weight));
-            }
-
-            return Mathf.Clamp01(clear);
+            float t = 1f - Mathf.Sqrt(distSq);
+            return t * t * (3f - 2f * t);
         }
 
-        private void BeginFollow(Vector3 position, bool fullStrength)
+        public float SampleDensity(Vector3 worldPosition, DarknessChaseState chase)
         {
-            EnsureInitialized();
-            if (_followIndex >= 0 && _followIndex < _count && _anchors[_followIndex].IsFollow)
-            {
-                Anchor existing = _anchors[_followIndex];
-                existing.Position = position;
-                if (fullStrength)
-                {
-                    existing.Weight = Mathf.Max(existing.Weight, _anchorBoostWeight);
-                    existing.TargetWeight = _anchorBoostWeight;
-                    existing.RadiusScale = Mathf.Max(existing.RadiusScale, 1f);
-                    existing.TargetRadiusScale = 1f;
-                }
-
-                _anchors[_followIndex] = existing;
-                _lastTrailDropPosition = position;
-                _hasTrailDropPosition = true;
-                return;
-            }
-
-            for (int i = 0; i < _count; i++)
-            {
-                Anchor anchor = _anchors[i];
-                anchor.IsFollow = false;
-                _anchors[i] = anchor;
-            }
-
-            float startWeight = fullStrength ? _anchorBoostWeight : _landingStartWeight;
-            float startScale = fullStrength ? 1f : _landingStartRadiusFactor;
-            AddOrBoost(position, startWeight, _anchorBoostWeight, startScale, 1f, true);
-            _lastTrailDropPosition = position;
-            _hasTrailDropPosition = true;
+            float clear = SampleClear(worldPosition);
+            float blend = TargetClearRadius * 0.15f;
+            float aboveChase = SmoothStep(
+                chase.ChaseY - blend,
+                chase.ChaseY + blend,
+                worldPosition.y);
+            return Mathf.Clamp01(1f - clear * aboveChase);
         }
 
-        private void AddTrailAnchor(Vector3 position)
+        private static float SmoothStep(float edge0, float edge1, float x)
         {
-            AddOrBoost(
-                position,
-                _trailWeight,
-                _trailWeight,
-                _trailRadiusFactor,
-                _trailRadiusFactor,
-                false);
+            if (edge0 >= edge1)
+                return x < edge0 ? 0f : 1f;
+            float t = Mathf.Clamp01((x - edge0) / (edge1 - edge0));
+            return t * t * (3f - 2f * t);
         }
 
-        private void AddOrBoost(
-            Vector3 position,
-            float startWeight,
-            float targetWeight,
-            float startRadiusScale,
-            float targetRadiusScale,
-            bool asFollow)
+        private float NormalizedDistance(Vector3 point)
         {
-            EnsureInitialized();
-
-            if (!asFollow)
-            {
-                for (int i = 0; i < _count; i++)
-                {
-                    if (_anchors[i].IsFollow)
-                        continue;
-                    if (Vector3.SqrMagnitude(_anchors[i].Position - position) > _mergeDistance * _mergeDistance)
-                        continue;
-
-                    Anchor merged = _anchors[i];
-                    merged.Position = Vector3.Lerp(merged.Position, position, 0.35f);
-                    merged.TargetWeight = Mathf.Min(2f, Mathf.Max(merged.TargetWeight, targetWeight));
-                    merged.TargetRadiusScale = Mathf.Max(merged.TargetRadiusScale, targetRadiusScale);
-                    if (merged.Weight < startWeight)
-                        merged.Weight = startWeight;
-                    _anchors[i] = merged;
-                    return;
-                }
-            }
-
-            Anchor created = new Anchor
-            {
-                Position = position,
-                Weight = startWeight,
-                TargetWeight = targetWeight,
-                RadiusScale = startRadiusScale,
-                TargetRadiusScale = targetRadiusScale,
-                IsFollow = asFollow
-            };
-
-            if (_count < _maxAnchors)
-            {
-                if (asFollow)
-                    _followIndex = _count;
-                _anchors[_count++] = created;
-                return;
-            }
-
-            int weakest = 0;
-            float weakestWeight = float.MaxValue;
-            for (int i = 0; i < _count; i++)
-            {
-                if (_anchors[i].IsFollow)
-                    continue;
-                if (_anchors[i].TargetWeight < weakestWeight)
-                {
-                    weakestWeight = _anchors[i].TargetWeight;
-                    weakest = i;
-                }
-            }
-
-            if (_anchors[weakest].IsFollow)
-                return;
-
-            _anchors[weakest] = created;
-            if (asFollow)
-                _followIndex = weakest;
+            float radiusX = Mathf.Max(1f, _radiusHorizontal * _radiusScale);
+            float radiusY = Mathf.Max(1f, _radiusVertical * _radiusScale);
+            Vector3 delta = point - _position;
+            float nx = delta.x / radiusX;
+            float ny = delta.y / radiusY;
+            float nz = delta.z / radiusX;
+            return Mathf.Sqrt(nx * nx + ny * ny + nz * nz);
         }
     }
 }

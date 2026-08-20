@@ -6,7 +6,6 @@ namespace Project.Scripts.Generation.Darkness
 {
     public class DarknessKillSampler
     {
-        private readonly DarknessVolumeField _field;
         private readonly DarknessClearAnchors _anchors;
         private readonly DarknessChaseState _chase;
         private readonly PlayerHealth _playerHealth;
@@ -17,7 +16,6 @@ namespace Project.Scripts.Generation.Darkness
         private readonly int _damage;
 
         public DarknessKillSampler(
-            DarknessVolumeField field,
             DarknessClearAnchors anchors,
             DarknessChaseState chase,
             PlayerHealth playerHealth,
@@ -27,7 +25,6 @@ namespace Project.Scripts.Generation.Darkness
             float velocityLookAhead,
             int damage)
         {
-            _field = field;
             _anchors = anchors;
             _chase = chase;
             _playerHealth = playerHealth;
@@ -45,8 +42,7 @@ namespace Project.Scripts.Generation.Darkness
             if (velocity.sqrMagnitude > 0.01f)
                 samplePos += velocity.normalized * _velocityLookAhead;
 
-            float density = _field.Sample(samplePos, _anchors, _chase);
-            if (density >= _killThreshold)
+            if (_anchors.SampleDensity(samplePos, _chase) >= _killThreshold)
                 _playerHealth.TakeDamage(_damage);
         }
     }

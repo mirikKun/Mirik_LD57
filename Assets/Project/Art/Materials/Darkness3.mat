@@ -102,10 +102,10 @@ Material:
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
-    - _CellDensity: 5.17
+    - _CellDensity: 2.82
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
-    - _ColorNoiseScale: 4.01
+    - _ColorNoiseScale: 4.29
     - _Cull: 2
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
@@ -113,19 +113,19 @@ Material:
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
-    - _FlashPower: 5.59
-    - _FlashScale: 0.04
-    - _FlashSpeed: 0.1
-    - _FlashThreshold: 0.31
+    - _FlashPower: 7
+    - _FlashScale: 1.4
+    - _FlashSpeed: 0.69
+    - _FlashThreshold: 0.66
     - _GlossMapScale: 1
     - _Glossiness: 0
     - _GlossyReflections: 1
     - _Metallic: 0
     - _Mode: 0
-    - _NoiseAScale: 0.58
-    - _NoiseA_Tiling: 2.19
-    - _NoiseBScale: 5
-    - _NoiseB_Tiling: 4.4
+    - _NoiseAScale: 1
+    - _NoiseA_Tiling: 2
+    - _NoiseBScale: 1
+    - _NoiseB_Tiling: 2
     - _NoiseColorScale: 0.4
     - _NoisePower: 15
     - _OcclusionStrength: 1
@@ -139,21 +139,21 @@ Material:
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _Surface: 0
-    - _SwayAmplitude: 1.04
-    - _SwayMainWeight: 3
-    - _SwayScale: 0.1
-    - _SwaySecondarySpeedMul: 2
-    - _SwaySecondaryWeight: 5
-    - _SwaySpeed: 0.01
+    - _SwayAmplitude: 0.02
+    - _SwayMainWeight: 4.12
+    - _SwayScale: 4
+    - _SwaySecondarySpeedMul: 1
+    - _SwaySecondaryWeight: -3
+    - _SwaySpeed: 0.1
     - _UVSec: 0
     - _WorkflowMode: 1
     - _XRMotionVectorsPass: 1
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 0.07058824, g: 0.07058824, b: 0.07058824, a: 1}
+    - _BaseColor: {r: 0, g: 0, b: 0, a: 1}
     - _Color: {r: 0, g: 0, b: 0, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _FlashColor: {r: 0.17610055, g: 0.17610055, b: 0.17610055, a: 1}
+    - _FlashColor: {r: 0.549243, g: 0, b: 1, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
