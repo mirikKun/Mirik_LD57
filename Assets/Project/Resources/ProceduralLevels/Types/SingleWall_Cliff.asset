@@ -16,18 +16,18 @@ MonoBehaviour:
     x: 70
     y: 110
   StepDistanceRange:
-    x: 5
-    y: 6
+    x: 7
+    y: 12
   StepDownRange:
-    x: 2
-    y: 3.5
+    x: 3
+    y: 8
   PlateauChance: 0.15
   MeanderAngleRange:
     x: 4
     y: 12
   CurvatureBiasRange:
-    x: 0
-    y: 3
+    x: 1
+    y: 7
   StepDownJitter: 1
   DifficultyGapBonus: 1.2
   MinPlatformSize: 1.5
@@ -57,34 +57,47 @@ MonoBehaviour:
     x: 0
     y: 3
   WallRoughness: 1.2
-  Protrusion1Chance: 0.65
-  Protrusion1:
+  WallFaceOffsetRange:
+    x: 1
+    y: 2
+  Protrusions:
+  - Weight: 0.5
     SizeRange:
-      min: {x: 5, y: 3, z: 10}
-      max: {x: 9, y: 6, z: 15}
+      min: {x: 3, y: 2, z: 10}
+      max: {x: 4, y: 3, z: 15}
     SinkRange:
-      x: 0.7
+      x: 0.6
       y: 0.9
     RotationRange:
       min: {x: -7, y: -20, z: -7}
       max: {x: 7, y: 20, z: 7}
-  Protrusion2:
+  - Weight: 0.35
     SizeRange:
-      min: {x: 2.5, y: 0.6, z: 2.5}
-      max: {x: 9, y: 2.4, z: 9}
+      min: {x: 2.5, y: 2, z: 2.5}
+      max: {x: 7, y: 5, z: 7}
     SinkRange:
       x: 0.6
-      y: 0.75
+      y: 0.7
     RotationRange:
       min: {x: -4, y: -8, z: -4}
       max: {x: 4, y: 8, z: 4}
+  - Weight: 0.15
+    SizeRange:
+      min: {x: 5, y: 4, z: 20}
+      max: {x: 9, y: 7, z: 35}
+    SinkRange:
+      x: 0.7
+      y: 0.83
+    RotationRange:
+      min: {x: -15, y: -15, z: -15}
+      max: {x: 15, y: 15, z: 15}
   WallSegmentLengthMultiplier: 1.7
   SlabCountRange:
     x: 2
     y: 4
   SlabHeightOverlap: 0.6
-  MinRange: 4
-  MaxPossibleRange: 8
+  MinRange: 8
+  MaxPossibleRange: 35
   ExtraHeightOffsetRange:
-    x: -3
-    y: 3
+    x: -25
+    y: 25
