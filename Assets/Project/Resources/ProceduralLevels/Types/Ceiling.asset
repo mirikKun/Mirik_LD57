@@ -66,6 +66,9 @@ MonoBehaviour:
     ColumnSizeRange:
       min: {x: 1, y: -5, z: 1}
       max: {x: 3, y: 3, z: 3}
+    RotationRange:
+      min: {x: -5, y: 0, z: -5}
+      max: {x: 5, y: 360, z: 5}
   - Weight: 0.3
     Prefab: {fileID: 5975232817302344390, guid: f3d6d8aea23684547a2c766653a862a0, type: 3}
     PlatformSizeRange:
@@ -74,6 +77,9 @@ MonoBehaviour:
     ColumnSizeRange:
       min: {x: 1, y: -5, z: 1}
       max: {x: 3, y: 4, z: 3}
+    RotationRange:
+      min: {x: -5, y: 0, z: -5}
+      max: {x: 5, y: 360, z: 5}
   MinRange: 12
   MaxPossibleRange: 35
   ExtraLateralRange:

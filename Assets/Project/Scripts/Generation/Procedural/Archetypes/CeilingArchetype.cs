@@ -20,6 +20,7 @@ namespace Project.Scripts.Generation.Procedural
             public Vector3Range PlatformSizeRange;
             [Tooltip("X/Z = column cross-section. Y is extra height added on top of clearance.")]
             public Vector3Range ColumnSizeRange;
+            public Vector3Range RotationRange;
         }
 
         [Header("Platforms")]
@@ -44,12 +45,14 @@ namespace Project.Scripts.Generation.Procedural
                 Weight = 0.7f,
                 PlatformSizeRange = new Vector3Range(new Vector3(5f, 0.5f, 5f), new Vector3(8f, 0.8f, 8f)),
                 ColumnSizeRange = new Vector3Range(new Vector3(0.8f, 1f, 0.8f), new Vector3(1.8f, 1f, 1.8f)),
+                RotationRange = new Vector3Range(new Vector3(0f, 0f, 0f), new Vector3(0f, 360f, 0f)),
             },
             new CeilingProtrusionSettings
             {
                 Weight = 0.3f,
                 PlatformSizeRange = new Vector3Range(new Vector3(6f, 0.4f, 6f), new Vector3(10f, 1f, 10f)),
                 ColumnSizeRange = new Vector3Range(new Vector3(1.2f, 1f, 1.2f), new Vector3(2.4f, 1f, 2.4f)),
+                RotationRange = new Vector3Range(new Vector3(0f, 0f, 0f), new Vector3(0f, 360f, 0f)),
             },
         };
 
@@ -100,13 +103,14 @@ namespace Project.Scripts.Generation.Procedural
             platformSize.x = Mathf.Max(MinPlatformSize, platformSize.x - shrink);
             platformSize.z = Mathf.Max(MinPlatformSize, platformSize.z - shrink);
             Vector3 columnSize = ctx.RangeEven(settings.ColumnSizeRange);
+            Vector3 euler = ctx.RangeEven(settings.RotationRange);
             float height = ceilingPoint.y - point.Position.y;
 
             CeilingProtrusion instance = Instantiate(settings.Prefab, ctx.LevelElements);
             instance.name = $"{settings.Prefab.name}_{index}";
             Transform tr = instance.transform;
             tr.localPosition = ceilingPoint;
-            tr.localRotation = Quaternion.identity;
+            tr.localRotation = Quaternion.Euler(euler);
             Vector3 walkableLocal = instance.Apply(
                 height, platformSize, columnSize,
                 ctx.Palette.StructureMaterial, ctx.Palette.PlatformMaterial);
