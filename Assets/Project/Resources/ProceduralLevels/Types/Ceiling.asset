@@ -21,7 +21,7 @@ MonoBehaviour:
   FirstStepDistance: 9
   StepDownRange:
     x: 4
-    y: 8
+    y: 11
   PlateauChance: 0
   MeanderAngleRange:
     x: 8
@@ -75,8 +75,8 @@ MonoBehaviour:
       min: {x: 6, y: 1, z: 6}
       max: {x: 14, y: 3, z: 14}
     ColumnSizeRange:
-      min: {x: 1, y: -5, z: 1}
-      max: {x: 3, y: 4, z: 3}
+      min: {x: 2, y: -5, z: 2}
+      max: {x: 5, y: 4, z: 5}
     RotationRange:
       min: {x: -5, y: 0, z: -5}
       max: {x: 5, y: 360, z: 5}

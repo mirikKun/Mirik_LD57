@@ -14459,7 +14459,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _startLocation: {fileID: 641396999}
-  _testArchetype: {fileID: 11400000, guid: c0de5eed1008aaaa8888bbbbcccc1008, type: 2}
+  _testArchetype: {fileID: 0}
   _skipTutorial: 1
   _basicTutorialLocations:
   - {fileID: 7586372245869605210, guid: 7fb87133ce6b6204f9a3998f4b7a3a8f, type: 3}

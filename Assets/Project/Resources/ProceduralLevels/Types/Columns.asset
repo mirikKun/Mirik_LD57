@@ -12,19 +12,91 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0de5eed000baaaa8888bbbbcccc000b, type: 3}
   m_Name: Columns
   m_EditorClassIdentifier: 
-  LengthRange: {x: 60, y: 100}
-  StepDistanceRange: {x: 4.5, y: 6}
-  StepDownRange: {x: 1.5, y: 3}
-  PlateauChance: 0.2
-  MeanderAngleRange: {x: 15, y: 35}
-  CurvatureBiasRange: {x: 0, y: 0}
+  LengthRange:
+    x: 60
+    y: 100
+  StepDistanceRange:
+    x: 8
+    y: 16
+  FirstStepDistance: 0
+  StepDownRange:
+    x: 1.5
+    y: 8
+  PlateauChance: 0.291
+  MeanderAngleRange:
+    x: 15
+    y: 35
+  CurvatureBiasRange:
+    x: 0
+    y: 0
+  StepDownJitter: 1
   DifficultyGapBonus: 1.2
+  MinPlatformSize: 1.5
   LightEveryNthPlatform: 4
+  GuideLightHeight: 2
+  GuideLightIntensity: 2.5
+  GuideLightRange: 10
+  GuideMarkerOffsetRange:
+    x: -0.6
+    y: 0.6
+  GuideMarkerYOffset: 0.06
+  GuideMarkerSize: {x: 0.5, y: 0.12, z: 0.5}
+  GuideMarkerYawRange:
+    x: 0
+    y: 90
   Palette: {fileID: 11400000, guid: c0de5eed1001aaaa8888bbbbcccc1001, type: 2}
-  PlatformSizeRange: {x: 3, y: 5}
   DifficultyPlatformShrink: 1.2
-  HangingChance: 0.15
-  ColumnDiameterRange: {x: 3, y: 6}
-  ColumnDepthRange: {x: 45, y: 80}
-  MonolithWidthRange: {x: 3, y: 6}
-  MonolithHeightRange: {x: 35, y: 55}
+  Columns:
+  - Weight: 0.7
+    Prefab: {fileID: 5940809795918652487, guid: 2ff80c5faeb1bb442af057228e968ae2, type: 3}
+    WidthRange:
+      x: 3
+      y: 6
+    LowerHeightRange:
+      x: 45
+      y: 80
+    UpperHeightRange:
+      x: 8
+      y: 20
+    HideUpperChance: 0.85
+    GapRange:
+      x: 4
+      y: 6
+    LowerOffsetRange:
+      x: -0.5
+      y: 0.5
+    UpperOffsetRange:
+      x: -1
+      y: 1
+    RotationRange:
+      min: {x: 0, y: 0, z: 0}
+      max: {x: 0, y: 360, z: 0}
+  - Weight: 0.3
+    Prefab: {fileID: 5940809795918652487, guid: 2ff80c5faeb1bb442af057228e968ae2, type: 3}
+    WidthRange:
+      x: 5
+      y: 8
+    LowerHeightRange:
+      x: 20
+      y: 40
+    UpperHeightRange:
+      x: 15
+      y: 40
+    HideUpperChance: 0.15
+    GapRange:
+      x: 6
+      y: 10
+    LowerOffsetRange:
+      x: -1
+      y: 1
+    UpperOffsetRange:
+      x: -2
+      y: 4
+    RotationRange:
+      min: {x: 0, y: 0, z: 0}
+      max: {x: 0, y: 360, z: 0}
+  MinRange: 9
+  MaxPossibleRange: 35
+  ExtraLateralRange:
+    x: -35
+    y: 35

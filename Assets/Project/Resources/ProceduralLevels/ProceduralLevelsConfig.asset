@@ -13,21 +13,13 @@ MonoBehaviour:
   m_Name: ProceduralLevelsConfig
   m_EditorClassIdentifier: 
   Archetypes:
-  - Archetype: {fileID: 11400000, guid: c0de5eed1004aaaa8888bbbbcccc1004, type: 2}
+  - Archetype: {fileID: 11400000, guid: c0de5eed1008aaaa8888bbbbcccc1008, type: 2}
     Weight: 1
-  - Archetype: {fileID: 11400000, guid: c0de5eed1005aaaa8888bbbbcccc1005, type: 2}
+  - Archetype: {fileID: 11400000, guid: c0de5eed100baaaa8888bbbbcccc100b, type: 2}
     Weight: 1
   - Archetype: {fileID: 11400000, guid: c0de5eed1006aaaa8888bbbbcccc1006, type: 2}
     Weight: 1
-  - Archetype: {fileID: 11400000, guid: c0de5eed1007aaaa8888bbbbcccc1007, type: 2}
-    Weight: 1
-  - Archetype: {fileID: 11400000, guid: c0de5eed1008aaaa8888bbbbcccc1008, type: 2}
-    Weight: 1
-  - Archetype: {fileID: 11400000, guid: c0de5eed1009aaaa8888bbbbcccc1009, type: 2}
-    Weight: 1
-  - Archetype: {fileID: 11400000, guid: c0de5eed100aaaaa8888bbbbcccc100a, type: 2}
-    Weight: 1
-  - Archetype: {fileID: 11400000, guid: c0de5eed100baaaa8888bbbbcccc100b, type: 2}
+  - Archetype: {fileID: 11400000, guid: c0de5eed1005aaaa8888bbbbcccc1005, type: 2}
     Weight: 1
   LevelsBeforeAdvancedTutorials: 3
   LevelsToMaxDifficulty: 12

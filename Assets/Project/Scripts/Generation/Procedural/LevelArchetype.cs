@@ -14,11 +14,11 @@ namespace Project.Scripts.Generation.Procedural
         [Tooltip("Total horizontal length of the level, meters (min..max).")]
         public FloatRange LengthRange = new FloatRange(60f, 110f);
         [Tooltip("Horizontal center-to-center distance between platforms (min..max).")]
-        public FloatRange StepDistanceRange = new FloatRange(5f, 6.5f);
+        public FloatRange StepDistanceRange = new FloatRange(8f, 16.5f);
         [Tooltip("Horizontal length of the first step, meters. 0 = use Step Distance Range like the rest.")]
         public float FirstStepDistance = 0f;
         [Tooltip("Vertical drop per platform (min..max).")]
-        public FloatRange StepDownRange = new FloatRange(1.5f, 3.5f);
+        public FloatRange StepDownRange = new FloatRange(1.5f, 8f);
         [Range(0f, 0.6f)] public float PlateauChance = 0.15f;
 
         [Header("Path Shape")]
