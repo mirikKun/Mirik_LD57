@@ -9,25 +9,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c0de5eed0009aaaa8888bbbbcccc0009, type: 3}
-  m_Name: SingleWall_Cliff
+  m_Script: {fileID: 11500000, guid: c0de5eed0008aaaa8888bbbbcccc0008, type: 3}
+  m_Name: TwoWalls
   m_EditorClassIdentifier: 
   LengthRange:
-    x: 70
-    y: 110
+    x: 90
+    y: 140
   StepDistanceRange:
-    x: 7
-    y: 12
+    x: 15
+    y: 23
   StepDownRange:
-    x: 3
-    y: 8
-  PlateauChance: 0.15
+    x: 1.5
+    y: 3.5
+  PlateauChance: 0.18
   MeanderAngleRange:
-    x: 4
-    y: 12
+    x: 10
+    y: 25
   CurvatureBiasRange:
     x: 1
-    y: 7
+    y: 8
   StepDownJitter: 1
   DifficultyGapBonus: 1.2
   MinPlatformSize: 1.5
@@ -43,61 +43,65 @@ MonoBehaviour:
   GuideMarkerYawRange:
     x: 0
     y: 90
-  Palette: {fileID: 11400000, guid: c0de5eed1001aaaa8888bbbbcccc1001, type: 2}
-  WallHeightAboveRange:
-    x: 35
-    y: 60
-  WallDepthBelowRange:
+  Palette: {fileID: 11400000, guid: c0de5eed1003aaaa8888bbbbcccc1003, type: 2}
+  StartGapRange:
+    x: 60
+    y: 75
+  EndGapRange:
     x: 30
-    y: 50
+    y: 45
+  WallHeightAboveRange:
+    x: 64
+    y: 96
+  WallDepthBelowRange:
+    x: 25
+    y: 35
   WallThicknessRange:
     x: 3
     y: 6
   WallTiltRange:
     x: 0
     y: 3
-  WallRoughness: 1.2
-  WallFaceOffsetRange:
-    x: 1
-    y: 2
+  WallRoughness: 1.5
   Protrusions:
   - Weight: 0.5
     SizeRange:
-      min: {x: 3, y: 2, z: 10}
-      max: {x: 4, y: 3, z: 15}
-    SinkRange:
-      x: 0.6
-      y: 0.9
-    RotationRange:
-      min: {x: -7, y: -20, z: -7}
-      max: {x: 7, y: 20, z: 7}
-  - Weight: 0.35
-    SizeRange:
-      min: {x: 2.5, y: 2, z: 2.5}
-      max: {x: 7, y: 5, z: 7}
-    SinkRange:
-      x: 0.6
-      y: 0.7
+      min: {x: 5, y: 5, z: 80}
+      max: {x: 8, y: 8, z: 81}
+    SideRange:
+      x: -0.25
+      y: 0.25
     RotationRange:
       min: {x: -4, y: -8, z: -4}
       max: {x: 4, y: 8, z: 4}
-  - Weight: 0.15
+  - Weight: 0.25
     SizeRange:
-      min: {x: 5, y: 4, z: 20}
-      max: {x: 9, y: 7, z: 35}
-    SinkRange:
-      x: 0.7
-      y: 0.83
+      min: {x: 5, y: 2.5, z: 20}
+      max: {x: 8, y: 5, z: 40}
+    SideRange:
+      x: -1
+      y: -0.6
     RotationRange:
-      min: {x: -15, y: -15, z: -15}
-      max: {x: 15, y: 15, z: 15}
-  WallSegmentLengthMultiplier: 1.7
+      min: {x: -4, y: -8, z: -4}
+      max: {x: 4, y: 8, z: 4}
+  - Weight: 0.25
+    SizeRange:
+      min: {x: 5, y: 2.5, z: 20}
+      max: {x: 8, y: 5, z: 40}
+    SideRange:
+      x: 0.6
+      y: 1
+    RotationRange:
+      min: {x: -4, y: -8, z: -4}
+      max: {x: 4, y: 8, z: 4}
+  WallSegmentLengthMultiplier: 1.6
+  WallOverrun: 20
   SlabCountRange:
     x: 2
-    y: 4
-  SlabHeightOverlap: 0.6
-  MinRange: 8
-  MaxPossibleRange: 35
+    y: 3
+  SlabHeightOverlap: 0.5
+  MinRange: 10
+  MaxPossibleRange: 24
   ExtraHeightOffsetRange:
-    x: -25
-    y: 25
+    x: -35
+    y: 35

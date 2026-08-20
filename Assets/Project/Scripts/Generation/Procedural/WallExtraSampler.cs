@@ -28,7 +28,7 @@ namespace Project.Scripts.Generation.Procedural
                 lengths[i] = lengths[i - 1] + Vector3.Distance(path[i - 1].Position, path[i].Position);
 
             float sMin = lengths[1];
-            float sMax = lengths[path.Count - 2];
+            float sMax = lengths[path.Count - 1];
             if (sMax <= sMin)
                 return extras;
 
@@ -41,7 +41,7 @@ namespace Project.Scripts.Generation.Procedural
 
             var samples = new List<Vector2>();
             var active = new List<int>();
-            for (int i = 1; i < path.Count - 1; i++)
+            for (int i = 1; i < path.Count; i++)
             {
                 samples.Add(new Vector2(lengths[i], 0f));
                 active.Add(samples.Count - 1);
@@ -114,7 +114,7 @@ namespace Project.Scripts.Generation.Procedural
         private static float NearestPathDistance(IReadOnlyList<PathPoint> path, Vector3 position)
         {
             float min = float.MaxValue;
-            for (int i = 1; i < path.Count - 1; i++)
+            for (int i = 1; i < path.Count; i++)
             {
                 float d = Vector3.Distance(position, path[i].Position);
                 if (d < min)

@@ -44,6 +44,8 @@ namespace Project.Scripts.Generation.Procedural
         public float WallRoughness = 1.2f;
         [Tooltip("Distance from the path to the wall face, meters (min..max). Rolled once per level.")]
         public FloatRange WallFaceOffsetRange = new FloatRange(4f, 7f);
+        [Tooltip("How far the guide marker and light sit from the wall face, meters.")]
+        public float GuideMarkerWallDistance = 1f;
 
         [Header("Protrusions")]
         public List<WallProtrusionSettings> Protrusions = new List<WallProtrusionSettings>
@@ -66,6 +68,7 @@ namespace Project.Scripts.Generation.Procedural
 
         [Header("Wall Construction")]
         public float WallSegmentLengthMultiplier = 1.7f;
+        public float WallOverrun = 20f;
         public IntRange SlabCountRange = new IntRange(2, 4);
         public float SlabHeightOverlap = 0.6f;
 
@@ -85,6 +88,11 @@ namespace Project.Scripts.Generation.Procedural
             float tilt = ctx.Range(WallTiltRange);
             float wallOffset = ctx.Range(WallFaceOffsetRange);
 
+            Vector3 startForward = path[0].Forward;
+            Vector3 startToWall = Vector3.Cross(Vector3.up, startForward).normalized * sideSign;
+            Vector3 startMid = path[0].Position - startForward * (WallOverrun * 0.5f) + startToWall * wallOffset;
+            BuildWallSegment(ctx, startMid, startForward, startToWall, WallOverrun * WallSegmentLengthMultiplier, heightAbove, depthBelow, tilt, -1);
+
             for (int i = 0; i < path.Count; i++)
             {
                 Vector3 right = Vector3.Cross(Vector3.up, path[i].Forward).normalized;
@@ -101,6 +109,11 @@ namespace Project.Scripts.Generation.Procedural
                     BuildWallSegment(ctx, mid, path[i].Forward, toWall, segmentLength, heightAbove, depthBelow, tilt, i);
                 }
             }
+
+            Vector3 endForward = path[path.Count - 1].Forward;
+            Vector3 endToWall = Vector3.Cross(Vector3.up, endForward).normalized * sideSign;
+            Vector3 endMid = path[path.Count - 1].Position + endForward * (WallOverrun * 0.5f) + endToWall * wallOffset;
+            BuildWallSegment(ctx, endMid, endForward, endToWall, WallOverrun * WallSegmentLengthMultiplier, heightAbove, depthBelow, tilt, path.Count);
 
             List<PathPoint> extras = WallExtraSampler.Sample(
                 path, MinRange, MaxPossibleRange, ExtraHeightOffsetRange, ctx.Rng);
@@ -161,7 +174,7 @@ namespace Project.Scripts.Generation.Procedural
                 ctx.LevelElements, objectName,
                 center, rotation, rolled.Size, ctx.Palette.StructureMaterial);
 
-            RegisterWalkable(ctx, point.Position, index, isPrimary);
+            RegisterWalkable(ctx, point.Position, index, isPrimary, toWall * (wallOffset - GuideMarkerWallDistance));
         }
 
         private void BuildWallSegment(LevelBuildContext ctx, Vector3 faceMid, Vector3 forward, Vector3 toWall, float length, float heightAbove, float depthBelow, float tilt, int index)

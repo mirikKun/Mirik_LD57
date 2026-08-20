@@ -1,0 +1,105 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0de5eed0009aaaa8888bbbbcccc0009, type: 3}
+  m_Name: SingleWall
+  m_EditorClassIdentifier: 
+  LengthRange:
+    x: 70
+    y: 110
+  StepDistanceRange:
+    x: 7
+    y: 12
+  StepDownRange:
+    x: 3
+    y: 8
+  PlateauChance: 0.15
+  MeanderAngleRange:
+    x: 4
+    y: 12
+  CurvatureBiasRange:
+    x: 1
+    y: 7
+  StepDownJitter: 1
+  DifficultyGapBonus: 1.2
+  MinPlatformSize: 1.5
+  LightEveryNthPlatform: 4
+  GuideLightHeight: 2
+  GuideLightIntensity: 2.5
+  GuideLightRange: 10
+  GuideMarkerOffsetRange:
+    x: -0.6
+    y: 0.6
+  GuideMarkerYOffset: 0.06
+  GuideMarkerSize: {x: 0.5, y: 0.12, z: 0.5}
+  GuideMarkerYawRange:
+    x: 0
+    y: 90
+  Palette: {fileID: 11400000, guid: c0de5eed1001aaaa8888bbbbcccc1001, type: 2}
+  WallHeightAboveRange:
+    x: 35
+    y: 60
+  WallDepthBelowRange:
+    x: 30
+    y: 50
+  WallThicknessRange:
+    x: 3
+    y: 6
+  WallTiltRange:
+    x: 0
+    y: 3
+  WallRoughness: 1.2
+  WallFaceOffsetRange:
+    x: 6
+    y: 8
+  GuideMarkerWallDistance: 3
+  Protrusions:
+  - Weight: 0.5
+    SizeRange:
+      min: {x: 3, y: 2, z: 10}
+      max: {x: 4, y: 3, z: 15}
+    SinkRange:
+      x: 0.6
+      y: 0.9
+    RotationRange:
+      min: {x: -7, y: -20, z: -7}
+      max: {x: 7, y: 20, z: 7}
+  - Weight: 0.35
+    SizeRange:
+      min: {x: 2.5, y: 2, z: 2.5}
+      max: {x: 7, y: 5, z: 7}
+    SinkRange:
+      x: 0.6
+      y: 0.7
+    RotationRange:
+      min: {x: -4, y: -8, z: -4}
+      max: {x: 4, y: 8, z: 4}
+  - Weight: 0.15
+    SizeRange:
+      min: {x: 5, y: 4, z: 20}
+      max: {x: 9, y: 7, z: 35}
+    SinkRange:
+      x: 0.7
+      y: 0.83
+    RotationRange:
+      min: {x: -15, y: -15, z: -15}
+      max: {x: 15, y: 15, z: 15}
+  WallSegmentLengthMultiplier: 1.7
+  WallOverrun: 20
+  SlabCountRange:
+    x: 2
+    y: 4
+  SlabHeightOverlap: 0.6
+  MinRange: 8
+  MaxPossibleRange: 35
+  ExtraHeightOffsetRange:
+    x: -25
+    y: 25

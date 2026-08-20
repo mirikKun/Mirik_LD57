@@ -84,7 +84,7 @@ namespace Project.Scripts.Generation.Procedural
         /// a glow marker and (every Nth platform) a guide light. Extra branch candidates stay
         /// unmarked so the player has to judge them visually instead of following a lit trail.
         /// </summary>
-        protected void RegisterWalkable(LevelBuildContext ctx, Vector3 topLocalPosition, int pathIndex, bool isPrimary = true)
+        protected void RegisterWalkable(LevelBuildContext ctx, Vector3 topLocalPosition, int pathIndex, bool isPrimary = true, Vector3 guideOffset = default)
         {
             ctx.PlatformTops.Add(topLocalPosition);
 
@@ -94,7 +94,7 @@ namespace Project.Scripts.Generation.Procedural
             Vector3 markerOffset = new Vector3(ctx.Range(GuideMarkerOffsetRange), GuideMarkerYOffset, ctx.Range(GuideMarkerOffsetRange));
             LevelGeometry.CreateBox(
                 ctx.LevelElements, "GuideMarker",
-                topLocalPosition + markerOffset,
+                topLocalPosition + guideOffset + markerOffset,
                 Quaternion.Euler(0f, ctx.Range(GuideMarkerYawRange), 0f),
                 GuideMarkerSize,
                 ctx.Palette.GlowMaterial,
@@ -104,7 +104,7 @@ namespace Project.Scripts.Generation.Procedural
             {
                 LevelGeometry.CreatePointLight(
                     ctx.LevelElements, "GuideLight",
-                    topLocalPosition + Vector3.up * GuideLightHeight,
+                    topLocalPosition + guideOffset + Vector3.up * GuideLightHeight,
                     ctx.Palette.GuideLightColor, GuideLightIntensity, GuideLightRange);
             }
         }
