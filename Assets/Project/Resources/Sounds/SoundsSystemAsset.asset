@@ -28,6 +28,12 @@ MonoBehaviour:
   - _clips:
     - {fileID: 8300000, guid: 145a86719f4b184468f7f07dffb76df4, type: 3}
     _group: {fileID: -3319337060313718263, guid: 319fba8083a4b0441ba1189881889356, type: 2}
+  - _clips:
+    - {fileID: 8300000, guid: 266a5228302fa8549b166243691d990e, type: 3}
+    _group: {fileID: -3319337060313718263, guid: 319fba8083a4b0441ba1189881889356, type: 2}
+  - _clips:
+    - {fileID: 8300000, guid: 858974fa73586f34cb799957ad1a8e32, type: 3}
+    _group: {fileID: -3319337060313718263, guid: 319fba8083a4b0441ba1189881889356, type: 2}
   _soundSystemEvents:
   - _eventName: StartSoundtrack1
     _actions:
@@ -41,6 +47,12 @@ MonoBehaviour:
   - _eventName: Step
     _actions:
     - rid: 8473138015717031940
+  - _eventName: Landing
+    _actions:
+    - rid: 8473138015717031941
+  - _eventName: Lamp
+    _actions:
+    - rid: 8473138015717031942
   references:
     version: 2
     RefIds:
@@ -79,8 +91,28 @@ MonoBehaviour:
       data:
         _clipName: Steps3
         _loop: 0
-        _volume: 0.65
+        _volume: 0.862
         _waitType: 0
         _randomPitch: 1
         _pitchFrom: 0.66
         _pitchTo: 0.89
+    - rid: 8473138015717031941
+      type: {class: PlayActionConfig, ns: Project.Scripts.Sounds.ActionConfigs, asm: Assembly-CSharp}
+      data:
+        _clipName: Landing
+        _loop: 0
+        _volume: 0.296
+        _waitType: 0
+        _randomPitch: 1
+        _pitchFrom: 0.694
+        _pitchTo: 1.08
+    - rid: 8473138015717031942
+      type: {class: PlayActionConfig, ns: Project.Scripts.Sounds.ActionConfigs, asm: Assembly-CSharp}
+      data:
+        _clipName: LightUpBurst
+        _loop: 0
+        _volume: 0.173
+        _waitType: 0
+        _randomPitch: 0
+        _pitchFrom: 1
+        _pitchTo: 1

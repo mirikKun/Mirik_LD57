@@ -10,7 +10,7 @@ namespace Project.Scripts.Generation.Darkness
         public static DarknessFollowZone Ensure(Transform parent, DarknessFollowZone existing, float height, float diameter)
         {
             DarknessFollowZone zone = existing;
-            if (zone == null && Application.isPlaying)
+            if (zone == null && Application.isPlaying && parent.gameObject.scene.IsValid())
                 zone = Create(parent);
             if (zone != null)
                 zone.FitVerticalShaft(height, diameter);

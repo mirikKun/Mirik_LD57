@@ -9,17 +9,12 @@ namespace Project.Scripts.Generation
 {
     public class DarknessFollowing : MonoBehaviour, IGameStartable, IGameUpdatable
     {
-        [SerializeField] private Vector3 _offset;
-        [SerializeField] private Vector3 _newLocationOffset;
-        [SerializeField] private float _tunnelEntryDarknessDrop = 5f;
-        [SerializeField] private float _deathClearDrop = 8f;
         [SerializeField] private DescentController _descentController;
         [SerializeField] private LocationsGenerator _locationsGenerator;
         [SerializeField] private PlayerHealth _playerHealth;
         [SerializeField] private PlayerController _playerController;
         [SerializeField] private MeshRenderer _meshRenderer;
         [SerializeField] private Material _darknessMaterial;
-        [SerializeField] private DarknessChaseState _chase = new DarknessChaseState();
         [SerializeField] private DarknessClearAnchors _anchors = new DarknessClearAnchors();
         [SerializeField] private bool _killEnabled = true;
         [SerializeField] private float _killThreshold = 0.5f;
@@ -41,13 +36,11 @@ namespace Project.Scripts.Generation
             _meshRenderer.reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
 
             Vector3 playerPos = _playerController.transform.position;
-            _chase.SetChaseY(playerPos.y + _offset.y);
             _anchors.Snap(playerPos);
             SyncVisual();
 
             _killSampler = new DarknessKillSampler(
                 _anchors,
-                _chase,
                 _playerHealth,
                 _playerController.transform,
                 _playerController,
@@ -67,9 +60,7 @@ namespace Project.Scripts.Generation
 
         private void OnPlayerRespawned()
         {
-            Vector3 position = _playerController.transform.position;
-            _chase.SnapBelow(position.y - _deathClearDrop);
-            _anchors.Snap(position);
+            _anchors.Snap(_playerController.transform.position);
             SyncVisual();
         }
 
@@ -77,13 +68,13 @@ namespace Project.Scripts.Generation
         {
             Vector3 playerPos = _playerController.transform.position;
             Vector3 pathEnd = entryPlatform != null ? entryPlatform.position : playerPos;
-            if (entryPlatform != null)
-            {
-                float sealY = entryPlatform.position.y - _tunnelEntryDarknessDrop;
-                _chase.SealAt(sealY);
-            }
-
             _anchors.CoverPath(playerPos, pathEnd);
+            SyncVisual();
+        }
+
+        public void SetPulseScale(float scale)
+        {
+            _anchors.SetPulseScale(scale);
             SyncVisual();
         }
 
@@ -113,9 +104,7 @@ namespace Project.Scripts.Generation
 
         public void GameUpdate()
         {
-            Vector3 followPosition = GetFollowPosition();
-            _chase.Tick(GetTargetY(followPosition));
-            _anchors.Tick(followPosition, Time.deltaTime);
+            _anchors.Tick(GetFollowPosition(), Time.deltaTime);
             SyncVisual();
 
             if (_killEnabled)
@@ -136,20 +125,6 @@ namespace Project.Scripts.Generation
             if (_descentController.InDarknessFollowZone)
                 return _playerController.transform.position;
             return _descentController.LastGroundPosition;
-        }
-
-        private float GetTargetY(Vector3 followPosition)
-        {
-            float targetY;
-            if (_locationsGenerator.TryGetNearestLocationEnterPoint(
-                    followPosition,
-                    _offset.magnitude,
-                    out Vector3 locationEnter))
-                targetY = locationEnter.y + _newLocationOffset.y;
-            else
-                targetY = followPosition.y + _offset.y;
-
-            return _chase.ClampTargetY(targetY);
         }
     }
 }

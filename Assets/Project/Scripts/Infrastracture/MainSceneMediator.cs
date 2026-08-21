@@ -1,12 +1,15 @@
 using System;
 using Project.Scripts.Generation;
 using Scripts.UI.Animations;
+using TMPro;
 using UnityEngine;
 
 namespace Scripts.Infrastracture
 {
     public class MainSceneMediator : MonoBehaviour
     {
+        private const string ContinueButtonLabel = "Continue";
+
         [SerializeField] private GameObject _mainMenu;
         [SerializeField] private GameObject _settingsMenu;
 
@@ -16,6 +19,7 @@ namespace Scripts.Infrastracture
         [SerializeField] private FadeAnimation _hudAnimation;
 
         [SerializeField] private InputReader _inputReader;
+        [SerializeField] private TMP_Text _startButtonText;
         
 
         private void Start()
@@ -96,6 +100,7 @@ namespace Scripts.Infrastracture
             _hudAnimation.FadeOut();
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+            _startButtonText.text = ContinueButtonLabel;
         }
         
     }

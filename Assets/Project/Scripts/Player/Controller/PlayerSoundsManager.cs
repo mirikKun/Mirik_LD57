@@ -12,6 +12,7 @@ namespace Assets.Scripts.Player.Controller
         [SerializeField] private PlayerController _playerController;
         [Space] [SerializeField] private string _deathSoundEvent;
         [SerializeField] private string _stepSoundEvent;
+        [SerializeField] private string _landingSoundEvent;
         [SerializeField] private string _highSpeedSoundEvent;
         [Space] [SerializeField] private float _stepSoundRate;
 
@@ -57,10 +58,7 @@ namespace Assets.Scripts.Player.Controller
             if (!_wasGrounded && _playerController.Mover.IsGrounded())
             {
                 if (_passedTimeToJump > _timeToJump)
-                {
-                    _soundSystem.InvokeEvent(_stepSoundEvent);
-                    _soundSystem.InvokeEvent(_stepSoundEvent);
-                }
+                    _soundSystem.InvokeEvent(_landingSoundEvent);
 
                 _stepProgress = 0;
                 _passedTimeToJump = 0;

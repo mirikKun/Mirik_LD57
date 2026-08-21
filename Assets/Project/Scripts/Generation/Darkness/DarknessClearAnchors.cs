@@ -17,21 +17,26 @@ namespace Project.Scripts.Generation.Darkness
 
         private Vector3 _position;
         private float _radiusScale = 1f;
+        private float _pulseScale = 1f;
         private bool _hasState;
-
-        public float TargetClearRadius =>
-            Mathf.Max(_radiusHorizontal, _radiusVertical) * _maxRadiusScale;
 
         public Vector3 Position => _position;
         public float RadiusScale => _radiusScale;
-        public float CurrentRadiusHorizontal => _radiusHorizontal * _radiusScale;
-        public float CurrentRadiusVertical => _radiusVertical * _radiusScale;
+        public float CurrentRadiusHorizontal => _radiusHorizontal * EffectiveScale;
+        public float CurrentRadiusVertical => _radiusVertical * EffectiveScale;
+
+        private float EffectiveScale => _radiusScale * _pulseScale;
 
         public void ApplyWebProfile()
         {
             _maxRadiusScale = 1.15f;
             _growSpeed = 6f;
             _hasState = false;
+        }
+
+        public void SetPulseScale(float scale)
+        {
+            _pulseScale = Mathf.Max(0.01f, scale);
         }
 
         public void Snap(Vector3 position)
@@ -101,8 +106,8 @@ namespace Project.Scripts.Generation.Darkness
             if (!_hasState)
                 return 0f;
 
-            float radiusX = _radiusHorizontal * _radiusScale;
-            float radiusY = _radiusVertical * _radiusScale;
+            float radiusX = _radiusHorizontal * EffectiveScale;
+            float radiusY = _radiusVertical * EffectiveScale;
             if (radiusX <= 0.0001f || radiusY <= 0.0001f)
                 return 0f;
 
@@ -118,29 +123,17 @@ namespace Project.Scripts.Generation.Darkness
             return t * t * (3f - 2f * t);
         }
 
-        public float SampleDensity(Vector3 worldPosition, DarknessChaseState chase)
+        public float SampleDensity(Vector3 worldPosition)
         {
-            float clear = SampleClear(worldPosition);
-            float blend = TargetClearRadius * 0.15f;
-            float aboveChase = SmoothStep(
-                chase.ChaseY - blend,
-                chase.ChaseY + blend,
-                worldPosition.y);
-            return Mathf.Clamp01(1f - clear * aboveChase);
-        }
-
-        private static float SmoothStep(float edge0, float edge1, float x)
-        {
-            if (edge0 >= edge1)
-                return x < edge0 ? 0f : 1f;
-            float t = Mathf.Clamp01((x - edge0) / (edge1 - edge0));
-            return t * t * (3f - 2f * t);
+            var sampleClear = SampleClear(worldPosition);
+            Debug.Log($"SampleClear: {sampleClear}");
+            return 1f - sampleClear;
         }
 
         private float NormalizedDistance(Vector3 point)
         {
-            float radiusX = Mathf.Max(1f, _radiusHorizontal * _radiusScale);
-            float radiusY = Mathf.Max(1f, _radiusVertical * _radiusScale);
+            float radiusX = Mathf.Max(1f, _radiusHorizontal * EffectiveScale);
+            float radiusY = Mathf.Max(1f, _radiusVertical * EffectiveScale);
             Vector3 delta = point - _position;
             float nx = delta.x / radiusX;
             float ny = delta.y / radiusY;

@@ -34,8 +34,8 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States {
 
         public void OnExit()
         {
-            // _jumpInputIsLocked = false;
-            // ResetJumpKeys();
+            _jumpInputIsLocked = false;
+            ResetJumpKeys();
         }
 
         public override void FixedUpdate() {

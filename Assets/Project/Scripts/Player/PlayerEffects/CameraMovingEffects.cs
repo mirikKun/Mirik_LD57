@@ -8,6 +8,7 @@ namespace Assets.Scripts.Player.PlayerEffects
         [Header("Camera References")]
         [SerializeField] private CinemachineCamera _playerCamera;
         [SerializeField] private Transform _cameraHolder;
+        [SerializeField] private Transform _cameraTarget;
         [SerializeField] private float _cameraPositionReturnSpeed = 3f;
 
         [Header("Walking Shake Settings")]
@@ -215,8 +216,8 @@ namespace Assets.Scripts.Player.PlayerEffects
             _currentWallTiltAngle =
                 Mathf.MoveTowards(_currentWallTiltAngle, _targetWallTiltAngle, _wallRunTiltSpeed * deltaTime);
 
-            Vector3 currentRotation = _cameraHolder.localEulerAngles;
-            _cameraHolder.localEulerAngles = new Vector3(currentRotation.x, currentRotation.y, _currentWallTiltAngle);
+            Vector3 currentRotation = _cameraTarget.localEulerAngles;
+            _cameraTarget.localEulerAngles = new Vector3(currentRotation.x, currentRotation.y, _currentWallTiltAngle);
         }
 
         private void ApplyFOVChange(float deltaTime)
