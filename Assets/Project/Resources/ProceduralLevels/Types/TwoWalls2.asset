@@ -1,0 +1,88 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0de5eed0008aaaa8888bbbbcccc0008, type: 3}
+  m_Name: TwoWalls2
+  m_EditorClassIdentifier: 
+  LengthRange:
+    x: 150
+    y: 240
+  StepDistanceRange:
+    x: 15
+    y: 23
+  FirstStepDistance: 0
+  StepDownRange:
+    x: 1.5
+    y: 3.5
+  PlateauChance: 0.18
+  MeanderAngleRange:
+    x: -9.21
+    y: 1.07
+  CurvatureBiasRange:
+    x: -35.7
+    y: -5.55
+  StepDownJitter: 1
+  DifficultyGapBonus: 1.2
+  MinPlatformSize: 1.5
+  LightEveryNthPlatform: 4
+  GuideLightHeight: 2
+  GuideLightIntensity: 2.5
+  GuideLightRange: 10
+  GuideMarkerOffsetRange:
+    x: -0.6
+    y: 0.6
+  GuideMarkerYOffset: 0.06
+  GuideMarkerSize: {x: 0.5, y: 0.12, z: 0.5}
+  GuideMarkerYawRange:
+    x: 0
+    y: 90
+  Palette: {fileID: 11400000, guid: c0de5eed1003aaaa8888bbbbcccc1003, type: 2}
+  StartGapRange:
+    x: 30
+    y: 38
+  EndGapRange:
+    x: 30
+    y: 38
+  WallHeightAboveRange:
+    x: 64
+    y: 96
+  WallDepthBelowRange:
+    x: 25
+    y: 35
+  WallThicknessRange:
+    x: 6
+    y: 12
+  WallTiltRange:
+    x: 0
+    y: 3
+  WallRoughness: 1.5
+  Protrusions:
+  - Weight: 1
+    SizeRange:
+      min: {x: 5, y: 5, z: 70}
+      max: {x: 8, y: 8, z: 76}
+    SideRange:
+      x: -0.25
+      y: 0.25
+    RotationRange:
+      min: {x: -18, y: -25, z: -8}
+      max: {x: 18, y: 25, z: 8}
+  WallSegmentLengthMultiplier: 1.6
+  WallOverrun: 20
+  SlabCountRange:
+    x: 2
+    y: 3
+  SlabHeightOverlap: 0.5
+  MinRange: 14
+  MaxPossibleRange: 24
+  ExtraHeightOffsetRange:
+    x: -35
+    y: 35

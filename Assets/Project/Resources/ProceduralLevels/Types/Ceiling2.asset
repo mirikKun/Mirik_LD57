@@ -1,0 +1,87 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0de5eed000aaaaa8888bbbbcccc000a, type: 3}
+  m_Name: Ceiling2
+  m_EditorClassIdentifier: 
+  LengthRange:
+    x: 70
+    y: 200
+  StepDistanceRange:
+    x: 12
+    y: 18
+  FirstStepDistance: 6
+  StepDownRange:
+    x: 4
+    y: 11
+  PlateauChance: 0
+  MeanderAngleRange:
+    x: 8
+    y: 26
+  CurvatureBiasRange:
+    x: 0
+    y: 20
+  StepDownJitter: 2
+  DifficultyGapBonus: 1.2
+  MinPlatformSize: 1.5
+  LightEveryNthPlatform: 4
+  GuideLightHeight: 2
+  GuideLightIntensity: 2.5
+  GuideLightRange: 10
+  GuideMarkerOffsetRange:
+    x: -0.6
+    y: 0.6
+  GuideMarkerYOffset: 0.06
+  GuideMarkerSize: {x: 0.5, y: 0.12, z: 0.5}
+  GuideMarkerYawRange:
+    x: 0
+    y: 90
+  Palette: {fileID: 11400000, guid: c0de5eed1001aaaa8888bbbbcccc1001, type: 2}
+  DifficultyPlatformShrink: 1
+  ClearanceRange:
+    x: 12
+    y: 32
+  CeilingHalfWidthRange:
+    x: 30
+    y: 35
+  CeilingThicknessRange:
+    x: 2
+    y: 5
+  CeilingSegmentLengthMultiplier: 1.5
+  EntryOverheadMargin: 2
+  Protrusions:
+  - Weight: 0.7
+    Prefab: {fileID: 2378212508396588339, guid: b138dec461c9b1f40af3844fd7ccad36, type: 3}
+    PlatformSizeRange:
+      min: {x: 5, y: 2, z: 5}
+      max: {x: 9, y: 3, z: 9}
+    ColumnSizeRange:
+      min: {x: 1, y: -14, z: 1}
+      max: {x: 3, y: 7, z: 3}
+    RotationRange:
+      min: {x: -5, y: 0, z: -5}
+      max: {x: 5, y: 360, z: 5}
+  - Weight: 0.3
+    Prefab: {fileID: 5975232817302344390, guid: f3d6d8aea23684547a2c766653a862a0, type: 3}
+    PlatformSizeRange:
+      min: {x: 6, y: 1, z: 6}
+      max: {x: 14, y: 3, z: 14}
+    ColumnSizeRange:
+      min: {x: 2, y: -14, z: 2}
+      max: {x: 5, y: 7, z: 5}
+    RotationRange:
+      min: {x: -5, y: 0, z: -5}
+      max: {x: 5, y: 360, z: 5}
+  MinRange: 7.6
+  MaxPossibleRange: 22
+  ExtraLateralRange:
+    x: -35
+    y: 35

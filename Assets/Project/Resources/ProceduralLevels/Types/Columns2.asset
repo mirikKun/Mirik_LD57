@@ -1,0 +1,78 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0de5eed000baaaa8888bbbbcccc000b, type: 3}
+  m_Name: Columns2
+  m_EditorClassIdentifier: 
+  LengthRange:
+    x: 90
+    y: 190
+  StepDistanceRange:
+    x: 16
+    y: 45
+  FirstStepDistance: 20
+  StepDownRange:
+    x: 3
+    y: 12
+  PlateauChance: 0.203
+  MeanderAngleRange:
+    x: 15
+    y: 35
+  CurvatureBiasRange:
+    x: 0
+    y: 0.23
+  StepDownJitter: 1
+  DifficultyGapBonus: 1.2
+  MinPlatformSize: 1.5
+  LightEveryNthPlatform: 4
+  GuideLightHeight: 2
+  GuideLightIntensity: 2.5
+  GuideLightRange: 10
+  GuideMarkerOffsetRange:
+    x: -0.6
+    y: 0.6
+  GuideMarkerYOffset: 0.06
+  GuideMarkerSize: {x: 0.5, y: 0.12, z: 0.5}
+  GuideMarkerYawRange:
+    x: 0
+    y: 90
+  Palette: {fileID: 11400000, guid: c0de5eed1001aaaa8888bbbbcccc1001, type: 2}
+  DifficultyPlatformShrink: 1.2
+  Columns:
+  - Weight: 1
+    Prefab: {fileID: 2724776528033617213, guid: a155a1a66a1d0054da6d95e7a52b0349, type: 3}
+    WidthRange:
+      x: 9
+      y: 15
+    LowerHeightRange:
+      x: 20
+      y: 30
+    UpperHeightRange:
+      x: 20
+      y: 30
+    HideUpperChance: 0
+    GapRange:
+      x: -1
+      y: -1
+    LowerOffsetRange:
+      x: 0
+      y: 0
+    UpperOffsetRange:
+      x: 0
+      y: 0
+    RotationRange:
+      min: {x: -6, y: 0, z: -6}
+      max: {x: 6, y: 360, z: 6}
+  MinRange: 18
+  MaxPossibleRange: 38
+  ExtraLateralRange:
+    x: -55
+    y: 55

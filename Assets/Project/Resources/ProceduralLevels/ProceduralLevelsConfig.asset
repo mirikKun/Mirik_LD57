@@ -21,6 +21,14 @@ MonoBehaviour:
     Weight: 1
   - Archetype: {fileID: 11400000, guid: c0de5eed1005aaaa8888bbbbcccc1005, type: 2}
     Weight: 1
+  - Archetype: {fileID: 11400000, guid: c0de5eed1007aaaa8888bbbbcccc1007, type: 2}
+    Weight: 1
+  - Archetype: {fileID: 11400000, guid: c0de5eed1004aaaa8888bbbbcccc1004, type: 2}
+    Weight: 1
+  - Archetype: {fileID: 11400000, guid: c0de5eed1009aaaa8888bbbbcccc1009, type: 2}
+    Weight: 1
+  - Archetype: {fileID: 11400000, guid: c0de5eed100caaaa8888bbbbcccc100c, type: 2}
+    Weight: 1
   LevelsBeforeAdvancedTutorials: 3
   LevelsToMaxDifficulty: 12
   Seed: 0
