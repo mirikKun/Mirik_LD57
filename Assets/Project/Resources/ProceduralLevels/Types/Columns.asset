@@ -16,13 +16,13 @@ MonoBehaviour:
     x: 60
     y: 100
   StepDistanceRange:
-    x: 8
-    y: 16
+    x: 13
+    y: 30
   FirstStepDistance: 0
   StepDownRange:
-    x: 1.5
-    y: 8
-  PlateauChance: 0.291
+    x: 3
+    y: 9
+  PlateauChance: 0.203
   MeanderAngleRange:
     x: 15
     y: 35
@@ -48,15 +48,15 @@ MonoBehaviour:
   DifficultyPlatformShrink: 1.2
   Columns:
   - Weight: 0.7
-    Prefab: {fileID: 5940809795918652487, guid: 2ff80c5faeb1bb442af057228e968ae2, type: 3}
+    Prefab: {fileID: 8548699500298132039, guid: 35a8f66d508fee9408233d049103fd1c, type: 3}
     WidthRange:
-      x: 3
+      x: 4
       y: 6
     LowerHeightRange:
       x: 45
-      y: 80
+      y: 50
     UpperHeightRange:
-      x: 8
+      x: 20
       y: 20
     HideUpperChance: 0.85
     GapRange:
@@ -69,19 +69,19 @@ MonoBehaviour:
       x: -1
       y: 1
     RotationRange:
-      min: {x: 0, y: 0, z: 0}
-      max: {x: 0, y: 360, z: 0}
+      min: {x: -6, y: 0, z: -6}
+      max: {x: 6, y: 360, z: 6}
   - Weight: 0.3
     Prefab: {fileID: 5940809795918652487, guid: 2ff80c5faeb1bb442af057228e968ae2, type: 3}
     WidthRange:
       x: 5
-      y: 8
+      y: 9
     LowerHeightRange:
       x: 20
-      y: 40
+      y: 30
     UpperHeightRange:
-      x: 15
-      y: 40
+      x: 20
+      y: 30
     HideUpperChance: 0.15
     GapRange:
       x: 6
@@ -93,10 +93,34 @@ MonoBehaviour:
       x: -2
       y: 4
     RotationRange:
-      min: {x: 0, y: 0, z: 0}
-      max: {x: 0, y: 360, z: 0}
-  MinRange: 9
-  MaxPossibleRange: 35
+      min: {x: -9, y: 0, z: -9}
+      max: {x: 9, y: 360, z: 9}
+  - Weight: 0.05
+    Prefab: {fileID: 2724776528033617213, guid: a155a1a66a1d0054da6d95e7a52b0349, type: 3}
+    WidthRange:
+      x: 9
+      y: 15
+    LowerHeightRange:
+      x: 20
+      y: 30
+    UpperHeightRange:
+      x: 20
+      y: 30
+    HideUpperChance: 0
+    GapRange:
+      x: -1
+      y: -1
+    LowerOffsetRange:
+      x: 0
+      y: 0
+    UpperOffsetRange:
+      x: 0
+      y: 0
+    RotationRange:
+      min: {x: -6, y: 0, z: -6}
+      max: {x: 6, y: 360, z: 6}
+  MinRange: 11
+  MaxPossibleRange: 40
   ExtraLateralRange:
-    x: -35
-    y: 35
+    x: -40
+    y: 40

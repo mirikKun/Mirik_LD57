@@ -113,8 +113,9 @@ namespace Project.Scripts.Generation
 
         public void GameUpdate()
         {
-            _chase.Tick(GetTargetY());
-            _anchors.Tick(_descentController.LastGroundPosition, Time.deltaTime);
+            Vector3 followPosition = GetFollowPosition();
+            _chase.Tick(GetTargetY(followPosition));
+            _anchors.Tick(followPosition, Time.deltaTime);
             SyncVisual();
 
             if (_killEnabled)
@@ -130,16 +131,23 @@ namespace Project.Scripts.Generation
                 _anchors.CurrentRadiusHorizontal);
         }
 
-        private float GetTargetY()
+        private Vector3 GetFollowPosition()
+        {
+            if (_descentController.InDarknessFollowZone)
+                return _playerController.transform.position;
+            return _descentController.LastGroundPosition;
+        }
+
+        private float GetTargetY(Vector3 followPosition)
         {
             float targetY;
             if (_locationsGenerator.TryGetNearestLocationEnterPoint(
-                    _descentController.LastGroundPosition,
+                    followPosition,
                     _offset.magnitude,
                     out Vector3 locationEnter))
                 targetY = locationEnter.y + _newLocationOffset.y;
             else
-                targetY = _descentController.LastGroundPosition.y + _offset.y;
+                targetY = followPosition.y + _offset.y;
 
             return _chase.ClampTargetY(targetY);
         }

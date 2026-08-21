@@ -20,7 +20,7 @@ RenderSettings:
   m_FogDensity: 0.038
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.09433961, g: 0.09433961, b: 0.09433961, a: 1}
+  m_AmbientSkyColor: {r: 0.24705882, g: 0.24705882, b: 0.24705882, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
@@ -1971,8 +1971,8 @@ MonoBehaviour:
   _meshRenderer: {fileID: 1101632269}
   _darknessMaterial: {fileID: 2100000, guid: 2015a8d76fbe42b4a9329b7daca12cf6, type: 2}
   _anchors:
-    _radiusHorizontal: 50
-    _radiusVertical: 40
+    _radiusHorizontal: 60
+    _radiusVertical: 45
     _maxRadiusScale: 1.25
     _followMoveSpeed: 18
     _recedeMoveSpeed: 55
@@ -82373,7 +82373,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _startLocation: {fileID: 641396999}
-  _testArchetype: {fileID: 0}
+  _testArchetype: {fileID: 11400000, guid: c0de5eed100baaaa8888bbbbcccc100b, type: 2}
   _skipTutorial: 1
   _basicTutorialLocations:
   - {fileID: 7586372245869605210, guid: 7fb87133ce6b6204f9a3998f4b7a3a8f, type: 3}
@@ -100577,10 +100577,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 1.65
+  m_Radius: 0.254
+  m_Height: 0.508
   m_Direction: 1
-  m_Center: {x: 0, y: 0.144375, z: 0}
+  m_Center: {x: 0, y: 0.12496801, z: 0}
 --- !u!222 &95964717835707109
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -100812,8 +100812,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42a6bf1de7de47729a369509d7af400e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _stepHeightRatio: 0.175
-  _colliderHeight: 2
+  _stepHeightRatio: 0.492
+  _colliderHeight: 1
   _colliderThickness: 1
   _colliderOffset: {x: 0, y: 0, z: 0}
   _adjustmentVelocityMultiplier: 0.5

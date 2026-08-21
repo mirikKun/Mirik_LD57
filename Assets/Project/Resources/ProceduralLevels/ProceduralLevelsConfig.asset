@@ -25,8 +25,8 @@ MonoBehaviour:
   LevelsToMaxDifficulty: 12
   Seed: 0
   TunnelLength: 2
-  MinEntryTunnelLength: 4
-  TunnelExitDropHeight: 5
+  MinEntryTunnelLength: 18
+  TunnelExitDropHeight: 8
   EntryPlatformSize: {x: 10, y: 10}
   BarrierHeight: 8
   ExitTunnelLength: 3

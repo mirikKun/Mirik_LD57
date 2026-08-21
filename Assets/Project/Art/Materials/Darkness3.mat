@@ -113,20 +113,20 @@ Material:
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
-    - _FlashMult: 0.57
-    - _FlashPower: 1.34
+    - _FlashMult: 0.35
+    - _FlashPower: 2
     - _FlashScale: 1.4
     - _FlashSpeed: 0.69
-    - _FlashThreshold: 1.7
+    - _FlashThreshold: 1
     - _GlossMapScale: 1
     - _Glossiness: 0
     - _GlossyReflections: 1
     - _Metallic: 0
     - _Mode: 0
     - _NoiseAScale: 1
-    - _NoiseA_Tiling: 2
+    - _NoiseA_Tiling: 5
     - _NoiseBScale: 1
-    - _NoiseB_Tiling: 2
+    - _NoiseB_Tiling: 5
     - _NoiseColorScale: 0.4
     - _NoisePower: 15
     - _OcclusionStrength: 1
@@ -154,7 +154,7 @@ Material:
     - _BaseColor: {r: 0, g: 0, b: 0, a: 1}
     - _Color: {r: 0, g: 0, b: 0, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _FlashColor: {r: 0.26285, g: 0, b: 0.6289307, a: 1}
+    - _FlashColor: {r: 0.03416874, g: 0, b: 0.08176088, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

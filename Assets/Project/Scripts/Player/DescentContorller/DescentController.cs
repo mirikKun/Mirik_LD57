@@ -19,6 +19,7 @@ namespace Scripts.Player.DescentContorller
         private float _maxGroundDepth;
         private Vector3 _startPosition;
         private bool _inStaminaReplenishZone;
+        private int _darknessFollowZoneCount;
         private Vector3 _lastGroundPosition;
         private bool _grounded;
 
@@ -26,6 +27,7 @@ namespace Scripts.Player.DescentContorller
         public event Action<float, float> DepthChanged;
         public event Action Grounded; 
         public Vector3 LastGroundPosition => _lastGroundPosition;
+        public bool InDarknessFollowZone => _darknessFollowZoneCount > 0;
 
 
         private void Start()
@@ -62,6 +64,10 @@ namespace Scripts.Player.DescentContorller
         {
             _inStaminaReplenishZone = inside;
         }
+
+        public void AddDarknessFollowZone() => _darknessFollowZoneCount++;
+
+        public void RemoveDarknessFollowZone() => _darknessFollowZoneCount--;
    
 
         private void CheckCurrentDepth()

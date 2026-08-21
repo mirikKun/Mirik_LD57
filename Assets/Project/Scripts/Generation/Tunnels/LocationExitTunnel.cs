@@ -1,4 +1,5 @@
 using System;
+using Project.Scripts.Generation.Darkness;
 using Scripts.LevelObjects;
 using UnityEngine;
 using LocationEnteredTrigger = Project.Scripts.Generation.LocationEnteredTrigger;
@@ -14,6 +15,8 @@ namespace Project.Scripts.Generation.Procedural
         [SerializeField] private Transform _sealBarrier;
         [SerializeField] private LocationEnteredTrigger _enterTrigger;
         [SerializeField] private float _visualRadius = 4.4f;
+        [SerializeField] private DarknessFollowZone _followZone;
+        [SerializeField] private float _followTriggerDiameter = 3.5f;
 
         public float Height => _height;
         public Transform EndPoint => _endPoint;
@@ -22,6 +25,11 @@ namespace Project.Scripts.Generation.Procedural
         public void SetHeight(float height)
         {
             _height = Mathf.Max(0.1f, height);
+            ApplyHeight();
+        }
+
+        private void Awake()
+        {
             ApplyHeight();
         }
 
@@ -53,6 +61,7 @@ namespace Project.Scripts.Generation.Procedural
             _visual.localScale = new Vector3(_visualRadius, _height, _visualRadius);
             _endPoint.localPosition = new Vector3(0f, -_height, 0f);
             _sealBarrier.localPosition = new Vector3(0f, _sealBarrierHeight, 0f);
+            _followZone = DarknessFollowZone.Ensure(transform, _followZone, _height, _followTriggerDiameter);
         }
     }
 }

@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcdebcd2722b4a2aa89d48a40d320946, type: 3}
   m_Name: ClimbingOverStateConfig
   m_EditorClassIdentifier: 
-  <ClimbingOverSpeed>k__BackingField: 7
+  <ClimbingOverSpeed>k__BackingField: 12
   <HorizontalSpeedReduction>k__BackingField: 0.3
