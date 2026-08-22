@@ -126,7 +126,6 @@ namespace Project.Scripts.Generation.Darkness
         public float SampleDensity(Vector3 worldPosition)
         {
             var sampleClear = SampleClear(worldPosition);
-            Debug.Log($"SampleClear: {sampleClear}");
             return 1f - sampleClear;
         }
 

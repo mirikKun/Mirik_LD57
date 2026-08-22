@@ -36,7 +36,7 @@ namespace Assets.Scripts.Player.Controller
         [Header("Sensor Settings:")] [SerializeField]
         private bool _isInDebugMode;
 
-        [Range(0.5f, 1f)] [SerializeField]
+        [Range(0f, 1f)] [SerializeField]
         private float _groundCheckRadiusRatio = 0.9f;
 
         private bool _isUsingExtendedSensorRange = true; // Use extended range for smoother ground transitions
@@ -92,7 +92,7 @@ namespace Assets.Scripts.Player.Controller
                 : _baseSensorRange+_additionalRaycastLength;
             _sensor.Cast();
 
-            _isGrounded = _sensor.HasDetectedHit();
+            _isGrounded = _sensor.HasDetectedHit() && Vector3.Dot(_sensor.GetNormal(), _tr.up) > 0f;
             if (!_isGrounded) return;
 
             float distance = _sensor.GetDistance();

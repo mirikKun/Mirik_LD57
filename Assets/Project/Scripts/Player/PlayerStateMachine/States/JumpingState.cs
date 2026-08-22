@@ -11,11 +11,8 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States {
         private readonly CountdownTimer _jumpTimer;
         private readonly JumpStateConfig _jumpStateConfig;
 
-
-        private bool _jumpKeyIsPressed; // Tracks whether the jump key is currently being held down by the player
-        private bool _jumpKeyWasPressed; // Indicates if the jump key was pressed since the last reset, used to detect jump initiation
-        private bool _jumpKeyWasLetGo; // Indicates if the jump key was released since it was last pressed, used to detect when to stop jumping
-        private bool _jumpInputIsLocked; // Prevents jump initiation when true, used to ensure only one jump action per press
+        private bool _jumpKeyIsPressed;
+        private bool _jumpInputIsLocked;
 
         public JumpingState(PlayerController controller, JumpStateConfig jumpStateConfig) : base(controller)
         {
@@ -32,15 +29,12 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States {
             OnJumpStart();
         }
 
-        public void OnExit()
+        public override void OnExit()
         {
-            _jumpInputIsLocked = false;
-            ResetJumpKeys();
+            _jumpTimer.Stop();
         }
 
         public override void FixedUpdate() {
-            
-            
             Vector3 momentum = _controller.GetMomentum();
 
             Vector3 horizontalMomentum = momentum -VectorMath.ExtractDotVector(momentum, _controller.Tr.up);
@@ -55,28 +49,15 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States {
             momentum += _controller.Tr.up * _jumpStateConfig.JumpSpeed;
             
             _controller.SetMomentum(momentum);
-
-            ResetJumpKeys();
         }
         private void HandleJumpKeyInput(bool isButtonPressed)
         {
-            if (!_jumpKeyIsPressed && isButtonPressed)
-            {
-                _jumpKeyWasPressed = true;
-            }
-
             if (_jumpKeyIsPressed && !isButtonPressed)
             {
-                _jumpKeyWasLetGo = true;
                 _jumpInputIsLocked = false;
             }
 
             _jumpKeyIsPressed = isButtonPressed;
-        }
-        private void ResetJumpKeys()
-        {
-            _jumpKeyWasLetGo = false;
-            _jumpKeyWasPressed = false;
         }
 
         public void OnJumpStart()
@@ -92,7 +73,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States {
         }
         
         public bool GroundedToJumping()=>(_jumpKeyIsPressed ) && !_jumpInputIsLocked;
-        public bool JumpingToRising() => _jumpTimer.IsFinished || _jumpKeyWasLetGo;
+        public bool JumpingToRising() => _jumpTimer.IsFinished || !_jumpKeyIsPressed;
         public bool JumpingToFalling() => _controller.HitCeiling();
 
     }

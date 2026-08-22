@@ -78,7 +78,9 @@ namespace Assets.Scripts.Player.PlayerEffects
         {
             _input.Attack -= OnAttack;
             _isPulsing = false;
-            Apply(0f);
+            if (_darkness)
+                _darkness.SetPulseScale(1f);
+            ApplyLocal(0f);
         }
 
         private void Update()
@@ -132,6 +134,11 @@ namespace Assets.Scripts.Player.PlayerEffects
         private void Apply(float envelope)
         {
             _darkness.SetPulseScale(Mathf.Lerp(1f, _radiusMultiplier, envelope));
+            ApplyLocal(envelope);
+        }
+
+        private void ApplyLocal(float envelope)
+        {
             RenderSettings.fogDensity = Mathf.Lerp(
                 _restFogDensity,
                 _restFogDensity * _fogDensityMultiplier,

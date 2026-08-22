@@ -59,7 +59,7 @@ namespace Assets.Scripts.Player.PlayerStateMachine.States
         }
 
         public bool GroundedToRising()=> _controller.IsRising();
-        public bool GroundedToSliding() => _controller.IsRising() && _controller.IsGroundTooSteep();
+        public bool GroundedToSliding() => _controller.IsGrounded() && _controller.IsGroundTooSteep();
         public bool GroundedToFalling() => !_controller.IsGrounded();
         
     }

@@ -158,7 +158,7 @@ namespace Assets.Scripts.Player.Controller
             _stateMachine.FixedUpdate();
 
             _savedVelocity += _useLocalMomentum ? _transform.localToWorldMatrix * _momentum : _momentum;
-            _mover.SetExtendSensorRange(IsGroundedState());
+            _mover.SetExtendSensorRange(IsGroundedState() && !IsGroundTooSteep());
             _mover.SetVelocity(_savedVelocity);
             _savedMovementVelocity = CalculateMovementVelocity();
 
